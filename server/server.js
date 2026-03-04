@@ -1,10 +1,25 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from "dotenv";
+
+dotenv.config({ path: ".env.development" });
+
+// Routes
+import odooRoute from './src/routes/odoo.routes.js'; // test to get user session
+import roomRoute from './src/routes/room.routes.js';
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:3000'
+    ],
+    credentials: true
+}));
+
+app.use('/odoo', odooRoute);
+app.use('/room', roomRoute);
 
 
 app.get('/', (req, res) => {

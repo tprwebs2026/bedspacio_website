@@ -2,7 +2,7 @@
 
 import Inquire from '@/asset/icon/inquire.svg'
 import Reserve from '@/asset/icon/reserve.svg'
-import { spawn } from 'child_process';
+import Link from 'next/link';
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -34,21 +34,21 @@ export default function InquiryForm () {
 
 
     return (
-        <div className='flex flex-col items-center w-full rounded-[10px] border-dashed border-2 border-[#0077C0]/75 overflow-hidden'>
+        <div className={`flex flex-col items-start w-full rounded-[10px] h-fit border-dashed border-2 border-[#0077C0]/75 overflow-hidden`} id="rental_inquiry">
             <div className='grid grid-cols-2 w-full place-items-center bg-[#FAFAFA]'>
-                <button onClick={() => {setInquireOpen(true); setReserveOpen(false);}} className={`${inquireOpen ? 'bg-[#C7EEFF] text-[#0077C0]' : 'bg-[#FAFAFA] text-[#0077C0] opacity-50'} flex items-center justify-center gap-2 p-2 py-4 w-full cursor-pointer hover:opacity-100 transition-all duration-100`}>
+                <Link href="#rental_inquiry"  onClick={() => {setInquireOpen(prev => !prev); setReserveOpen(false);}} className={`${inquireOpen ? 'bg-[#C7EEFF] text-[#0077C0]' : 'bg-[#FAFAFA] text-[#0077C0] opacity-50'} flex items-center justify-center gap-2 p-2 py-4 w-full cursor-pointer hover:opacity-100 transition-all duration-100`}>
                     <Inquire className={`fill-[#0077C0] w-[30px] h-auto`} />
                     <span className='text-[20px] font-[900]'>Inquire</span>
-                </button>
-                <button onClick={() => {setReserveOpen(true); setInquireOpen(false);}} className={`${reserveOpen ? 'bg-[#C7EEFF] text-[#0077C0]' : 'bg-[#FAFAFA] text-[#0077C0] opacity-50'} flex items-center justify-center w-full gap-2 p-2 py-4 cursor-pointer hover:opacity-100 transition-all duration-100`}>
+                </Link>
+                <Link href="#rental_inquiry" onClick={() => {setReserveOpen(true); setInquireOpen(false);}} className={`${reserveOpen ? 'bg-[#C7EEFF] text-[#0077C0]' : 'bg-[#FAFAFA] text-[#0077C0] opacity-50'} flex items-center justify-center w-full gap-2 p-2 py-4 cursor-pointer hover:opacity-100 transition-all duration-100`}>
                     <Reserve className={`stroke-[#0077C0] w-[30px] h-auto`} />
                     <span className='text-[20px] font-[900]'>Reserve</span>
-                </button>
+                </Link>
             </div>
 
             {inquireOpen && (
                 !isSubmitSuccessful ? (
-                    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col w-full gap-[1rem] p-4 py-5 bg-[#C7EEFF]'>
+                    <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col w-full gap-[1rem] p-4 py-5 bg-[#C7EEFF]`}>
                         <div className='flex flex-col w-full gap-1'>
                             <span className='text-[14px] text-[#1D242B]'>Selected Listing</span>
                             <span className='w-full border-2 border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA]'>ROOM TITLE</span>

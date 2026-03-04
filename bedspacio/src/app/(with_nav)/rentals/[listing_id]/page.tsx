@@ -1,11 +1,15 @@
-import InquiryForm from "./InquiryForm";
 
+import Link from "next/link";
+
+import InquiryForm from "./InquiryForm";
 import ArrowLong from '@/asset/icon/arrow-long.svg'
+import Arrow from '@/asset/icon/arrow-right.svg'
 
 
 type Props = { params: { listing_id: string } };
 
 export default async function ListingInfoPage ({ params }: Props ) {
+
 
     // FETCH THE DATA LIKE THIS LATER ON
     /*
@@ -15,29 +19,48 @@ export default async function ListingInfoPage ({ params }: Props ) {
         );
     */
 
+    
 
     return (
-        <div className="flex flex-col items-start w-full min-h-screen">
-            <div className="flex items-center w-full px-[8rem] py-[1rem]">
+        <div className="relative flex flex-col items-start w-full min-h-screen">
+            <div className="flex items-center w-full px-[1rem] xl:px-[8rem] lg:px-[6rem] py-[1rem]">
                 <span>{`Rentals > Listings >`}</span>
             </div>
 
-            <section className="flex flex-col items-start justify-start w-full min-h-[800px] px-[8rem] gap-[2rem] box-border">
-                <div className="relative grid grid-cols-4 w-full gap-[1rem]">
+            
+            
+            <section className="flex flex-col items-start justify-start w-full min-h-[800px] px-[1rem] xl:px-[8rem] lg:px-[2rem] gap-[2rem] box-border">
+                <div className="relative flex w-full h-[400px] gap-[1rem] rounded-[10px]">
                     <div className="absolute top-3 left-3 rounded-[10px] p-2 flex items-center gap-2 bg-[#0077C0]">
                         <span className="text-[#FAFAFA] text-[16px]">Bedspace</span>
                         <span className="text-[#FAFAFA] text-[16px]">|</span>
                         <span className="text-[#FAFAFA] text-[16px]">Male Only</span>
                     </div>
 
-                    <div className="flex items-center justify-center bg-[#C7EEFF] min-h-[250px] col-span-2 row-span-2 rounded-[10px]">Image</div>
-                    <div className="flex items-center justify-center bg-[#C7EEFF] h-[250px] rounded-[10px]">Image</div>
-                    <div className="flex items-center justify-center bg-[#C7EEFF] h-[250px] rounded-[10px]">Image</div>
-                    <div className="flex items-center justify-center bg-[#C7EEFF] h-[250px] rounded-[10px]">Image</div>
-                    <div className="flex items-center justify-center bg-[#C7EEFF] h-[250px] rounded-[10px]">Image</div>
+                    <div className="flex flex-col items-center justify-center xl:flex-row lg:flex-row md:flex-col w-full h-full gap-2">
+                        <div className="relative flex items-center justify-center w-full h-full">
+                            <div className="xl:hidden lg:hidden absolute flex items-center justify-between w-full h-full px-2">
+                                <button className="bg-[#FAFAFA] rounded-full cursor-pointer active:bg-[#0077C0] active:scale-95 transition-all duration-100">
+                                    <Arrow className="w-[50px] h-[50px] -rotate-180"/>
+                                </button>
+
+                                <button className="bg-[#FAFAFA] rounded-full cursor-pointer active:bg-[#0077C0] active:scale-95 transition-all duration-100">
+                                    <Arrow className="w-[50px] h-[50px]"/>
+                                </button>
+                            </div>
+                            <img src="/asset/bedspace_example.jpg" alt="sample" className="w-full h-full object-cover rounded-[10px]"/>
+                        </div>
+
+                        <div className="hidden xl:grid lg:grid grid-cols-2 grid-rows-2 gap-2 w-full h-full">
+                            <img src="/asset/bedspace_example.jpg" alt="sample" className="w-full h-[25%] xl:h-full lg:h-full object-cover rounded-[10px]"/>
+                            <img src="/asset/bedspace_example.jpg" alt="sample" className="w-full h-[25%] xl:h-full lg:h-full object-cover rounded-[10px]"/>
+                            <img src="/asset/bedspace_example.jpg" alt="sample" className="w-full h-[25%] xl:h-full lg:h-full object-cover rounded-[10px]"/>
+                            <img src="/asset/bedspace_example.jpg" alt="sample" className="w-full h-[25%] xl:h-full lg:h-full object-cover rounded-[10px]"/>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="relative grid grid-cols-[60%_40%] pb-[4rem] box-border">
+                <div className="relative flex flex-col xl:grid lg:grid md:flex xl:grid-cols-[60%_40%] lg:grid-cols-[60%_40%] md:flex-col pb-[4rem] box-border gap-[2rem] xl:gap-0 lg:gap-0 md:gap-[2rem]">
                     <div className="flex flex-col items-start justify-start w-full gap-[1.5rem] pr-4">
                         <div className="flex flex-col items-start justify-start w-full gap-[1rem] pb-[1rem]">
                             <span className="text-[28px] text-[#1D242B] font-[900]">ROOM NAME</span>
@@ -50,8 +73,8 @@ export default async function ListingInfoPage ({ params }: Props ) {
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <span className="text-[16px] text-[#FAFAFA] font-[900] leading-[1] bg-[#0077C0] p-2 rounded-full px-4">MAXIMUM PAX: 8</span>
-                                <span className="text-[16px] text-[#FAFAFA] font-[900] leading-[1] bg-[#0077C0] p-2 rounded-full px-4">AVAILABLE SLOTS: 2</span>
+                                <span className="text-[14px] xl:text-[16px] lg:text-[16px] text-[#FAFAFA] font-[900] leading-[1] bg-[#0077C0] p-2 rounded-full px-4">MAXIMUM PAX: 8</span>
+                                <span className="text-[14px] xl:text-[16px] lg:text-[16px] text-[#FAFAFA] font-[900] leading-[1] bg-[#0077C0] p-2 rounded-full px-4">AVAILABLE SLOTS: 2</span>
                             </div>
                         </div>
 
@@ -116,7 +139,7 @@ export default async function ListingInfoPage ({ params }: Props ) {
                         </div>
                     </div>
 
-                    <div className="flex w-full items-start">
+                    <div className="scroll-mt-24 flex w-full h-full items-start" id="form">
                         <InquiryForm />
                     </div>
                 </div>

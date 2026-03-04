@@ -6,6 +6,10 @@ const dmSans = DM_Sans({
   subsets: ["latin"]
 })
 
+export const metadata = {
+  title: 'BedSpacio',
+  description: 'My website description',
+}
 
 export default function RootLayout({
   children,
@@ -14,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="overflow-y-scroll">
+      <body>
         { children }
       </body>
     </html>

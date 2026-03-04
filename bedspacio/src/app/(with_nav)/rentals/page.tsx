@@ -1,7 +1,12 @@
 
 import SearchFilter from "@/components/SearchFilter"
+import ListingCard, { ListingDetail } from "./ListingCard"
+
+import { BASE_URL } from "@/config/config";
+import axios from 'axios';
 
 import Link from "next/link"
+import { useState } from "react"
 
 // MAKE THIS an "async" function later when fetching data
 
@@ -47,24 +52,31 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
 
     console.log(params);
 
-    return (
-        <div className="flex flex-col items-center justify-start min-h-scree w-auto">
-            <section className="relative flex flex-col items-center justify-center w-full h-[300px] bg-[#C7EEFF] overflow-hidden">
-                <img src="/asset/rentas_bg_image.jpg" alt=""  className="inset-0 w-full h-full object-cover opacity-50"/>
+    const response = await axios.get(`${BASE_URL}/room/listing`, { withCredentials: true })
+    const rooms:ListingDetail[] = response.data;
 
-                <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex w-full h-full items-center justify-center px-[8rem]">
+    console.log("Room listing result: ", rooms)
+    console.log("Room type: ", typeof rooms)
+
+    return (
+        <div className="flex flex-col items-center justify-start min-h-screen min-w-[400px] w-auto">
+            <section className="relative flex flex-col items-center justify-center w-full h-screen xl:h-[400px] lg:h-[400px] md:h-screen bg-[#C7EEFF]">
+                <img src="/asset/rentas_bg_image.jpg" alt="rentals-header-image"  className="absolute inset-0 w-full h-full object-cover opacity-50"/>
+
+                <div className="absolute flex flex-col w-full h-full items-center justify-center gap-[8rem] xl:gap-[2rem] lg:gap-[2rem] md:gap-[1rem] px-[1rem] xl:px-[8rem] lg:px-[8rem] md:px-[4rem]">
+                    <span className="text-[32px] text-[#1D242B] font-[900] leading-[1]">Explore all [Number] of our listings</span>
                     <SearchFilter />
                 </div>
             </section>
 
 
-            <section className="flex flex-col items-start justify-start w-full min-h-[800px] px-[8rem] py-[1rem]">
+            <section className="flex flex-col items-start justify-start w-full min-h-[800px] px-[1rem] xl:px-[8rem] lg:px-[4rem]  py-[1rem]">
                 <div className="flex items-center justify-start py-[0.3rem] border-b border-b-[#0077C0]/50 w-full">
                     <span className="text-[#1D242B] text-[24px] font-bold">Explore Listings</span>
                 </div>
 
-                <div className="grid grid-cols-4 w-full gap-[0.5rem] py-[2rem]">
-                    <Link href="/rentals/1" className="group flex flex-col items-center bg-[#FAFAFA] rounded-[10px] p-3 gap-2 border-1 border-[#1D242B]/25 cursor-pointer hover:border-[#1D242B] hover:-translate-y-1 transition-all duration-100">
+                <div className="grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 w-full gap-[0.5rem] py-[2rem]">
+                    {/* <Link href="/rentals/1" className="group flex flex-col items-center bg-[#FAFAFA] rounded-[10px] p-3 gap-2 border-1 border-[#1D242B]/25 cursor-pointer hover:border-[#1D242B] hover:-translate-y-1 transition-all duration-100">
                         <div className="relative flex items-center justify-center w-full h-[300px] bg-[#C7EEFF] rounded-[5px]">
                             <div className="absolute top-2 left-2 flex items-center px-2 py-1 rounded-[5px] bg-[#1D242B] gap-1">
                                 <span className="text-[12px] text-[#FAFAFA]">Bedspace</span>
@@ -95,8 +107,11 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
                                 <span className="bg-[#0077C0] rounded-full text-[#FAFAFA] text-[12px] px-2">Locker / Cabinet</span>
                             </div>
                         </div>
-                    </Link>
+                    </Link> */}
 
+                    {rooms.map(room => (
+                        <ListingCard key={room.id} detail={room}/>
+                    ))}
                 </div>
             </section>
         </div>

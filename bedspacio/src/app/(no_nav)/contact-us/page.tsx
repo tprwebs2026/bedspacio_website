@@ -22,21 +22,21 @@ export default function ContactUs() {
 
     return (
         <div className="flex flex-col min-h-screen w-auto items-start justify-start">
-            <div className="grid grid-cols-[40%_60%] px-[16rem] py-[4rem] gap-[2rem]">
-                <div className="flex flex-col items-start justify-start gap-[4rem]">
+            <div className="flex flex-col xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 px-[2rem] xl:px-[6rem] py-[4rem] gap-[2rem]">
+                <div className="grid grid-cols-2 xl:flex lg:flex xl:flex-col lg:flex-col gap-[2rem] xl:gap-[4rem] lg:gap-[4rem]">
                     <div className="flex flex-col gap-[2rem]">
-                        <span className="text-[36px] text-[#1D242B] font-[900] whitespace-nowrap">Contact Us</span>
-                        <span className="text-[24px] text-[#1D242B] leading-[1.2]">
+                        <span className="text-[28px] xl:text-[36px] lg:text-[36px] text-[#1D242B] font-[900] whitespace-nowrap">Contact Us</span>
+                        <span className="text-[20px] xl:text-[24px] lg:text-[24px] text-[#1D242B] leading-[1.2]">
                             Got questions? We're easy to reach and happy to chat. Whether by call or message, our team is here to help you every step of the way.
                         </span>
                     </div>
 
-                    <div className="flex flex-col">
-                        <span className="text-[36px] text-[#0077C0] font-[900] whitespace-nowrap">Reach us on:</span>
+                    <div className="flex flex-col gap-[2rem]">
+                        <span className="text-[28px] xl:text-[36px] lg:text-[36px] text-[#0077C0] font-[900] whitespace-nowrap">Reach us on:</span>
                         <div className="flex flex-col items-start w-full">
-                            <span className="text-[20px] text-[#1D242B]">Mobile: <strong>0917 849 0044</strong></span>
-                            <span className="text-[20px] text-[#1D242B]">Telephone: <strong>(02) 8802 3188</strong></span>
-                            <span className="text-[20px] text-[#1D242B]">Email: <strong>bedspacio@gmail.com</strong></span>
+                            <span className="text-[20px] text-[#1D242B] leading-[1.2]">Mobile: 0917 849 0044</span>
+                            <span className="text-[20px] text-[#1D242B] leading-[1.2]">Telephone: (02) 8802 3188</span>
+                            <span className="text-[20px] text-[#1D242B] leading-[1.2]">Email: bedspacio@gmail.com</span>
                         </div>
                     </div>
                 </div>

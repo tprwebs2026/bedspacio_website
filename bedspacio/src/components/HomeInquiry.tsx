@@ -23,11 +23,11 @@ export default function HomeInquiry() {
 
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center justify-center w-full h-auto  bg-[#FAFAFA] py-[4rem] px-[8rem] gap-[1rem] border-dashed border-t-2 border-t-[#1D242B]/50">
-            <span className="text-[48px] text-[#1D242B] font-[900] leading-[1]">{!isSubmitSuccessful ? 'INQUIRE NOW' : 'INQUIRY SENT'}</span>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center justify-center w-full h-auto bg-[#FAFAFA] py-[4rem] px-[1rem] xl:px-[8rem] lg:px-[8rem] md:px-[4rem] gap-[1rem] border-dashed border-t-2 border-t-[#1D242B]/50">
+            <span className="text-[48px] text-[#1D242B] text-center font-[900] leading-[1]">{!isSubmitSuccessful ? 'INQUIRE NOW' : 'INQUIRY SENT'}</span>
             
             {!isSubmitSuccessful ? (
-                <div className="flex flex-col items-center justify-center w-[500px] h-auto bg-[#FAFAFA] gap-2">
+                <div className="flex flex-col items-center justify-center w-full xl:w-[700px] lg:w-[700px] md:w-[600px] h-auto bg-[#FAFAFA] gap-2">
                     <div className="flex flex-col items-start gap-1 w-full">
                         <span className="text-[16px] text-[#1D242B]">Full name</span>
                         <input type="text" id="full_name" placeholder="Enter your full name here..." 
@@ -105,7 +105,7 @@ export default function HomeInquiry() {
             )}
 
             {!isSubmitSuccessful && (
-                <button className="bg-[#0077C0] w-[500px] p-3 rounded-[10px] text-[#FAFAFA] text-[18px] font-bold cursor-pointer hover:bg-[#1D242B] active:bg-[#0077C0] transition-all duration-100">Submit</button>
+                <button className="bg-[#0077C0] w-full xl:w-[700px] lg:w-[700px] md:w-[600px] p-3 rounded-[10px] text-[#FAFAFA] text-[18px] font-bold cursor-pointer hover:bg-[#1D242B] active:bg-[#0077C0] transition-all duration-100">Submit</button>
             )}
         </form>
     )
