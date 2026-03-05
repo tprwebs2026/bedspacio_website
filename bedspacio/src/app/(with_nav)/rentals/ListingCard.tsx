@@ -18,6 +18,7 @@ export type ListingDetail = {
     room_type: string,
     gender: string,
     price: string,
+    is_available: boolean,
     branch_id: Branch,
     inclusions: Inclusions[],
     thumbnail: string,
@@ -37,6 +38,8 @@ export default function ListingCard ({ detail }: ListingDetailProps) {
                     <span className="text-[12px] text-[#FAFAFA]">{detail.room_type}</span>
                     <span className="text-[12px] text-[#FAFAFA]">|</span>
                     <span className="text-[12px] text-[#FAFAFA]">{detail.gender}</span>
+                    <span className="text-[12px] text-[#FAFAFA]">|</span>
+                    <span className={`text-[12px] ${detail.is_available ? 'text-[#77D970]' : 'text-[#FF0075]'}`}>{detail.is_available ? "Available" : "Unavailable"}</span>
                 </div>
 
                 <div className="flex w-full h-full text-[#FAFAFA] rounded-[5px] overflow-hidden">

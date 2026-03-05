@@ -1,12 +1,12 @@
 
 import SearchFilter from "@/components/SearchFilter"
 import ListingCard, { ListingDetail } from "./ListingCard"
+import Arrow from '@/asset/icon/arrow-down.svg'
 
 import { BASE_URL } from "@/config/config";
 import axios from 'axios';
 
-import Link from "next/link"
-import { useState } from "react"
+
 
 // MAKE THIS an "async" function later when fetching data
 
@@ -59,7 +59,7 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
     console.log("Room type: ", typeof rooms)
 
     return (
-        <div className="flex flex-col items-center justify-start min-h-screen min-w-[400px] w-auto">
+        <div className="flex flex-col items-center justify-start min-h-screen w-full">
             <section className="relative flex flex-col items-center justify-center w-full h-screen xl:h-[400px] lg:h-[400px] md:h-screen bg-[#C7EEFF]">
                 <img src="/asset/rentas_bg_image.jpg" alt="rentals-header-image"  className="absolute inset-0 w-full h-full object-cover opacity-50"/>
 
@@ -70,7 +70,7 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
             </section>
 
 
-            <section className="flex flex-col items-start justify-start w-full min-h-[800px] px-[1rem] xl:px-[8rem] lg:px-[4rem]  py-[1rem]">
+            <section className="flex flex-col items-start justify-start w-full h-auto px-[1rem] xl:px-[8rem] lg:px-[4rem]  py-[1rem]">
                 <div className="flex items-center justify-start py-[0.3rem] border-b border-b-[#0077C0]/50 w-full">
                     <span className="text-[#1D242B] text-[24px] font-bold">Explore Listings</span>
                 </div>
@@ -113,7 +113,28 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
                         <ListingCard key={room.id} detail={room}/>
                     ))}
                 </div>
+
             </section>
+
+            <div className="flex items-center justify-center w-full px-[1rem] py-[2rem] gap-[1rem]">
+                <button className="cursor-pointer p-1 rounded-[5px] border-2 border-[#1D242B]/25 hover:bg-[#1D242B]/10 active:bg-[#0077C0]">
+                    <Arrow className="rotate-90 w-[30px] h-[30px]" />
+                </button>
+                <div className="flex items-center gap-[0.5rem]">
+                    <button className="flex items-center justify-center w-[42px] h-[42px] bg-[#0077C0] text-[#1D242B] font-bold cursor-pointer  rounded-[5px] border-2 border-[#1D242B]/25 hover:border-[#1D242B] active:bg-[#0077C0]">
+                    1
+                    </button>
+                    <button className="flex items-center justify-center w-[42px] h-[42px] bg-[#FAFAFA] text-[#1D242B] font-bold cursor-pointer  rounded-[5px] border-2 border-[#1D242B]/25 hover:border-[#1D242B] active:bg-[#0077C0]">
+                    2
+                    </button>
+                    <button className="flex items-center justify-center w-[42px] h-[42px] bg-[#FAFAFA] text-[#1D242B] font-bold cursor-pointer  rounded-[5px] border-2 border-[#1D242B]/25 hover:border-[#1D242B] active:bg-[#0077C0]">
+                    3
+                    </button>
+                </div>
+                <button className="cursor-pointer p-1 rounded-[5px] border-2 border-[#1D242B]/25 hover:bg-[#1D242B]/10 active:bg-[#0077C0]">
+                    <Arrow className="-rotate-90 w-[30px] h-[30px]" />
+                </button>
+            </div>
         </div>
     )
 }

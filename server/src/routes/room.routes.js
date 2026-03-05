@@ -4,6 +4,13 @@ import { readByIds } from '../odoo/odoo.service.js';
 
 const roomRoute = express.Router();
 
+/*
+    THIS ROUTE WILL BE USED TO RETRIEVE INFORMATION ABOUT:
+    > room listings
+    > room in-depth information
+    > room images
+*/
+
 
 roomRoute.get('/listing' , async (req, res, next) => {
     try {
@@ -13,7 +20,7 @@ roomRoute.get('/listing' , async (req, res, next) => {
             model: "bedspacio.room",
             domain,
             fields: [ 
-                "room_name", "room_type", "gender", "starting_price", 'description', 'image_ids', "branch_id", "inclusion_ids" 
+                "room_name", "room_type", "gender", "starting_price", "is_available",'description', 'image_ids', "branch_id", "inclusion_ids" 
             ],
             limit: 20,
             offset: Number(req.query.offset || 0),
@@ -61,7 +68,7 @@ roomRoute.get('/listing' , async (req, res, next) => {
                     room_type: room.room_type,
                     gender: room.gender,
                     price: room.starting_price,
-                    description: room.description,
+                    is_available: room.is_available,
                     branch_id: room.branch_id,
                     inclusions: (room.inclusion_ids || [])
                         .map(id => inclusionMap[id])

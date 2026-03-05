@@ -5,16 +5,19 @@ import { usePathname } from "next/navigation"
 import Contact from '@/asset/icon/contact.svg'
 import BurgerMenu from '@/asset/icon/burger-menu.svg'
 
+type Toggle = {
+    toggleMobileNav: () => void
+}
 
-export default function NavigationBar() {
+export default function NavigationBar({ toggleMobileNav }:Toggle ) {
 
     const url = usePathname();
 
 
     return (
-        <div className="sticky top-0 h-[80px] xl:h-auto lg:h-auto md:h-[80px] flex items-center justify-between lg:grid lg:grid-cols-3 w-full bg-[#FAFAFA] box-border px-[1rem] border-b-2 border-[#0077C0] z-10">
+        <div className="sticky top-0 h-[80px] xl:h-auto lg:h-auto md:h-[80px] flex items-center justify-between lg:grid lg:grid-cols-3 w-full bg-[#FAFAFA] box-border px-[1rem] border-b-2 border-[#0077C0] z-30">
             <div className="flex w-full items-center">    
-                <Link href="/">
+                <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
                     <img src="/asset/bedspacio_logo.jpg" alt="bedspacio-logo" className="w-[70px] h-auto"/>
                 </Link>
             </div>
@@ -34,9 +37,9 @@ export default function NavigationBar() {
             </div>
 
 
-            <div className="flex xl:hidden lg:hidden md:flex">
+            <button onClick={toggleMobileNav} className="flex xl:hidden lg:hidden md:flex">
                 <BurgerMenu className="flex w-[40px] h-[40px]" />
-            </div>
+            </button>
         </div>
     )
 }

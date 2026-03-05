@@ -9,9 +9,30 @@ import Quote from '@/asset/icon/quote.svg'
 import Star from '@/asset/icon/star.svg'
 
 import Link from 'next/link'
+import { useSearchParams } from "next/navigation";
+import { useState, useMemo } from 'react'
 
 export default function Home() {
     
+    const params = useSearchParams();
+    // const  [bedspace, setBedspace] = useState<string>('Bedspace')
+    // const  [aparment, setAparment] = useState<string>('Aparment')
+    const bedspace = "Bedspace";
+    const aparment = "Aparment"
+
+    
+    const roomTypeHREF = useMemo(() => {
+        const params = new URLSearchParams();
+
+        if (bedspace) params.set('room_type', bedspace)  
+        if (aparment) params.set('room_type', aparment)  
+
+        const parameters = params.toString();
+
+        return parameters && `/rentals?${parameters}`
+
+    }, [bedspace, aparment])
+
 
     return (
         <div className="flex flex-col min-h-screen items-start justify-start ">
@@ -78,8 +99,8 @@ export default function Home() {
                     <div className='flex flex-col xl:flex-row lg:flex-row md:flex-row items-center justify-center gap-[1rem] w-full p-3'>
                         <div className='group relative flex items-center justify-center w-full xl:w-[600px] lg:w-[600px] h-[200px] xl:h-[337.5px] lg:h-[337.5px] bg-[#1D242B] rounded-[10px] overflow-hidden'>
                             <img src="/asset/bedspace_example.jpg" alt="bedspace" className='absolute inset-0 w-full h-full object-cover opacity-75 group-hover:scale-105 transition-all duration-200'/>
-                            <Link href="" className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center gap-2 bg-[#FAFAFA] rounded-full p-2 px-4 hover:bg-[#C7EEFF] active:bg-[#0077C0] transition-all duration-100 border-2 border-[#1D242B]'>
-                                <span className='text-[#1D242B] text-[18px] font-bold'>BedSpace</span>
+                            <Link href={roomTypeHREF} className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center gap-2 bg-[#FAFAFA] rounded-full p-2 px-4 hover:bg-[#C7EEFF] active:bg-[#0077C0] transition-all duration-100 border-2 border-[#1D242B]'>
+                                <span className='text-[#1D242B] text-[18px] font-bold'>{bedspace}</span>
                                 <ArrowRight className="w-[25px] h-auto stroke-[#1D242B]"/>
                             </Link>
 
@@ -87,8 +108,8 @@ export default function Home() {
 
                         <div className='group relative flex items-center justify-center w-full xl:w-[600px] lg:w-[600px] h-[200px] xl:h-[337.5px] lg:h-[337.5px] bg-[#1D242B] rounded-[10px] overflow-hidden'>
                             <img src="/asset/apartment_example.jpg" alt="bedspace" className='absolute inset-0 w-full h-full object-cover opacity-75 group-hover:scale-105 transition-all duration-200'/>
-                            <Link href="" className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center gap-2 bg-[#FAFAFA] rounded-full p-2 px-4 hover:bg-[#C7EEFF] active:bg-[#0077C0] transition-all duration-100 border-2 border-[#1D242B]'>
-                                <span className='text-[#1D242B] text-[18px] font-bold'>Apartment</span>
+                            <Link href={roomTypeHREF} className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center gap-2 bg-[#FAFAFA] rounded-full p-2 px-4 hover:bg-[#C7EEFF] active:bg-[#0077C0] transition-all duration-100 border-2 border-[#1D242B]'>
+                                <span className='text-[#1D242B] text-[18px] font-bold'>{aparment}</span>
                                 <ArrowRight className="w-[25px] h-auto stroke-[#1D242B]"/>
                             </Link>
                         </div>

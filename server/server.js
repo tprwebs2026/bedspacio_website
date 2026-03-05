@@ -7,6 +7,8 @@ dotenv.config({ path: ".env.development" });
 // Routes
 import odooRoute from './src/routes/odoo.routes.js'; // test to get user session
 import roomRoute from './src/routes/room.routes.js';
+import branchRoute from './src/routes/branch.routes.js';
+import managerRoute from './src/routes/manager.routes.js';
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.use(cors({
 
 app.use('/odoo', odooRoute);
 app.use('/room', roomRoute);
+app.use('/branch', branchRoute);
+app.use('/manager', managerRoute);
 
 
 app.get('/', (req, res) => {

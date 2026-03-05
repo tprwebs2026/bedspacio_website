@@ -3,14 +3,14 @@ export default function HowItWorks() {
     return (
         <div className="flex flex-col items-center justify-start min-h-screen w-full">
 
-            <div className="relative flex w-full h-[350px] items-center justify-center bg-[#1D242B] overflow-hidden">
+            <div className="relative flex w-full h-screen xl:h-[350px] lg:h-[350px] md:h-screen items-center justify-center bg-[#1D242B] overflow-hidden">
                 <div className="absolute flex items-center justify-center w-full inset-0 opacity-25">
                     <img src="/asset/how_it_works.jpg" alt="how-it-works" className="w-full h-full object-cover" />
                 </div>
 
                 <div className="absolute flex flex-col items-center justify-center">
                     <span className="text-[24px] text-[#0077C0]">How It Works</span>
-                    <span className="text-[56px] text-[#FAFAFA] text-center font-[900] leading-[1] w-[800px]">Finding Your Next BedSpace, Made Simple</span>
+                    <span className="text-[56px] text-[#FAFAFA] text-center font-[900] leading-[1] w-auto xl:w-[800px] lg:w-[800px]">Finding Your Next BedSpace, Made Simple</span>
                 </div>
             </div>
 

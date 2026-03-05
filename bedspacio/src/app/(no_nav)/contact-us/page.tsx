@@ -21,9 +21,9 @@ export default function ContactUs() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen w-auto items-start justify-start">
-            <div className="flex flex-col xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 px-[2rem] xl:px-[6rem] py-[4rem] gap-[2rem]">
-                <div className="grid grid-cols-2 xl:flex lg:flex xl:flex-col lg:flex-col gap-[2rem] xl:gap-[4rem] lg:gap-[4rem]">
+        <div className="flex flex-col min-h-screen w-full items-start justify-start">
+            <div className="flex flex-col xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 px-[2rem] xl:px-[6rem] py-[4rem] gap-[2rem] w-full">
+                <div className="flex flex-col xl:flex lg:flex xl:flex-col lg:flex-col md:grid md:grid-cols-2 gap-[2rem] xl:gap-[4rem] lg:gap-[4rem]">
                     <div className="flex flex-col gap-[2rem]">
                         <span className="text-[28px] xl:text-[36px] lg:text-[36px] text-[#1D242B] font-[900] whitespace-nowrap">Contact Us</span>
                         <span className="text-[20px] xl:text-[24px] lg:text-[24px] text-[#1D242B] leading-[1.2]">
@@ -45,7 +45,7 @@ export default function ContactUs() {
                     <div className="flex flex-col w-full h-auto rounded-[15px] border border-[#1D242B]/50 bg-[#C7EEFF]/50 overflow-hidden">
                         <span className="w-full py-[0.5rem] border-b-2 border-dashed border-b-[#1D242B]/50 text-[26px] text-center bg-[#FAFAFA] italic">Inquiry Form</span>
 
-                        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-[2rem] w-full gap-[1rem]">
+                        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-[1rem] xl:p-[2rem] lg:p-[2rem] w-full gap-[1rem]">
                             <div className="flex flex-col w-full items-start gap-1">
                                 <span>Full Name</span>
                                 <input type="text" id="full_name" placeholder="Enter your full name here..."
@@ -122,9 +122,9 @@ export default function ContactUs() {
                         </form>
                     </div>
                 ) : (
-                    <div className="flex flex-col w-full h-auto items-center justify-center rounded-[15px] border-2 border-dashed border-[#1D242B]/50 bg-[#C7EEFF]/50 gap-[1rem] overflow-hidden">
+                    <div className="flex flex-col w-full h-auto items-center justify-center rounded-[15px] border-2 border-dashed border-[#1D242B]/50 bg-[#C7EEFF]/50 gap-[1rem] p-2 py-[6rem] xl:py-[1rem] lg:py-[1rem]">
                         <span className="text-[28px] text-[#0077C0] font-bold">INQUIRY SENT!</span>
-                        <span className="text-[20px] text-[#1D242B] text-center leading-[1.2] w-[400px]">Thanks! Your inquiry was sent successfully. We've emailed you a confirmation and will be in touch soon.</span>
+                        <span className="text-[20px] text-[#1D242B] text-center leading-[1.2] w-full">Thanks! Your inquiry was sent successfully. We've emailed you a confirmation and will be in touch soon.</span>
                     </div>
                 )}
             </div>
