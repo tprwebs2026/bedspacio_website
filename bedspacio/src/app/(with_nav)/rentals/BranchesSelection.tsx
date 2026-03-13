@@ -19,7 +19,7 @@ export default function BranchSelection ({ branchData, selectedBranch, setSelect
     const [ openBranch, setOpenBranch ] = useState<Boolean>(false);
     
     return (
-        <div className='relative flex flex-col items-start justify-start w-full xl:min-w-[250px] lg:min-w-[250px] rounded-[10px]'>
+        <div className='relative flex flex-col items-start justify-start w-full xl:w-[350px] lg:w-[250px] rounded-[10px]'>
             <button onClick={() => setOpenBranch(prev => !prev)} className={`flex items-center justify-between text-[18px] font-bold p-3 cursor-pointer hover:bg-[#C7EEFF] active:bg-[#C7EEFF] rounded-[10px] w-full ${selectedBranch ? 'border-2 border-[#1D242B] bg-[#FAFAFA]' : 'border-2 border-[#FAFAFA] text-[#1D242B]  bg-[#FAFAFA]'}`}>
                 <span className='text-left whitespace-nowrap w-[225px] truncate'>{!selectedBranch ? 'Choose a branch' : selectedBranch}</span>
                 <ArrowDown className={`${openBranch && 'rotate-180'} w-[30px] h-auto transition-all duration-100`} />

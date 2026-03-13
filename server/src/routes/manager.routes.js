@@ -10,7 +10,7 @@ const managerRoute = express.Router();
     > property manager details
 */
 
-managerRoute.get('/', async (req, res, next) => {
+managerRoute.get('/v1', async (req, res, next) => {
     try {
         const domain = [];
 
@@ -30,24 +30,16 @@ managerRoute.get('/', async (req, res, next) => {
 
         if (!propertyManager) throw new Error('Failed to retrieve data fro Property Manager!');
 
-        const branchId = [
-            ...new Set(
-                propertyManager.map(prop => ({
-                    id: prop.id,
-                    branch_name: prop.name
-                }))
-            )
-        ]
-
-        console.log('Branch ID: ', branchId)
-        
         res.json(
             propertyManager.map(pm => ({
                 id: pm.id,
                 name: pm.name,
                 profile_image: pm.profile_image,
                 contact_number: pm.contact_number,
-                branch: branchId
+                branch: {
+                    id: pm.branch_id?.[0],
+                    branch_name: pm.branch_id?.[1]
+                }
             }))
         );
     } catch (err) {

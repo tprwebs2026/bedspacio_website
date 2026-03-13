@@ -11,7 +11,7 @@ import Link from 'next/link'
 
 export default function Footer() {
     return (
-        <div className="flex flex-col items-start justify-between min-h-[350px] w-auto px-[1rem] pt-[3rem] bg-[#1D242B]">
+        <div className="flex flex-col items-start justify-between min-h-[350px] w-auto px-[1rem] xl:px-[8rem] lg:px-[4rem] md:px-[1rem] pt-[3rem] bg-[#1D242B]">
             <div className="flex flex-col pb-[2rem] xl:grid lg:grid md:grid xl:grid-cols-[40%_30%_30%] lg:grid-cols-[40%_30%_30%] md:grid-cols-[40%_30%_30%] w-full">
                 <div className="flex flex-col items-start justify-start gap-[2.5rem]">
                     <img src="/asset/bedspacio_logo.jpg" alt="bedspacio-logo" className="w-[100px] h-auto"/>
@@ -22,7 +22,7 @@ export default function Footer() {
 
                     <div className="flex flex-col items-start justify-start gap-[0.2rem]">
                         <span className='text-[18px] text-[#FAFAFA]'>(63) 917-849-0044</span>
-                        <span className='text-[18px] text-[#FAFAFA]'>Lirio St Pembo , Makati, Philippines, 1218</span>
+                        <span className='text-[18px] text-[#FAFAFA]'>Lirio St Pembo, Taguig, Philippines, 1643</span>
                         <span className='text-[18px] text-[#FAFAFA]'>bedspacio@gmail.com</span>
                     </div>
                 </div>
@@ -38,7 +38,7 @@ export default function Footer() {
                 </div>
             </div>
 
-            <div className='flex flex-col items-center justify-between w-full border-t border-t-[#FAFAFA]/25 gap-[1rem] py-[1rem]'>
+            <div className='flex flex-col xl:flex-row lg:flex-row items-center justify-between w-full border-t border-t-[#FAFAFA]/25 gap-[1rem] py-[1rem]'>
                 <span className="text-[16px] xl:text-[18px] lg:text-[18px] md:text-[16px] text-[#FAFAFA]">Comfortable bedspace and dormitory living with BedSpacio.</span>
                 <div className='flex items-center gap-[1rem]'>
                     <span className='text-[20px] text-[#FAFAFA] font-bold'>Follow Us</span>

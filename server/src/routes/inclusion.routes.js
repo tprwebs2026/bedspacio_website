@@ -4,7 +4,7 @@ import { readByIds } from '../odoo/odoo.service.js';
 
 const inclusionRoute = express.Router();
 
-inclusionRoute.get('/', async (req, res, next) => {
+inclusionRoute.get('/v1', async (req, res, next) => {
     try {
         const inclusions = await searchRead({
             model: "bedspacio.room.inclusion",

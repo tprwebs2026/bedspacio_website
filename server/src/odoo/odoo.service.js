@@ -46,3 +46,34 @@ export async function readByIds({ model, ids, fields = [] }) {
 
     return response.data.result;
 }
+
+
+
+export async function executeKw({
+    model, 
+    method,
+    args = [],
+    kwargs = {}
+}) {
+    const odoo = await getOdooClient();
+
+    const response = await odoo.call("/web/dataset/call_kw", {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+            model,
+            method, 
+            args,
+            kwargs,
+        },
+        id: Date.now(),
+    });
+
+    console.log("executeKw response:", response.data);
+
+    if (response?.data?.error) {
+        throw new Error(JSON.stringify(response.data.error));
+    }
+    
+    return response?.data?.result;
+};

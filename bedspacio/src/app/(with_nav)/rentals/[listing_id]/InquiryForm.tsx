@@ -19,7 +19,19 @@ type InquiryFormValues = {
 }
 
 
-export default function InquiryForm () {
+type PropertyManagerInfo = {
+    propertyManager: string,
+    propertyManagerContact: string,
+    profileImage: string
+}
+
+
+
+export default function InquiryForm ({ 
+    propertyManager, 
+    propertyManagerContact, 
+    profileImage
+}: PropertyManagerInfo) {
 
     const [inquireOpen, setInquireOpen] = useState<boolean>(true);
     const [reserveOpen, setReserveOpen] = useState<boolean>(false)
@@ -34,23 +46,23 @@ export default function InquiryForm () {
 
 
     return (
-        <div className={`flex flex-col items-start w-full rounded-[10px] h-fit border-dashed border-2 border-[#0077C0]/75 overflow-hidden`} id="rental_inquiry">
+        <div className={`flex flex-col items-start w-full rounded-[10px] h-fit border-dashed border-2 border-[#0077C0]/75 overflow-hidden`}>
             <div className='grid grid-cols-2 w-full place-items-center bg-[#FAFAFA]'>
-                <Link href="#rental_inquiry"  onClick={() => {setInquireOpen(prev => !prev); setReserveOpen(false);}} className={`${inquireOpen ? 'bg-[#C7EEFF] text-[#0077C0]' : 'bg-[#FAFAFA] text-[#0077C0] opacity-50'} flex items-center justify-center gap-2 p-2 py-4 w-full cursor-pointer hover:opacity-100 transition-all duration-100`}>
+                <button onClick={() => {setInquireOpen(true); setReserveOpen(false);}} className={`${inquireOpen ? 'bg-[#C7EEFF] text-[#0077C0]' : 'bg-[#FAFAFA] text-[#0077C0] opacity-50'} flex items-center justify-center gap-2 p-2 py-4 w-full cursor-pointer hover:opacity-100 transition-all duration-100`}>
                     <Inquire className={`fill-[#0077C0] w-[30px] h-auto`} />
                     <span className='text-[20px] font-[900]'>Inquire</span>
-                </Link>
-                <Link href="#rental_inquiry" onClick={() => {setReserveOpen(true); setInquireOpen(false);}} className={`${reserveOpen ? 'bg-[#C7EEFF] text-[#0077C0]' : 'bg-[#FAFAFA] text-[#0077C0] opacity-50'} flex items-center justify-center w-full gap-2 p-2 py-4 cursor-pointer hover:opacity-100 transition-all duration-100`}>
+                </button>
+                <button onClick={() => {setReserveOpen(true); setInquireOpen(false);}} className={`${reserveOpen ? 'bg-[#C7EEFF] text-[#0077C0]' : 'bg-[#FAFAFA] text-[#0077C0] opacity-50'} flex items-center justify-center w-full gap-2 p-2 py-4 cursor-pointer hover:opacity-100 transition-all duration-100`}>
                     <Reserve className={`stroke-[#0077C0] w-[30px] h-auto`} />
                     <span className='text-[20px] font-[900]'>Reserve</span>
-                </Link>
+                </button>
             </div>
 
             {inquireOpen && (
                 !isSubmitSuccessful ? (
                     <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col w-full gap-[1rem] p-4 py-5 bg-[#C7EEFF]`}>
                         <div className='flex flex-col w-full gap-1'>
-                            <span className='text-[14px] text-[#1D242B]'>Selected Listing</span>
+                            <span className='text-[14px] text-[#1D242B]'>Selected Room</span>
                             <span className='w-full border-2 border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA]'>ROOM TITLE</span>
                         </div>
 
@@ -108,22 +120,22 @@ export default function InquiryForm () {
                         </div>
 
                         <div className='flex flex-col gap-1 w-full'>
-                            <span className='text-[14px] text-[#1D242B]'>Target Move-In</span>
-                            <input type="date" id="target_move_in"
-                            {...register('targetMoveIn', { required: 'Target Move-in is required' })}
-                            className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]'/>
-                            {errors.targetMoveIn && (
-                                <span className='text-[16px] text-[#FF0000]'>{errors.targetMoveIn.message}</span>
-                            )}
-                        </div>
-
-                        <div className='flex flex-col gap-1 w-full'>
                             <span className='text-[14px] text-[#1D242B]'>Maximum Budget</span>
                             <input type="text" id="budget" placeholder='Enter your maximum budget...'
                             {...register('budget', { required: 'Maximum Budget is required' })}
                             className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]'/>
                             {errors.budget && (
                                 <span className='text-[16px] text-[#FF0000]'>{errors.budget.message}</span>
+                            )}
+                        </div>
+
+                        <div className='flex flex-col gap-1 w-full'>
+                            <span className='text-[14px] text-[#1D242B]'>Target Move-In</span>
+                            <input type="date" id="target_move_in"
+                            {...register('targetMoveIn', { required: 'Target Move-in is required' })}
+                            className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]'/>
+                            {errors.targetMoveIn && (
+                                <span className='text-[16px] text-[#FF0000]'>{errors.targetMoveIn.message}</span>
                             )}
                         </div>
 
@@ -154,25 +166,18 @@ export default function InquiryForm () {
             {reserveOpen && (
                 <div className='flex flex-col w-full gap-[1rem] p-5 bg-[#C7EEFF]'>
                     <span className='text-[16px] font-bold'>Give a quick call to the assigned Property Manager of this listing</span>
-                    <div className='flex items-start w-full rounded-[10px] p-4 bg-[#FAFAFA] gap-4'>
+                    <div className='flex flex-col items-center justify-center w-full rounded-[10px] p-4 bg-[#FAFAFA] gap-4'>
                         <div className='max-w-[150px] max-h-[150px] bg-[#C7EEFF] rounded-full overflow-hidden'>
-                            <img src="/asset/property_manager.jpg" alt="property-manager" className='w-full h-full bg-cover' />
+                            <img src={`data:image/webp;base64,${profileImage}`} alt="property-manager" className='w-full h-full bg-cover' />
                         </div>
 
-                        <div className='flex flex-col items-start gap-2 w-full'>
-                            <span className='text-[20px] text-[#0077C0] font-[900] leading-[1]'>Property Manager Name</span>
+                        <div className='flex flex-col items-center justify-center gap-2 w-full'>
+                            <span className='text-[20px] text-[#0077C0] font-[900] leading-[1]'>{propertyManager}</span>
                             <span className='text-[16px] text-[#1D242B] leading-[1]'>Assigned Branch</span>
 
-                            <div className='flex flex-col items-start w-full gap-4 pt-2'>
+                            <div className='flex flex-col items-center justify-center w-full gap-4 pt-2'>
                                 <span className='text-[16px] text-[#FAFAFA] p-2 bg-[#0077C0] rounded-full leading-[0.75]'>Contact Details</span>
-                                <div className='flex flex-col items-start w-full'>
-                                    <span className='text-[16px] text-[#1D242B] leading-[1]'>Mobile number</span>
-                                    <span className='text-[20px] text-[#1D242B] font-bold leading-[1]'>0917 849 0044</span>
-                                </div>
-                                <div className='flex flex-col items-start w-full'>
-                                    <span className='text-[16px] text-[#1D242B] leading-[1]'>Telephone number</span>
-                                    <span className='text-[20px] text-[#1D242B] font-bold leading-[1]'>(02) 8802-3188</span>
-                                </div>
+                                <span className='text-[20px] text-[#1D242B] font-bold leading-[1]'>{propertyManagerContact}</span>
                             </div>
                         </div>
                     </div>

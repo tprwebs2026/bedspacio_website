@@ -1,9 +1,14 @@
 
 import Inquire from '@/asset/icon/inquire.svg'
-
 import Link from "next/link"
 
-export default function About() {
+import { getManagers } from '../../../../lib/branch'
+
+export default async function About() {
+    const managers = await getManagers();
+    console.log('Manager: ', managers)
+    
+    // console.log(managers.map(manager => {return manager.branch.map(br => br.branch_name)}))
     return (
         <div className="flex flex-col items-center justify-start min-h-screen w-auto">
 
@@ -79,25 +84,17 @@ export default function About() {
                     <span className="text-[28px] xl:text-[36px] lg:text-[36px] text-[#1D242B] text-center font-bold">Our Property Managers</span>
 
                     <div className="grid grid-rows-1 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 gap-[4rem] w-full">
-                        <div className="flex flex-col gap-[1rem] items-center justify-center">
-                            <div className="w-[150px] h-[150px] xl:w-[300px] xl:h-[300px] rounded-full bg-[#C7EEFF]">
-                                {/* Image here */}
+                        {managers.map((manager: any) => (
+                            <div key={manager.id} className="flex flex-col gap-[1rem] items-center justify-center">
+                                <div className="w-[150px] h-[150px] xl:w-[300px] xl:h-[300px] rounded-full bg-[#C7EEFF] overflow-hidden">
+                                    <img src={`data:wepb/image;base64,${manager.profile_image}`} alt="" className='w-full h-full object-cover' />
+                                </div>
+                                <div className="flex flex-col items-center justify-center">
+                                    <span className="text-[28px] text-[#0077C0] font-bold">{manager.name}</span>
+                                    <span className="text-[20px] text-[#1D242B]">{manager.branch?.branch_name}</span>
+                                </div>
                             </div>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-[28px] text-[#0077C0] font-bold">Juan dela Cruz</span>
-                                <span className="text-[20px] text-[#1D242B]">Branch Name Here</span>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-[1rem] items-center justify-center">
-                            <div className="w-[150px] h-[150px] xl:w-[300px] xl:h-[300px] rounded-full bg-[#C7EEFF]">
-                                {/* Image here */}
-                            </div>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-[28px] text-[#0077C0] font-bold">Juan dela Cruz also</span>
-                                <span className="text-[20px] text-[#1D242B]">Branch Name Here</span>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </section>
 

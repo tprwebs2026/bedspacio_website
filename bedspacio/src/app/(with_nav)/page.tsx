@@ -4,6 +4,8 @@ import FrequentlyAskedQuestions from '@/components/FrequentlyAskedQuestion'
 import HomeInquiry from '@/components/HomeInquiry'
 
 import ArrowRight from '@/asset/icon/arrow-right.svg'
+import ArrowLong from '@/asset/icon/arrow-long.svg'
+
 import Quote from '@/asset/icon/quote.svg'
 import Star from '@/asset/icon/star.svg'
 
@@ -18,18 +20,24 @@ export default function Home() {
     return (
         <div className="flex flex-col min-h-screen items-start justify-start ">
             
-            <section className="relative flex flex-col w-full h-screen items-center justify-center bg-[#0077C0] xl:items-start xl:justify-start lg:items-start lg:justify-start lg:h-[800px]">
+            <section className="relative flex flex-col w-full min-h-[800px] xl:h-screen items-center justify-center bg-[#0077C0] xl:items-start xl:justify-center lg:items-start lg:justify-center lg:h-[800px]">
                 <img src="/image/bedspaco-hero-x-large-example.jpg" alt="bedspacio-header-image" className='h-full w-full object-cover absolute inset-0 opacity-25'/>
 
-                <div className="absolute flex flex-col items-center justify-center xl:justify-center lg:justify-center md:justify-center w-full h-full xl:gap-[5rem] lg:gap-[5rem] gap-[5rem] p-[1rem] xl:p-0 lg:p-0 md:p-[2rem]">
+                <div className="absolute flex flex-col items-center justify-center xl:justify-center lg:justify-center md:justify-center w-full h-auto xl:gap-[5rem] lg:gap-[5rem] gap-[5rem] p-[1rem] border-box xl:p-0 lg:p-[1rem] md:p-[2rem]">
                     <div className="flex flex-col items-center justify-center gap-[1rem] xl:gap-[2rem] lg:gap-[2rem] md:gap-[1rem] xl:w-[800px] lg:w-[800px] md:w-[800px]">
                         <span className="text-[#FAFAFA] text-[55px] xl:text-[84px] lg:text-[84px] md:text-[72px] font-[900] leading-[1] text-center">Where Every Bed Feels Like Home</span>
-                        {/* <span className="text-[#0077C0] text-[60px] xl:text-[84px] lg:text-[84px] md:text-[72px] font-[900] leading-[1] xl:leading-[0.75] lg:leading-[0.75] md:leading-[0.75] text-center">Feels Like Home</span> */}
 
                         <span className="flex justify-center text-[#1D242B] text-[20px] md:text-[24px] text-center font-bold w-full">Made for students, workers, and everyday city living.</span>
                     </div>
 
+                    {/* <div className='flex flex-col items-center justify-center gap-2 bg-[#1D242B]/50 rounded-[10px]  h-full p-4'>
+                        <span className='text-[#FAFAFA] text-[18px]'>Tell us your preferrence</span>
+
+                        <SearchFilter/>
+                    </div> */}
+
                     <SearchFilter />
+
                 </div>
             </section>
 
@@ -49,7 +57,7 @@ export default function Home() {
             </section>  
 
 
-            <section className='flex flex-col w-full min-h-[800px] bg-[#FAFAFA] items-center justify-start xl:px-[8rem] lg:px-[8rem] py-[3rem] gap-[3rem]'>
+            <section className='flex flex-col w-full min-h-[800px] bg-[#FAFAFA] items-center justify-start px-[1rem] xl:px-[8rem] lg:px-[4rem] md:px-[1rem] py-[3rem] gap-[3rem]'>
                 <div className='flex flex-col items-center justify-center gap-[2rem] w-full'>
                     <span className='text-[42px] font-[900] text-[#1D242B] leading-[0.5]'>Our Branches</span>
                     <BranchCard />
@@ -62,7 +70,7 @@ export default function Home() {
             </section>
 
 
-            <section className='flex xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 md:grid md:grid-cols-2 w-full xl:min-h-[800px] lg:min-h-[800px]  bg-[#FAFAFA] xl:px-[8rem] lg:px-[6rem] py-[3rem] xl:py-[6rem] lg:py-[6rem] md:py-[3rem]  gap-[1rem]'>
+            <section className='flex xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 md:grid md:grid-cols-2 w-full xl:min-h-[800px] lg:min-h-[800px] bg-[#FAFAFA] xl:px-[8rem] lg:px-[6rem] py-[3rem] xl:py-[6rem] lg:py-[6rem] md:py-[3rem]  gap-[1rem]'>
                 <div className='hidden xl:grid lg:grid md:grid sm:hidden xl:grid-rows-2 lg:grid-rows-2 md:grid-rows-2 w-full gap-2'>
                     <div className='flex items-center justify-center h-[325px] md:min-h-[325px] lg:min-h-[325px] sm:min-h-[325px] bg-[#C7EEFF] rounded-[15px] overflow-hidden'>
                         <img src="/asset/why_choose_us_1.jpg" alt="" className='w-full h-full object-cover'/>
@@ -78,7 +86,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                <div className='flex flex-col w-full items-start justify-center xl:justify-end lg:justify-end md:justify-center p-[1rem] xl:p-[2rem] md:p-[2rem] gap-[1rem] xl:gap-[4rem] lg:gap-[1rem] md:gap-[1rem] sm:gap-[1rem]'>
+                <div className='flex flex-col w-full items-start justify-center xl:justify-end lg:justify-end md:justify-center px-[1rem] xl:px-[8rem] lg:px-[4rem] md:px-[1rem] gap-[1rem] xl:gap-[4rem] lg:gap-[1rem] md:gap-[1rem] sm:gap-[1rem]'>
                     <div className='flex flex-col gap-2'>
                         <span className='text-[36px] xl:text-[48px] lg:text-[42px] md:text-[38px] text-[#1D242B] font-[900] text-center xl:text-left lg:text-left md:text-left whitespace-nowrap'>WHY CHOOSE US</span>
 
@@ -122,9 +130,9 @@ export default function Home() {
             </section>
 
 
-            <section className="flex flex-col xl:items-center lg:items-center md:items-center w-full bg-[#0077C0] py-12 md:py-16 p-3">
-                <div className="flex flex-col xl:items-center lg:items-center md:items-center w-full max-w-6xl py-4 md:px-8 gap-[2rem]">
-                    <span className="flex text-center text-[32px] md:text-[46px] font-[900] text-[#FAFAFA] leading-[1]">
+            <section className="flex flex-col xl:items-center lg:items-center md:items-center w-full bg-[#C7EEFF] py-12 md:py-16 p-3">
+                <div className="flex flex-col xl:items-center lg:items-center md:items-start md:overflow-x-auto  w-full px-[0.5rem] xl:px-[8rem] lg:px-[4rem] md:px-[1rem] py-4 gap-[2rem]">
+                    <span className="flex text-center text-[32px] md:text-[46px] font-[900] text-[#0077C0] leading-[1]">
                         What Our Customers Say
                     </span>
 

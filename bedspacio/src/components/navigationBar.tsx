@@ -15,7 +15,7 @@ export default function NavigationBar({ toggleMobileNav }:Toggle ) {
 
 
     return (
-        <div className="sticky top-0 h-[80px] xl:h-auto lg:h-auto md:h-[80px] flex items-center justify-between lg:grid lg:grid-cols-3 w-full bg-[#FAFAFA] box-border px-[1rem] border-b-2 border-[#0077C0] z-30">
+        <div className="sticky top-0 h-[80px] xl:h-auto lg:h-auto md:h-[80px] flex items-center justify-between lg:grid lg:grid-cols-3 w-full bg-[#FAFAFA] box-border px-[1rem] xl:px-[8rem] lg:px-[4rem] md:px-[1rem] border-b-2 border-[#0077C0] z-30">
             <div className="flex w-full items-center">    
                 <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
                     <img src="/asset/bedspacio_logo.jpg" alt="bedspacio-logo" className="w-[70px] h-auto"/>
@@ -24,7 +24,7 @@ export default function NavigationBar({ toggleMobileNav }:Toggle ) {
 
             <div className="hidden xl:flex lg:flex md:hidden sm:hidden items-center justify-center w-full">
                 <Link href="/" className={`${url === "/" ? 'bg-[#0077C0] text-[#FAFAFA] active:bg-[#1D242B]' : 'hover:bg-[#C7EEFF] active:bg-[#FAFAFA]'} text-[#0077C0] text-[18px] font-bold p-2 xl:p-6 lg:p-6 whitespace-nowrap`}>Home</Link>
-                <Link href="/rentals" className={`${url === "/rentals" || url.startsWith("/rentals/") ? 'bg-[#0077C0] text-[#FAFAFA] active:bg-[#1D242B]' : 'hover:bg-[#C7EEFF] active:bg-[#FAFAFA]'} text-[#0077C0] text-[18px] font-bold p-2 xl:p-6 lg:p-6 whitespace-nowrap`}>Rentals</Link>
+                <Link href="/rentals?page=1" className={`${url === "/rentals" || url.startsWith("/rentals/") ? 'bg-[#0077C0] text-[#FAFAFA] active:bg-[#1D242B]' : 'hover:bg-[#C7EEFF] active:bg-[#FAFAFA]'} text-[#0077C0] text-[18px] font-bold p-2 xl:p-6 lg:p-6 whitespace-nowrap`}>Rentals</Link>
                 <Link href="/about" className={`${url === "/about" ? 'bg-[#0077C0] text-[#FAFAFA] active:bg-[#1D242B]' : 'hover:bg-[#C7EEFF] active:bg-[#FAFAFA]'} text-[#0077C0] text-[18px] font-bold p-2 xl:p-6 lg:p-6 whitespace-nowrap`}>About Us</Link>
                 <Link href="/how-it-works" className={`${url === "/how-it-works" ? 'bg-[#0077C0] text-[#FAFAFA] active:bg-[#1D242B]' : 'hover:bg-[#C7EEFF] active:bg-[#FAFAFA]'} text-[#0077C0] text-[18px] font-bold p-2 xl:p-6 lg:p-6 whitespace-nowrap`}>How It Works</Link>
             </div>

@@ -11,7 +11,7 @@ const branchRoute = express.Router();
 */
 
 
-branchRoute.get('/', async (req, res, next) => {
+branchRoute.get('/v1', async (req, res, next) => {
     try {
         const domain = [];
 
@@ -19,7 +19,7 @@ branchRoute.get('/', async (req, res, next) => {
             model: "bedspacio.branch",
             domain,
             fields: [
-                "name", 
+                "branch_name", 
                 "branch_image",
                 "address"
             ],
@@ -31,7 +31,7 @@ branchRoute.get('/', async (req, res, next) => {
         res.json(
             branches.map(branch => ({
                 id: branch.id,
-                name: branch.name,
+                name: branch.branch_name,
                 branch_image: branch.branch_image,
                 address:branch.address
             }))
