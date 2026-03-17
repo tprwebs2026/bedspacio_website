@@ -79,6 +79,7 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
 
     const inclusionList = await getInclusions();
 
+
     console.table({
         parameter: [
             params.branch,
@@ -97,26 +98,25 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
             <section className="relative flex flex-col items-center justify-center w-full h-screen xl:h-[400px] lg:h-[400px] md:h-screen bg-[#C7EEFF]">
                 <img src="/asset/rentas_bg_image.jpg" alt="rentals-header-image"  className="absolute inset-0 w-full h-full object-cover opacity-50"/>
 
-                <div className="absolute flex flex-col w-full h-full items-center justify-center gap-[8rem] xl:gap-[2rem] lg:gap-[2rem] md:gap-[1rem] px-[1rem] xl:px-[8rem] lg:px-[8rem] md:px-[4rem]">
-                    <span className="text-[32px] text-[#1D242B] text-center font-[900] leading-[1]">Explore all {roomListings.pagination.totalItems} of our listings</span>
-                    <div className="flex flex-col items-center justify-center gap-[2rem] w-full">
-                        <SearchFilter />
-                        <InclusionSelection  inclusionList={inclusionList} />
-                    </div>
+                <div className="flex flex-col items-center justify-center gap-[2rem] w-full px-[1rem] xl:px-[8rem] lg:px-[8rem] md:px-[2rem]">
+                    <SearchFilter />
+                    {/* <InclusionSelection  inclusionList={inclusionList} /> */}
                 </div>
-
             </section>
 
 
             <section className="flex flex-col items-start justify-start w-full h-auto p-[1rem] xl:px-[8rem] lg:px-[4rem]">
-                <div className="flex items-center justify-start py-[0.5rem] w-full border-b border-b-[#0077C0]/50">
-                    <span className="text-[#1D242B] text-[24px] font-bold">Explore Listings</span>
+                <div className="flex flex-col xl:flex-row lg:flex-row items-start justify-between py-[0.5rem] gap-2 w-full border-b border-b-[#0077C0]/50">
+                    <span className="text-[#1D242B] text-[24px] font-bold whitespace-nowrap">Explore Listings</span>
+                    <InclusionSelection  inclusionList={inclusionList} />
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 w-full gap-[0.5rem] py-[1rem]">
-                    {roomListings.items.map((room: ListingDetail) => (
-                        <ListingCard key={room.id} detail={room} />
-                    ))}
+                    {roomListings.items.map((room: ListingDetail) => {
+                        return (
+                            <ListingCard key={room.id} detail={room} />
+                        )
+                        })}
                 </div>
 
             </section>

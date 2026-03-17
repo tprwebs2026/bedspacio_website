@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import Arrow from '@/asset/icon/arrow-right.svg'
 import FullScreen from '@/asset/icon/full-screen.svg'
+import { ODOO_BASE_URL } from '@/config/config'
 
 import ImageFullView from './ImageFullView'
 
 export type RoomImage = {
     id: number,
-    image: string
+    url: string
 }
 
 export type RoomImageProp = {
@@ -19,10 +20,12 @@ export default function RoomImages ({ images }: RoomImageProp) {
     const [selectedIndex, setSelectedIndex] = useState<number>(0);
     const [fullViewOpen, setFullViewOpen] = useState<Boolean>(false);
 
-    const imageArray = images.map((image) => { return image.image })
+    const imageArray = images.map((image) => { return image.id })
     const selectedImage = imageArray[selectedIndex];
 
-    const displayImage = (image: string) => {
+    console.log('Selected image: ', selectedImage);
+
+    const displayImage = (image: number) => {
         const index = imageArray.indexOf(image);
         setSelectedIndex(index);
     }
@@ -40,6 +43,9 @@ export default function RoomImages ({ images }: RoomImageProp) {
         );
     }
 
+    console.log('Image details from roomImage: ', images );
+    console.log('Number of image', imagesLength);
+
 
     return (
         <>
@@ -50,7 +56,7 @@ export default function RoomImages ({ images }: RoomImageProp) {
                     </button>
                     {images.length > 1 && (
                         <div className="xl:hidden lg:hidden absolute inset-0 flex items-center justify-between w-full h-full px-2">
-                            <button onClick={toggleImageLeft} className="bg-[#FAFAFA] rounded-full cursor-pointer active:bg-[#0077C0] active:scale-95 transition-all duration-100">
+                            <button onClick={toggleImageLeft}  className="bg-[#FAFAFA] rounded-full cursor-pointer active:bg-[#0077C0] active:scale-95 transition-all duration-100">
                                 <Arrow className="w-[40px] h-[40px] -rotate-180" />
                             </button>
 
@@ -61,7 +67,7 @@ export default function RoomImages ({ images }: RoomImageProp) {
                     )}
 
                     <img 
-                        src={`data:image/webp;base64,${selectedImage}`}
+                        src={`${ODOO_BASE_URL}/web/image/bedspacio.room.image/${selectedImage}/image`}
                         alt="sample"
                         className="w-full h-full object-cover rounded-[10px]"
                     />
@@ -70,14 +76,15 @@ export default function RoomImages ({ images }: RoomImageProp) {
                 <div className="flex items-center w-full gap-1 overflow-x-scroll xl:overflow-x-auto overflow-y-hidden">
                     {images.map((img) => (
                         <button
-                            onClick={() => displayImage(img.image)}
+                            onClick={() => displayImage(img.id)}
                             key={img.id}
-                            className={`relative shrink-0 w-20 h-20 cursor-pointer hover:border-2 hover:border-[#1D242B] active:border-[#0077C0] rounded-[10px] overflow-hidden ${selectedImage === img.image && 'opacity-100 border-2 border-[#0077C0]'}`}
+                            className={`relative shrink-0 w-20 h-20 cursor-pointer hover:border-2 hover:border-[#1D242B] active:border-[#0077C0] rounded-[10px] overflow-hidden ${selectedImage === img.id && 'opacity-100 border-2 border-[#0077C0]'}`}
                         >
                             <img
-                                src={`data:image/webp;base64,${img.image}`}
+                                // src={`data:image/webp;base64,${img.image}`}
+                                src={`${ODOO_BASE_URL}${img.url}`}
                                 alt="sample"
-                                className={`w-full h-full object-cover opacity-50 active:opacity-100 ${selectedImage === img.image && 'opacity-100'}`}
+                                className={`w-full h-full object-cover opacity-50 active:opacity-100 ${selectedImage === img.id && 'opacity-100'}`}
                             />
                         </button>
                     ))}
@@ -87,7 +94,7 @@ export default function RoomImages ({ images }: RoomImageProp) {
             <div className='hidden xl:flex lg:flex'>
                 {fullViewOpen && (
                     <ImageFullView 
-                        selectedImage={selectedImage} 
+                        selectedImage={`${ODOO_BASE_URL}/web/image/bedspacio.room.image/${selectedImage}/image`} 
                         totalImage = {imagesLength}
                         onClose={() => setFullViewOpen(prev => !prev)}
                         viewLeft={toggleImageLeft}

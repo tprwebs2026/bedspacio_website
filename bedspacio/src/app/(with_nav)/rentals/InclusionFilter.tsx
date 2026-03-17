@@ -47,9 +47,9 @@ export default function InclusionSelection ({ inclusionList }: InclusionProps ) 
 
 
     return (
-        <div className="flex flex-wrap items-center justify-center w-full gap-2">
+        <div className="flex flex-wrap items-center justify-start gap-2">
             {inclusionList.map(inc => (
-                <label key={inc.id} htmlFor={`inclusion_${inc.id}`} className={`flex items-center justify-center px-4 py-2 rounded-full cursor-pointer hover:-translate-y-1 active:bg-[#1D242B] xl:active:translate-y-1 lg:active:translate-y-1 ${incList.includes(inc.id) ? 'bg-[#0077C0] text-[#FAFAFA] font-bold' : 'bg-[#1D242B] text-[#FAFAFA]'} transition-all duration-100`}>
+                <label key={inc.id} htmlFor={`inclusion_${inc.id}`} className={`flex items-center justify-center px-3 py-1 rounded-full cursor-pointer hover:-translate-y-1 active:bg-[#1D242B] xl:active:translate-y-1 lg:active:translate-y-1 ${incList.includes(inc.id) ? 'bg-[#0077C0] text-[#FAFAFA] border-2 border-[#0077C0] font-bold' : 'border-2 border-[#1D242B] text-[#1D242B] font-bold'} transition-all duration-100`}>
                     <input type="checkbox" onChange={(e) => handleInclusionFilter(e, inc.id)} name="inclusion" id={`inclusion_${inc.id}`} hidden
                     checked={incList.includes(inc.id)}/>
                     <span>{inc.name}</span>
@@ -57,7 +57,7 @@ export default function InclusionSelection ({ inclusionList }: InclusionProps ) 
             ))}
             {incList.length > 0 && (
                 <button onClick={handleInclusionFilterReset}
-                className="flex items-center gap-1 bg-[#FAFAFA] rounded-full font-bold text-[#1D242B] px-4 py-2 cursor-pointer active:bg-[#1D242B]/25">
+                className="flex items-center gap-1 rounded-full font-bold text-[#1D242B] bg-[#1D242B] text-[#FAFAFA] font-bold px-4 py-2 cursor-pointer active:bg-[#1D242B]/25">
                     <Closefrom className="w-[20px] h-[20px]" />
                     clear filter
                 </button>

@@ -9,8 +9,7 @@ export default async function SearchFilter() {
     
 
     return (
-        <div className="relative flex flex-col items-center justify-center w-fit rounded-[10px] gap-2 p-3 bg-[#1D242B]/50 ">
-            <span className='text-[#FAFAFA] text-[20px]'>Tell us your preferrence</span>
+        <div className="relative flex flex-col items-center justify-center w-fit rounded-[5px] gap-2 p-3 border border-[#FAFAFA] bg-[#1D242B]/25">
             <SearchFilterClient branchData={branches}/>
         </div>
     )

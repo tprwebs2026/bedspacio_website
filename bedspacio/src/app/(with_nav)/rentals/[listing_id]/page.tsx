@@ -5,7 +5,8 @@ import InquiryForm from "./InquiryForm";
 import ArrowLong from '@/asset/icon/arrow-long.svg'
 import Location from '@/asset/icon/map-pin.svg'
 
-import { getRoomDetails, getRoomImages } from "../../../../../lib/room";
+import { getRoomDetails } from "../../../../../lib/room";
+import { ODOO_BASE_URL } from "@/config/config";
 import RoomImages from "./RoomImage";
 
 
@@ -52,8 +53,8 @@ export default async function ListingInfoPage ({ params }: Props ) {
     */
 
     const room = await getRoomDetails(listing_id);
-    const room_images = await getRoomImages(listing_id);
 
+    console.log('Room details from roomImages: ', room);
     
 
     return (
@@ -74,7 +75,8 @@ export default async function ListingInfoPage ({ params }: Props ) {
                                 <span className="text-[#FAFAFA] text-[16px]">{room.gender !== 'male' ? 'Female' : 'Male'} Only</span>
                             </div>
 
-                            <RoomImages images={room_images}/>
+                            {/* <RoomImages images={room_images}/> */}
+                            <RoomImages images={room.images}/>
                         </div>
                         
                         <div className="flex flex-col items-start justify-start gap-[1rem] pb-[1rem] w-full">
@@ -86,20 +88,77 @@ export default async function ListingInfoPage ({ params }: Props ) {
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap items-start gap-2">
-                                <span className="flex justify-center items-center text-[12px] xl:text-[14px] lg:text-[14px] text-[#FAFAFA] font-[900] leading-[0.75] bg-[#0077C0] py-3 rounded-full px-4">Maximum Pax: {room.maximum_pax}</span>
+                            {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                                <div className="flex  items-center justify-start bg-[#1D242B]/10 pl-4 p-2 gap-2 overflow-hidden">
+                                    <span className="text-center text-[16px] font-medium text-[#1D242B] min-w-[100px] max-w-[140px] truncate">
+                                    Maximum Pax:
+                                    </span>
+                                    <span className="font-bold text-[16px] text-[#0077C0] whitespace-nowrap">
+                                    {room.maximum_pax}
+                                    </span>
+                                </div>
 
-                                <span className="text-[12px] xl:text-[14px] lg:text-[14px] text-[#FAFAFA] font-[900] leading-[0.75] bg-[#0077C0] rounded-full py-3 px-4">Available Slots: {room.available_slot}</span>
+                                <div className="flex  items-center justify-start bg-[#1D242B]/10 pl-4 p-2 gap-2  overflow-hidden">
+                                    <span className="text-center text-[16px] font-medium text-[#1D242B] min-w-[100px] max-w-[140px] truncate">
+                                    Available Slot:
+                                    </span>
+                                    <span className="font-bold text-[16px] text-[#0077C0] whitespace-nowrap">
+                                    {room.available_slot}
+                                    </span>
+                                </div>
 
                                 {room.type === 'bedspace' && (
-                                    <span className="text-[12px] xl:text-[14px] lg:text-[14px] text-[#FAFAFA] font-[900] leading-[0.75] bg-[#0077C0] rounded-full py-3 px-4">{`${room.available_upper} Upper decks & ${room.available_lower} Lower Decks`}</span>
+                                    <div className="flex  items-center justify-start bg-[#1D242B]/10 pl-4 p-2 gap-2 overflow-hidden">
+                                        <span className="text-center text-[16px] font-medium text-[#1D242B] min-w-[100px] max-w-[140px] truncate">
+                                            Upper Decks:
+                                        </span>
+                                        <span className="font-bold text-[16px] text-[#0077C0] whitespace-nowrap">
+                                            {room.available_upper}
+                                        </span>
+                                    </div>
                                 )}
-                            </div>
+
+                                {room.type === 'bedspace' && (
+                                    <div className="flex items-center justify-start bg-[#1D242B]/10 pl-4 p-2 gap-2 overflow-hidden">
+                                        <span className="text-center text-[16px] font-medium text-[#1D242B] min-w-[100px] max-w-[140px] truncate">
+                                            Lower Decks:
+                                        </span>
+                                        <span className="font-bold text-[16px] text-[#0077C0] whitespace-nowrap">
+                                            {room.available_lower}
+                                        </span>
+                                    </div>
+                                )}
+                                </div> */}
                         </div>
 
                         <div className="flex flex-col items-start gap-[1rem] w-full pt-[1rem] border-t border-t-[#1D242B]/50">
                             <span className="text-[20px] text-[#1D242B] font-[900]">Description</span>
                             <p className="text-[18px] text-[#1D242B]">{`${room.description}`}</p>
+                        </div>
+
+                        <div className="flex flex-col items-start gap-[1rem] w-full">
+                            <span className="text-[20px] text-[#1D242B] font-[900]">Availability</span>
+                            <div className="flex items-center gap-2">
+                                <ArrowLong className="w-[25px] h-full" />
+                                <span>Maximum pax: <strong>{room.maximum_pax}</strong></span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <ArrowLong className="w-[25px] h-full" />
+                                <span>Available Slot: <strong>{room.available_slot}</strong></span>
+                            </div>
+                            {room.room_type !== "bedspace" && (
+                                <>
+                                    <div className="flex items-center gap-2">
+                                        <ArrowLong className="w-[25px] h-full" />
+                                        <span>Upper Deck/s: <strong>{room.available_upper}</strong></span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <ArrowLong className="w-[25px] h-full" />
+                                        <span>Lower Deck/s: <strong>{room.available_lower}</strong></span>
+                                    </div>
+                                </>
+                            )}
+                            
                         </div>
 
                         <div className="flex flex-col items-start gap-2 w-full">
@@ -149,7 +208,7 @@ export default async function ListingInfoPage ({ params }: Props ) {
                             <span className="text-[20px] text-[#1D242B] font-[900]">Landmarks</span>
                             <div className="flex flex-col gap-[0.5rem] items-start w-full">
                                 {room.branch.landmarks.map((landmark: {id:number, name: string}) => (
-                                    <div className="flex items-center gap-2">
+                                    <div key={landmark.id} className="flex items-center gap-2">
                                         <ArrowLong className="w-[25px] h-auto" />
                                         <span key={landmark.id} className="text-[18px] text-[#1D242B] leading-[1]">
                                             {landmark.name}

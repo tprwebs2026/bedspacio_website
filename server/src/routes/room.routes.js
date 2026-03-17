@@ -80,24 +80,9 @@ roomRoute.get('/v1/listing' , async (req, res) => {
 
         const inclusionMap = Object.fromEntries(inclusions.map(inc => [inc.id, inc]));
 
-        const imageIds = [...new Set(
-            rooms
-                .flatMap(room => room.image_ids?.[0]) // take the first image [index 0]
-                .filter((id) => typeof id === "number")
-            )];
-        const thumbs = imageIds.length
-            ? await readByIds({
-                model: "bedspacio.room.image",
-                ids: imageIds,
-                fields: ["image"]
-            })
-            : [];
-        
-        const thumbMap = Object.fromEntries(thumbs.map(thumb => [thumb.id, thumb]))
 
         const items = rooms.map((room) => {
-            const thumbId = room.image_ids?.[0];
-            const thumbRecord = typeof thumbId === "number" ? thumbMap[thumbId] : null;
+            const thumbId = room.image_ids?.[0]; // get the first image 
 
             return {
                 id: room.id,
@@ -114,8 +99,7 @@ roomRoute.get('/v1/listing' , async (req, res) => {
                     .map(id => inclusionMap[id])
                     .filter(Boolean),
 
-                thumbnail: thumbRecord?.image ?? null,
-                thumbnail_image_id: thumbId ?? null
+                thumbnail_image_id: thumbId ?? null // get the first image 
             }
         });
 
@@ -173,7 +157,8 @@ roomRoute.get('/v1/detail/:id', async (req, res, next) => {
                 "property_contact",
                 "profile_image",
                 "inclusion_ids",
-                "payment_term_ids"
+                "payment_term_ids",
+                "image_ids"
             ],
             limit: 1,
             offset: Number(req.query.offset || 0),
@@ -231,6 +216,14 @@ roomRoute.get('/v1/detail/:id', async (req, res, next) => {
             }) : []
 
 
+        const images = data.image_ids?.length
+            ? await readByIds({
+                model: "bedspacio.room.image",
+                ids: data.image_ids,
+                fields: ["id"]   // you only need id because Odoo serves the image
+            })
+            : [];
+
         res.json({
                 id:room_id,
                 name: data.room_name,
@@ -254,7 +247,11 @@ roomRoute.get('/v1/detail/:id', async (req, res, next) => {
                 property_manager_contact: data.property_contact,
                 profile_image: data.profile_image,
                 inclusions: inclusions,
-                payment_terms: paymentTerms
+                payment_terms: paymentTerms,
+                images: images.map(img => ({
+                    id: img.id,
+                    url: `/web/image/bedspacio.room.image/${img.id}/image`
+                }))
             });
 
     } catch (err) {
@@ -268,56 +265,6 @@ roomRoute.get('/v1/detail/:id', async (req, res, next) => {
 })
 
 
-
-roomRoute.get('/v1/:id/images', async (req, res, next ) => {
-    try {
-        const room_id = Number(req.params.id);
-        
-        const roomImages = await searchRead({
-            model: "bedspacio.room",
-            domain: [["id", "=", room_id]],
-            fields: [ "image_ids" ],
-            limit: 1,
-            offset: Number(req.query.offset || 0),
-            order: "id asc"
-        });
-
-        const data = roomImages[0];
-
-
-        const images = data.image_ids.length
-            ? await readByIds({
-                model: "bedspacio.room.image",
-                ids: data.image_ids,
-                fields: [
-                    "image",
-                    "image_order"
-                ]
-            }) : [] 
-
-        res.json({
-            id: room_id,
-            image: images
-        });
-
-    } catch (err) {
-        next(err);
-    }
-})
-
-
-
-// TODO: 
-// Create a filter to retrieve all room listing that includes the selected inclusion id
-roomRoute.get('/v1/filter', async (req, res, next) => {
-    try {
-
-        
-    } catch (err) {
-        console.error('[Room filtering] Failed to do whatever the fuck this needs to do: ', err);
-        next(err);
-    }
-});
 
 
 

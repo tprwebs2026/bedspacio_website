@@ -28,7 +28,7 @@ export default function ImageFullView ({ selectedImage, totalImage, onClose, vie
                     <CloseImage className="w-[20px] h-[20px]"/>
                     close
                 </button>
-                <img src={`data:image/webp;base64,${selectedImage}`} alt="" className="w-full h-full object-cover rounded-[10px]"/>
+                <img src={`${selectedImage}`} alt="" className="w-full h-full object-cover rounded-[10px]"/>
             </div>
         </div>
     )

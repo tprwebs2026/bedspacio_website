@@ -3,6 +3,7 @@
 
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { ODOO_BASE_URL } from "@/config/config"
 
 type Branch = {
     id: number,
@@ -55,7 +56,10 @@ export default function ListingCard ({ detail }:ListingDetailProps) {
                 </div>
 
                 <div className="flex w-full h-full text-[#FAFAFA] rounded-[5px] overflow-hidden">
-                    <img loading="lazy" src={`data:image/webp;base64,${detail.thumbnail}`} alt="thumbnail" className="group-hover:scale-102 transition-all duration-100 w-full h-full object-cover"/>
+                    <img loading="lazy" 
+                    // src={`data:image/webp;base64,${detail.thumbnail}`} 
+                    src={`${ODOO_BASE_URL}/web/image/bedspacio.room.image/${detail.thumbnail_image_id}/image`}
+                    alt="thumbnail" className="group-hover:scale-102 transition-all duration-100 w-full h-full object-cover"/>
                 </div>
             </div>
 

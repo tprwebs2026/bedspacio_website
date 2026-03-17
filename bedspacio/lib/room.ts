@@ -48,25 +48,12 @@ export const getRoomDetails = cache(async (room_id: number) => {
         const response = await axios.get(`${BASE_URL}/room/v1/detail/${room_id}`);
 
         console.log(response.data);
-        return response.data ?? [];
+        return response.data ;
     } catch (err) {
         console.error('Failed to fetch room data: ', err);
-        return [];
+        return;
     }
 })
-
-
-export const getRoomImages = cache(async (room_id: number): Promise<RoomImage[]> => {
-    try {
-        const response = await axios.get(`${BASE_URL}/room/v1/${room_id}/images`);
-        console.log(response);
-
-        return response.data.image ?? [];
-    } catch (err) {
-        console.log('Failed to retrieve image: ', err)
-        return [];
-    }
-});
 
 
 export const getInclusions = cache(async () => {
