@@ -117,7 +117,7 @@ export default function SearchFilterClient ({ branchData }: BranchProp) {
                         <span className="text-[18px] whitespace-nowrap">Find a Room</span>
                 </button>
 
-                {hasAnyFilter && (
+                {hasAnyFilter  && (
                     <button onClick={handleFitlerReset} className="flex items-center gap-2 w-full rounded-[5px] bg-[#1D242B] cursor-pointer hover:bg-[#141414] active:bg-[#1D242B] xl:active:bg-[#1D242B] lg:active:bg-[#1D242B] text-[#FAFAFA] h-[50px] px-3 py-4 font-bold transition-all duration-100">
                         <Clear className="w-[20px] h-[20px]" />
                         Clear
