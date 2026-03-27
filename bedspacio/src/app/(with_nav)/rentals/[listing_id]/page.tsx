@@ -103,7 +103,7 @@ export default async function ListingInfoPage ({ params }: Props ) {
                                 <ArrowLong className="w-[25px] h-full" />
                                 <span>Available Slot: <strong>{room.available_slot}</strong></span>
                             </div>
-                            {room.room_type !== "bedspace" && (
+                            {room.room_type === "bedspace" ? (
                                 <>
                                     <div className="flex items-center gap-2">
                                         <ArrowLong className="w-[25px] h-full" />
@@ -114,6 +114,9 @@ export default async function ListingInfoPage ({ params }: Props ) {
                                         <span>Lower Deck/s: <strong>{room.available_lower}</strong></span>
                                     </div>
                                 </>
+                            ) : (
+                                <></>
+                                // Upper decks and lower deck slots are not show if the room type is APARTMENT
                             )}
                             
                         </div>

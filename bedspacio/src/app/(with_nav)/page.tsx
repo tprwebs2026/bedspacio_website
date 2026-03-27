@@ -3,20 +3,15 @@ import SearchFilter from '@/components/SearchFilter'
 import FrequentlyAskedQuestions from '@/components/FrequentlyAskedQuestion'
 import HomeInquiry from '@/components/HomeInquiry'
 
-import ArrowRight from '@/asset/icon/arrow-right.svg'
-import ArrowLong from '@/asset/icon/arrow-long.svg'
-
-import Quote from '@/asset/icon/quote.svg'
-import Star from '@/asset/icon/star.svg'
-
-import Link from 'next/link'
-// import { useSearchParams } from "next/navigation";
-// import { useState, useMemo } from 'react'
+import Bed from '@/asset/icon/bed.svg'
+import Heart from '@/asset/icon/heart.svg'
+import Community from '@/asset/icon/community.svg'
 
 import BranchCard from '@/components/BranchCard'
 import RoomType from '@/components/RoomType'
 import Reviews from '@/components/Reviews'
 import ReviewsMobile from '@/components/reviewsMobile'
+import BranchRoomCard from '@/components/Branch&RoomCard'
 
 export default function Home() {
     
@@ -24,7 +19,7 @@ export default function Home() {
         <div className="flex flex-col min-h-screen items-start justify-start ">
             
             <section className="relative flex flex-col w-full min-h-[800px] xl:h-screen items-center justify-center bg-[#0077C0] xl:items-start xl:justify-center lg:items-start lg:justify-center lg:h-[800px]">
-                <img src="/image/bedspaco-hero-x-large-example.jpg" alt="bedspacio-header-image" className='h-full w-full object-cover absolute inset-0 opacity-25'/>
+                <img src="/image/BedSpacio.png" alt="bedspacio-header-image" className='h-full w-full object-cover absolute inset-0 opacity-10'/>
 
                 <div className="absolute flex flex-col items-center justify-center xl:justify-center lg:justify-center md:justify-center w-full h-auto xl:gap-[5rem] lg:gap-[5rem] gap-[5rem] p-[1rem] border-box xl:p-0 lg:p-[1rem] md:p-[2rem]">
                     <div className="flex flex-col items-center justify-center gap-[1rem] xl:gap-[2rem] lg:gap-[2rem] md:gap-[1rem] xl:w-[800px] lg:w-[800px] md:w-[800px]">
@@ -45,7 +40,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className='flex w-full p-[1rem] py-[4rem] xl:h-[800px] lg:h-[800px] md:h-[800px] bg-[#FAFAFA] items-center justify-center'>
+            <section  className={`flex w-full p-[1rem] py-[4rem] xl:h-[800px] lg:h-[800px] md:h-[800px] bg-[#FAFAFA] items-center justify-center `}>
                 <div className="w-full max-w-5xl mx-auto rounded-[10px] overflow-hidden">
                     <div className="aspect-video">
                         <iframe
@@ -61,17 +56,7 @@ export default function Home() {
             </section>  
 
 
-            <section className='flex flex-col w-full min-h-[800px] bg-[#FAFAFA] items-center justify-start px-[1rem] xl:px-[8rem] lg:px-[4rem] md:px-[1rem] py-[3rem] gap-[3rem]'>
-                <div className='flex flex-col items-center justify-center gap-[2rem] w-full'>
-                    <span className='text-[42px] font-[900] text-[#1D242B] leading-[0.5]'>Our Branches</span>
-                    <BranchCard />
-                </div>
-
-                <div className='flex flex-col items-center justify-center gap-[2rem] w-full'>
-                    <span className='text-[42px] font-[900] text-[#1D242B] leading-[1] text-center'>Explore Room Types</span>
-                    <RoomType />
-                </div>
-            </section>
+            <BranchRoomCard />
 
 
             <section className='flex xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 md:grid md:grid-cols-2 w-full xl:min-h-[800px] lg:min-h-[800px] bg-[#FAFAFA] xl:px-[8rem] lg:px-[6rem] py-[3rem] xl:py-[6rem] lg:py-[6rem] md:py-[3rem]  gap-[1rem]'>
@@ -96,7 +81,7 @@ export default function Home() {
                         <span className='text-[36px] xl:text-[48px] lg:text-[42px] md:text-[38px] text-[#1D242B] font-[900] text-center xl:text-left lg:text-left md:text-left leading-[1]'>You don't just find a space, you find a place that feels like home</span>
 
                         <span className='text-[18px] text-[#0077C0] leading-[1.2] text-center xl:text-left lg:text-left md:text-left'>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
+                            You're not just choosing a place to stay, you're choosing where your story begins. Because the right space doesn't just shelter you, it welcomes you.
                         </span>
                     </div>
 
@@ -104,30 +89,33 @@ export default function Home() {
                         <div className='flex items-center gap-[1rem] xl:gap-[2rem] lg:gap-[1rem] md:gap-[1rem]'>
                             <div className="flex items-center justify-center min-w-[70px] min-h-[70px] xl:min-w-[90px] xl:min-h-[90px] lg:min-w-[90px] lg:min-h-[90px] rounded-full bg-[#0077C0]">
                                 {/* Add an Icon here */}
+                                <Bed className="w-[35px] h-[35px]" />
                             </div>
                             <div className='flex flex-col min-w-0 break-words'>
-                                <span className='text-[30px] text-[#1D242B] font-[900]'>Bullet</span>
-                                <span className='text-[16px] text-[#0077C0] leading-snug'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</span>
+                                <span className='text-[30px] text-[#1D242B] font-[900]'>Comfort you can feel</span>
+                                <span className='text-[16px] text-[#1D242B] leading-snug'>Thoughtfully designed spaces that make every day feel warm and welcoming.</span>
                             </div>
                         </div>
 
                         <div className='flex items-center gap-[1rem] xl:gap-[2rem] lg:gap-[1rem] md:gap-[1rem] w-auto'>
                             <div className="flex items-center justify-center min-w-[70px] min-h-[70px] xl:min-w-[90px] xl:min-h-[90px] lg:min-w-[90px] lg:min-h-[90px] rounded-full bg-[#0077C0]">
                                 {/* Add an Icon here */}
+                                <Heart className="w-[35px] h-[35px]" />
                             </div>
                             <div className='flex flex-col min-w-0 break-words'>
-                                <span className='text-[30px] text-[#1D242B] font-[900]'>Bullet</span>
-                                <span className='text-[16px] text-[#0077C0] leading-snug'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</span>
+                                <span className='text-[30px] text-[#1D242B] font-[900]'>Convenience That Fits Your Life</span>
+                                <span className='text-[16px] text-[#1D242B] leading-snug'>Prime locations and essentials that keep everything you need within reach.</span>
                             </div>
                         </div>
 
                         <div className='flex items-center gap-[1rem] xl:gap-[2rem] lg:gap-[1rem] md:gap-[1rem] w-auto'>
                             <div className="flex items-center justify-center min-w-[70px] min-h-[70px] xl:min-w-[90px] xl:min-h-[90px] lg:min-w-[90px] lg:min-h-[90px] rounded-full bg-[#0077C0]">
                                 {/* Add an Icon here */}
+                                <Community className="w-[35px] h-[35px]" />
                             </div>
                             <div className='flex flex-col min-w-0 break-words'>
-                                <span className='text-[30px] text-[#1D242B] font-[900]'>Bullet</span>
-                                <span className='text-[16px] text-[#0077C0] leading-snug'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</span>
+                                <span className='text-[30px] text-[#1D242B] font-[900]'>Community That Connects</span>
+                                <span className='text-[16px] text-[#1D242B] leading-snug'>A place where you're not just staying, you are part of something meaningful.</span>
                             </div>
                         </div>
                     </div>

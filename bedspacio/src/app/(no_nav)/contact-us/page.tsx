@@ -1,8 +1,12 @@
 "use client"
 
+import Arrow from '@/asset/icon/arrow-long.svg'
+
+import Breadcrumbs from "@/components/BreadCrumb";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 
-type inquiryFormValues = {
+export type inquiryFormValues = {
     fullname: string,
     contactnumber: string,
     email: string,
@@ -22,10 +26,20 @@ export default function ContactUs() {
 
     return (
         <div className="flex flex-col min-h-screen w-full items-start justify-start">
+
+            <div className="flex items-center px-[2rem] xl:px-[6rem]">
+                <Breadcrumbs />
+            </div>
+
             <div className="flex flex-col xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 px-[2rem] xl:px-[6rem] py-[4rem] gap-[2rem] w-full">
                 <div className="flex flex-col xl:flex lg:flex xl:flex-col lg:flex-col md:grid md:grid-cols-2 gap-[2rem] xl:gap-[4rem] lg:gap-[4rem]">
                     <div className="flex flex-col gap-[2rem]">
-                        <span className="text-[28px] xl:text-[36px] lg:text-[36px] text-[#1D242B] font-[900] whitespace-nowrap">Contact Us</span>
+                        <div className="flex items-center gap-3">
+                            <Link href="/" className='bg-[#0077C0] hover:bg-[#0077C0]/75 active:bg-[#1D242B] xl:active:bg-[#0077C0] lg:active:bg-[#0077C0] rounded-full '>
+                                <Arrow className="-rotate-180 w-[50px] h-[50px] p-3 " />
+                            </Link>
+                            <span className="text-[28px] xl:text-[36px] lg:text-[36px] text-[#1D242B] font-[900] whitespace-nowrap">Contact Us</span>
+                        </div>
                         <span className="text-[20px] xl:text-[24px] lg:text-[24px] text-[#1D242B] leading-[1.2]">
                             Got questions? We're easy to reach and happy to chat. Whether by call or message, our team is here to help you every step of the way.
                         </span>
@@ -124,7 +138,7 @@ export default function ContactUs() {
                 ) : (
                     <div className="flex flex-col w-full h-auto items-center justify-center rounded-[15px] border-2 border-dashed border-[#1D242B]/50 bg-[#C7EEFF]/50 gap-[1rem] p-2 py-[6rem] xl:py-[1rem] lg:py-[1rem]">
                         <span className="text-[28px] text-[#0077C0] font-bold">INQUIRY SENT!</span>
-                        <span className="text-[20px] text-[#1D242B] text-center leading-[1.2] w-full">Thanks! Your inquiry was sent successfully. We've emailed you a confirmation and will be in touch soon.</span>
+                        <span className="text-[20px] text-[#1D242B] text-center leading-[1.2] w-full">Thank you! Your inquiry was submitted successfully. We sent you a confirmation email and will be in touch with you soon.</span>
                     </div>
                 )}
             </div>

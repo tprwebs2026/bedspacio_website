@@ -2,7 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from "dotenv";
 
-dotenv.config({ path: ".env.development" });
+// dotenv.config({ path: ".env.development" });
+dotenv.config({ path: ".env" });
+
 
 // Routes
 import odooRoute from './src/routes/odoo.routes.js'; // test to get user session

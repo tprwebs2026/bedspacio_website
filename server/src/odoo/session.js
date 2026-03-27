@@ -1,8 +1,10 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '.env.development' })
-let cookieJar = null;
+// dotenv.config({ path: '.env.development' })
+dotenv.config({ path: '.env' })
+
+
 
 const baseURL = process.env.ODOO_URL;
 
@@ -81,9 +83,6 @@ export async function getOdooClient() {
     return {
         call: async (path, body) => {
             const response = await client.post(path, body);
-
-            console.log('Status: ', response.status);
-            console.log('Response data: ', response.data);
 
             if (response.data?.error) {
                 throw new Error(

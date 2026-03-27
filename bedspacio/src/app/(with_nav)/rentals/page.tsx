@@ -122,14 +122,19 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
                     <InclusionSelection  inclusionList={inclusionList} />
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 w-full gap-[0.5rem] py-[1rem]">
-                    {roomListings.items.map((room: ListingDetail) => {
-                        return (
-                            <ListingCard key={room.id} detail={room} />
-                        )
-                        })}
-                </div>
-
+                    {roomListings.pagination.totalItems === 0 ? (
+                        <div className="flex items-center justify-center w-full py-[2rem]">
+                            <span className="text-[#1D242B] text-[24px] font-bold text-center">No listings found that match your preferences. <br/> Try adjusting your filters.</span>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 w-full gap-[0.5rem] py-[1rem]">
+                            {roomListings.items.map((room: ListingDetail) => {
+                                return (
+                                    <ListingCard key={room.id} detail={room} />
+                                )
+                            })}
+                        </div>
+                    )}
             </section>
 
             {roomListings.pagination && (

@@ -24,8 +24,8 @@ export default function SearchFilterClient ({ branchData }: BranchProp) {
     const searchParams = useSearchParams();
     const pathname = usePathname();
 
-    const [selectedBranch, setSelectedBranch] = useState(searchParams.get("branch") || "")
-    const [selectedRoomType, setSelectedRoomType] = useState(searchParams.get("room_type") || "")
+    const [selectedBranch, setSelectedBranch] = useState(searchParams.get("branch") || "All")
+    const [selectedRoomType, setSelectedRoomType] = useState(searchParams.get("room_type") || "All")
 
     const [minBudget, setMinBudget] = useState(searchParams.get("minimumBudget") || "")
     const [maxBudget, setMaxBudget] = useState(searchParams.get("maximumBudget") || "")
@@ -89,7 +89,7 @@ export default function SearchFilterClient ({ branchData }: BranchProp) {
         maxBudget !== "";
 
     return (
-        <div className="relative flex flex-col xl:flex-row lg:flex-row  items-end justify-center rounded-[10px] w-fit gap-4 xl:gap-1 lg:gap-1">
+        <div className="relative flex flex-col xl:flex-row lg:flex-row  items-end justify-center rounded-[10px] w-fit gap-4 xl:gap-2 lg:gap-1">
 
             <BranchSelection 
                 branchData={branchData}
@@ -111,14 +111,14 @@ export default function SearchFilterClient ({ branchData }: BranchProp) {
                 <button
                     type="button"
                     onClick={handleSearch}
-                    className="flex items-center gap-2 w-full rounded-[5px] bg-[#0077C0] cursor-pointer hover:bg-[#0077C0]/50 active:bg-[#0077C0] xl:active:bg-[#0077C0] lg:active:bg-[#0077C0] text-[#FAFAFA] h-[50px] px-3 py-4 font-bold transition-all duration-100"
+                    className="flex items-center gap-2 w-full rounded-[5px] bg-[#1D242B] cursor-pointer hover:bg-[#1D242B]/75 active:bg-[#1D242B] xl:active:bg-[#1D242B] lg:active:bg-[#1D242B] text-[#FAFAFA] h-[50px] px-4 pr-6 py-4 font-bold transition-all duration-100"
                     >
                         <Search className="stroke-[#FAFAFA] h-[20px] w-[20px] fill-[#FAFAFA]" />
-                        <span className="text-[18px] whitespace-nowrap">Find a Room</span>
+                        <span className="text-[18px] whitespace-nowrap">Search</span>
                 </button>
 
                 {hasAnyFilter  && (
-                    <button onClick={handleFitlerReset} className="flex items-center gap-2 w-full rounded-[5px] bg-[#1D242B] cursor-pointer hover:bg-[#141414] active:bg-[#1D242B] xl:active:bg-[#1D242B] lg:active:bg-[#1D242B] text-[#FAFAFA] h-[50px] px-3 py-4 font-bold transition-all duration-100">
+                    <button onClick={handleFitlerReset} className="flex items-center gap-2 w-full rounded-[5px] bg-[#1D242B] cursor-pointer hover:bg-[#1D242B]/80 active:bg-[#1D242B] xl:active:bg-[#1D242B] lg:active:bg-[#1D242B] text-[#FAFAFA] h-[50px] px-3 py-4 font-bold transition-all duration-100">
                         <Clear className="w-[20px] h-[20px]" />
                         Clear
                     </button>

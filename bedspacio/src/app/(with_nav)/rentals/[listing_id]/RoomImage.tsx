@@ -50,7 +50,7 @@ export default function RoomImages ({ images }: RoomImageProp) {
     return (
         <>
             <div className="grid grid-rows-[80%_20%] w-full h-[550px] gap-1">
-                <div className="relative flex items-start justify-start w-full h-full overflow-hidden">
+                <div className="relative flex items-start justify-start w-full h-full overflow-hidden cursor-pointer">
                     <button onClick={() => setFullViewOpen(prev => !prev)} title='Full Screen' className='hidden xl:flex lg:flex absolute bottom-2 right-2 cursor-pointer'>
                         <FullScreen className="w-[20px] h-[20px] hover:scale-110 active:scale-100 transition-all duration-100"/>
                     </button>
@@ -67,8 +67,8 @@ export default function RoomImages ({ images }: RoomImageProp) {
                         </div>
                     )}
 
-                    <img 
-                        src={`${ODOO_BASE_URL}/web/image/bedspacio.room.image/${selectedImage}/image`}
+                    <img onClick={() => setFullViewOpen(prev => !prev)}
+                        src={`${ODOO_BASE_URL}/web/image/bedspacio.room.image/${selectedImage}/image?width=1920`}
                         alt="sample"
                         className="w-full h-full object-cover rounded-[10px]"
                     />
@@ -95,7 +95,7 @@ export default function RoomImages ({ images }: RoomImageProp) {
             <div className='hidden xl:flex lg:flex'>
                 {fullViewOpen && (
                     <ImageFullView 
-                        selectedImage={`${ODOO_BASE_URL}/web/image/bedspacio.room.image/${selectedImage}/image`} 
+                        selectedImage={`${ODOO_BASE_URL}/web/image/bedspacio.room.image/${selectedImage}/image?width=1920`} 
                         totalImage = {imagesLength}
                         onClose={() => setFullViewOpen(prev => !prev)}
                         viewLeft={toggleImageLeft}

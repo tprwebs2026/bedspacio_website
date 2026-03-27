@@ -28,23 +28,28 @@ export default function Reviews () {
     
 
     return (
-        <section className="flex flex-col xl:items-center lg:items-center md:items-center w-full bg-[#C7EEFF] py-12 md:py-16 p-3 gap-5">
+        <section className="relative flex flex-col xl:items-center lg:items-center md:items-center w-full bg-[#C7EEFF] py-12 md:py-16 p-3 gap-5">
             <span className="flex text-center text-[32px] md:text-[46px] font-[900] text-[#0077C0] leading-[1]">
                 What Our Customers Say
             </span>
+
+            {/* <div className='absolute inset-0 block w-full h-auto bg-blend-soft-light'>
+                <img src="/image/pattern.png" alt="pattern" className='w-full h-full object-cover'/>
+            </div> */}
+
             <div className="flex flex-col xl:items-start lg:items-start md:items-start gap-[2rem] w-auto xl:w-[1450px] oveflow-x-scroll overflow-hidden rounded-[10px]">
 
                 {/* Mobile: horizontal scroll | Desktop: grid */}
                 <div ref={containerRef} className={`flex flex-row items-start gap-2 pb-2 rounded-[10px] transition-all oveflow-x-scroll duration-300 rounded-[10px]`}
                 style={{
-                    transform: `translateX(-${(currentIndex * 500 + (6 * currentIndex))}px)`
+                    transform: `translateX(-${(currentIndex * 478 + (8 * currentIndex))}px)`
                 }}
                 >
-                    <div className='flex xl:w-[450px] lg:w-[450px] sm:w-[420px]  min-h-[320px]'/>
+                    {/* <div className='flex xl:w-[450px] lg:w-[450px] sm:w-[420px]  min-h-[320px]'/> */}
 
                     {/* Center Card */}
                     {Reviews.map((review, index) => (
-                        <div key={index} className={`xl:w-[500px] lg:w-[500px] sm:w-[420px] flex flex-col items-start justify-between min-h-[320px] bg-[#FAFAFA] p-5 rounded-[10px] gap-4`}>
+                        <div key={index} className={`xl:w-[478px] lg:w-[478px] sm:w-[420px] flex flex-col items-start justify-between min-h-[320px] bg-[#FAFAFA] p-[2rem] rounded-[10px] gap-4`}>
                             <div className="flex w-full items-center justify-between">
                                 <Quote className="w-[28px] h-auto" />
                                 <Quote className="w-[28px] h-auto -rotate-180" />
@@ -64,8 +69,6 @@ export default function Reviews () {
                             </div>
                         </div>
                     ))}
-
-
                 </div>
             </div>
 

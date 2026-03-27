@@ -15,7 +15,7 @@ type ViewImageProps = {
 export default function ImageFullView ({ selectedImage, totalImage, onClose, viewLeft, viewRight }: ViewImageProps) {
     
     return (
-        <div className="fixed z-40 top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center backdrop-blur-[5px] justify-center bg-[#1D242B]/75 w-full h-full">
+        <button className="fixed z-40 top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center backdrop-blur-[5px] justify-center bg-[#1D242B]/75 w-full h-full">
             {totalImage > 1 && (
                 <div className="absolute inset-0 flex items-center justify-between w-full">
                     <button onClick={viewLeft} className='bg-[#FAFAFA] rounded-full cursor-pointer active:bg-[#0077C0] active:scale-95 transition-all duration-100'><Arrow className="w-[40px] h-[40px] -rotate-180" /></button>
@@ -30,6 +30,6 @@ export default function ImageFullView ({ selectedImage, totalImage, onClose, vie
                 </button>
                 <img src={`${selectedImage}`} alt="" className="w-full h-full object-cover rounded-[10px]"/>
             </div>
-        </div>
+        </button>
     )
 }

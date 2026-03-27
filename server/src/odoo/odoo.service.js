@@ -74,7 +74,7 @@ export async function executeKw({
 // Create a lead for Inquiry (first activity)
 // CRM
 
-export async function createRecord({
+export async function createInquiryRecord({
     model,
     values,
 }) {
@@ -82,18 +82,22 @@ export async function createRecord({
         const odoo = await getOdooClient();
 
         const path = `/json/2/${model}/create`;
-        const body = { 
-            vals_list: values
-        };
+        const body = {
+            vals_list: [
+                { values }
+            ]
+        }
+
+        console.log('Inquiry body: ', body)
 
         const result = await odoo.call(path, body);
 
 
-        console.log('Create Record: ', result);
-
-        return result.data;
+        console.log('Inquiry Record: ', result.data);
+        return result.data || result;
 
     } catch (err) {
         console.error('Create Record failed: ', err);
+        throw err;
     }
 };

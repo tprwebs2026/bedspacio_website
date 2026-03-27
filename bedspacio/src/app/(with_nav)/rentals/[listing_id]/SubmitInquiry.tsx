@@ -7,13 +7,34 @@ import axios from "axios"
 
 export default async function SubmitInquiry (data: InquiryFormValues) {
 
-    // TODO: SUBMIT FORMDATA TO THIS POST REQUEST ENDPOINT: /room/v1/lead-record`
-    // const response = await axios.post(`${BASE_URL}/room/v1/lead-record`, data, {
-    //     withCredentials: true
-    // });
+    try {
+        const response = await axios.post(
+            `${BASE_URL}/room/v1/inquiry-record`, 
+            {
+                public_room_id: data.public_room_id,
+                starting_price: data.starting_price,
+                fullname: data.fullname,
+                contactNumber: data.contactNumber,
+                email: data.email,
+                schedule: data.schedule,
+                targetMoveIn: data.targetMoveIn,
+                monthsOfStay: data.monthsOfStay,
+                other: data.other || "",
+            }, 
+            {
+                withCredentials: true
+            }
+        );
+    
+        console.log("Submit Inquiry: ", response.data);
+        return {
+            success: true,
+            message: "Inquiry submitted successfully!",
+            data: response.data,
+        };
 
-    const response = data;
-
-    console.log("Submit Inquiry: ", response);
-    return response;
+    } catch (err) {
+        console.error('Something went wrong with the inquiry process: ', err);
+        return;
+    }
 }
