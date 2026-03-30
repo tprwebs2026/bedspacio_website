@@ -3,6 +3,7 @@ import InquiryFormClient from "./InquiryFormClient"
 import { InquiryFormValues } from "./InquiryFormClient"
 
 type PropertyManagerInfo = {
+    slot:number,
     propertyManager: string,
     propertyManagerContact: string,
     profileImage: string,
@@ -11,6 +12,7 @@ type PropertyManagerInfo = {
 }
 
 export default async function InquiryForm ({ 
+    slot,
     propertyManager, 
     propertyManagerContact, 
     profileImage,
@@ -23,6 +25,7 @@ export default async function InquiryForm ({
     return (
         <>
             <InquiryFormClient 
+                slot={slot}
                 propertyManager={propertyManager}
                 propertyManagerContact={propertyManagerContact}
                 profileImage={profileImage}

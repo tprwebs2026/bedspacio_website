@@ -34,7 +34,7 @@ type RoomDetailType = {
     starting_price: number,
     property_manager: string,
     property_manager_contact: string,
-    maximum_pax: number,
+    capacity: number,
     available_slot: number,
     available_upper: number,
     available_lower: number,
@@ -97,11 +97,11 @@ export default async function ListingInfoPage ({ params }: Props ) {
                             <span className="text-[20px] text-[#1D242B] font-[900]">Availability</span>
                             <div className="flex items-center gap-2">
                                 <ArrowLong className="w-[25px] h-full" />
-                                <span>Maximum pax: <strong>{room.maximum_pax}</strong></span>
+                                <span>Maximum Pax: <strong>{room.capacity}</strong></span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <ArrowLong className="w-[25px] h-full" />
-                                <span>Available Slot: <strong>{room.available_slot}</strong></span>
+                                <span className={`${room.available_slot > 0 ? 'text-[#007C01]' : 'text-[#F60002]' }`}>Available Slot: <strong>{room.available_slot}</strong></span>
                             </div>
                             {room.room_type === "bedspace" ? (
                                 <>
@@ -125,9 +125,9 @@ export default async function ListingInfoPage ({ params }: Props ) {
                             <span className="text-[20px] text-[#1D242B] font-[900]">Inclusion/s</span>
                             <div className="flex flex-wrap gap-[0.5rem] items-start">
                                 {room.inclusions.map((inc:Inclusions) => (
-                                    <div key={inc.id} className="flex items-center justify-center gap-2 rounded-full border-2 border-[#0077C0] px-3 py-2">
-                                        <span className="text-[16px] text-[#0077C0] font-bold leading-[0.75]">{inc.name}</span>
-                                    </div>
+                                    <Link href={`/rentals?page=1&inclusion=${inc.id}`} key={inc.id} className="group flex items-center justify-center gap-2 rounded-full border-2 border-[#0077C0] px-3 py-2 hover:bg-[#0077C0] text-[#0077C0] active:bg-[#1D242B] active:border-[#1D242B]">
+                                        <span className="group-hover:text-[#FAFAFA] text-[16px] font-bold leading-[0.75]">{inc.name}</span>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
@@ -180,6 +180,7 @@ export default async function ListingInfoPage ({ params }: Props ) {
                     </div>
 
                     <InquiryForm 
+                        slot = {room.available_slot}
                         propertyManager={room.property_manager}
                         propertyManagerContact={room.property_manager_contact}
                         profileImage={room.profile_image}

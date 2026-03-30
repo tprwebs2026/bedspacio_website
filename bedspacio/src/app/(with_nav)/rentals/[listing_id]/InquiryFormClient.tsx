@@ -24,6 +24,7 @@ export type InquiryFormValues = {
 
 
 type PropertyManagerInfo = {
+    slot: number,
     propertyManager: string,
     propertyManagerContact: string,
     profileImage: string,
@@ -33,6 +34,7 @@ type PropertyManagerInfo = {
 
 
 export default function InquiryFormClient ({ 
+    slot,
     propertyManager, 
     propertyManagerContact, 
     profileImage,
@@ -40,6 +42,7 @@ export default function InquiryFormClient ({
     startingPrice
 }: PropertyManagerInfo) {
 
+    const [noSlot, setNoSlot] = useState<boolean>(false);
     const [inquireOpen, setInquireOpen] = useState<boolean>(true);
     const [reserveOpen, setReserveOpen] = useState<boolean>(false);
     const [payload, setPayload] = useState<InquiryFormValues|null>(null);
@@ -84,7 +87,15 @@ export default function InquiryFormClient ({
             </div>
 
             {inquireOpen && !isSubmitted && (
-                    <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col w-full gap-[1rem] p-4 py-5 bg-[#C7EEFF]`}>
+                    <form onSubmit={handleSubmit(onSubmit)} className={`relative flex flex-col w-full gap-[1rem] p-4 py-5 bg-[#C7EEFF]`}>
+
+                        {/* SHOWS WHEN AVAILABLE SLOT FOR THE ROOM IS ZERO */}
+                        {slot === 0 && (
+                            <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-center'>
+                                <span className='text-[#1D242B] text-[36px] font-bold leading-[1]'>Sorry, there's no available slot yet.</span>
+                            </div>
+                        )}
+
                         <div className='flex flex-col w-full gap-1'>
                             <span className='text-[14px] text-[#1D242B]'>Room ID</span>
                             <span className='w-full border-2 border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA]'>{public_room_id}</span>
@@ -102,8 +113,8 @@ export default function InquiryFormClient ({
                         <div className='flex flex-col gap-1 w-full'>
                             <span className='text-[14px] text-[#1D242B]'>Full name</span>
                             <input type="text" id="fullname" placeholder='Enter your full name here...'
-                            {...register('fullname', { required: 'Full name is required!' })}
-                            className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]'/>
+                            {...register('fullname', { required: 'Full name is required!' })} disabled={slot==0}
+                            className={`w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0] ${slot === 0 && 'opacity-50'}`}/>
                             {errors.fullname && (
                                 <span className='text-[16px] text-[#FF0000]'>{errors.fullname.message}</span>
                             )}
@@ -120,8 +131,8 @@ export default function InquiryFormClient ({
                                 validate: value =>
                                     value.replace(/\D/g, '').length === 11 ||
                                     'Contact number must be 11 digits',
-                            })}
-                            className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]'/>
+                            })} disabled={slot==0}
+                            className={`w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0] ${slot === 0 && 'opacity-50'}`}/>
                             {errors.contactNumber && (
                                 <span className='text-[16px] text-[#FF0000]'>{errors.contactNumber.message}</span>
                             )}
@@ -135,8 +146,8 @@ export default function InquiryFormClient ({
                                     value: /^\S+@\S+$/,
                                     message: 'Invalid email address'
                                 }
-                            })}
-                            className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]'/>
+                            })} disabled={slot==0}
+                            className={`w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0] ${slot === 0 && 'opacity-50'}`}/>
                             {errors.email && (
                                 <span className='text-[16px] text-[#FF0000]'>{errors.email.message}</span>
                             )}
@@ -150,8 +161,8 @@ export default function InquiryFormClient ({
                             {errors.schedule && (
                                 <span className='text-[16px] text-[#FF0000]'>{errors.schedule.message}</span>
                             )} */}
-
-                            <select className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]' defaultValue={""} {...register('schedule', {required: 'Schedule is required.'})}>
+ 
+                            <select className={`w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0] ${slot === 0 && 'opacity-50'}`} defaultValue={""} {...register('schedule', {required: 'Schedule is required.'})} disabled={slot==0}>
                                 {/* Morning Shift, Mid-Shift, Night Shift */}
                                 <option value='' hidden>Select a schedule</option>
                                 <option value='Morning Shift' >Morning Shift</option>
@@ -174,8 +185,8 @@ export default function InquiryFormClient ({
                         <div className='flex flex-col gap-1 w-full'>
                             <span className='text-[14px] text-[#1D242B]'>Target Move-In</span>
                             <input type="date" id="target_move_in"
-                            {...register('targetMoveIn', { required: 'Target Move-in is required' })}
-                            className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]'/>
+                            {...register('targetMoveIn', { required: 'Target Move-in is required' })} disabled={slot==0}
+                            className={`w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0] ${slot === 0 && 'opacity-50'}`}/>
                             {errors.targetMoveIn && (
                                 <span className='text-[16px] text-[#FF0000]'>{errors.targetMoveIn.message}</span>
                             )}
@@ -184,23 +195,30 @@ export default function InquiryFormClient ({
                         <div className='flex flex-col gap-1 w-full'>
                             <span className='text-[14px] text-[#1D242B]'>How many months do you plan to stay?</span>
                             <input type="text" id="month_stay" placeholder='Enter a number of months (ex. 3 months)'
-                            { ...register('monthsOfStay', { required: 'Months of Stay is required' }) }
-                            className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]'/>
+                            { ...register('monthsOfStay', { required: 'Months of Stay is required' })} disabled={slot==0}
+                            className={`w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0] ${slot === 0 && 'opacity-50'}`}/>
                             {errors.monthsOfStay && (
                                 <span className='text-[16px] text-[#FF0000]'>{errors.monthsOfStay.message}</span>
                             )}
                         </div>
 
                         <div className='flex flex-col gap-1 w-full'>
-                            <span className='text-[14px] text-[#1D242B] font-bold'>Other:</span>
+                            <span className='text-[14px] text-[#1D242B]'>Other:</span>
                             <textarea id="other" rows={5} placeholder='Enter any other concerns you have here...'
-                            { ...register('other') }
-                            className='w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0]'></textarea>
+                            { ...register('other') } disabled={slot==0}
+                            className={`w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0] ${slot === 0 && 'opacity-50'}`}></textarea>
                         </div>
 
                         <button className='bg-[#0077C0] p-2 w-full rounded-[10px] text-[#FAFAFA] hover:bg-[#1D242B] cursor-pointer active:bg-[#0077C0] transition-all duration-100'>Submit</button>
                     </form>
                 )} 
+
+
+                {/* {inquireOpen && !isSubmitted && slot == 0 && (
+                    <div>
+                        asdasd
+                    </div>
+                )} */}
                 
                 {isSubmitted && payload && (
                     <div className='flex flex-col items-center bg-[#C7EEFF] gap-2 p-4 py-5 w-full'>
