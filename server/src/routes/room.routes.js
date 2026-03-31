@@ -297,7 +297,7 @@ roomRoute.post('/v1/:public_room_id/inquiries', async (req, res, next) => {
             model: "bedspacio.inquiry",
             values: {
                 public_room_id: Number(public_room_id),
-                form_type: 'Room Inquiry',
+                form_type: 'room',
                 starting_price: Number(starting_price),
                 full_name: full_name,
                 contact_number: contact_number,
@@ -318,7 +318,7 @@ roomRoute.post('/v1/:public_room_id/inquiries', async (req, res, next) => {
             })
         }
 
-        if (result?.name === 'odoo.exceptions.ValidationError') {
+        if (result?.name === 'odoo.exceptions') {
             return res.status(400).json({
                 success: false,
                 message: result.message,
@@ -344,19 +344,34 @@ roomRoute.post('/v1/:public_room_id/inquiries', async (req, res, next) => {
 })
 
 
-// roomRoute.post('/v1/inquiries/contact', async (req, res) => {
-//     try {
-//         const {
-//             fullName,
-//             contactNumber,
-//             email,
-//             subject,
-//             message
-//         } = req.body;
-//     } catch (err) {
+roomRoute.post('/v1/inquiries/contact', async (req, res) => {
+    try {
+        const {
+            full_name,
+            contact_number,
+            email,
+            subject,
+            message
+        } = req.body;
 
-//     }
-// });
+
+        const response = await createInquiryRecord({
+            model: 'bedspacio.inquiry',
+            values: {
+                form_type: 'contact',
+                full_name: full_name,
+                contact_number: contact_number,
+                email,
+                subject,
+                others: message
+            } 
+        })
+
+
+    } catch (err) {
+
+    }
+});
 
 
 
