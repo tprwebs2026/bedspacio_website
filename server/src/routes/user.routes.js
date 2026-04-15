@@ -75,9 +75,11 @@ userRoute.post('/v1/new_user', requireAuth, async (req, res) => {
         }
 
         const plainPassword = generatePassword();
+        console.log('Plain password: ', plainPassword);
+
         const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
-        const user = await db.none(
+        await db.none(
             `INSERT INTO
                 users (fullname, username, email, contact_number, role, password) 
                 VALUES ($1, $2, $3, $4, $5, $6)
@@ -86,7 +88,8 @@ userRoute.post('/v1/new_user', requireAuth, async (req, res) => {
 
         return res.json({
             message: 'User created succesfully',
-            user
+            username: username,
+            password: plainPassword
         });
 
     } catch (err) {

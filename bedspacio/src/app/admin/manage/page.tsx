@@ -72,14 +72,12 @@ export default function Manage () {
 
             {userWrapperModalOpen && (
                 <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-full h-screen bg-[#1D242B]/50 z-50">
-                    
                     <UserCreateWrapperModal isModalOpen={() => setUserWrapperModal(false)} />
                 </div>
             )}
 
             {userViewWrapperModalOpen && (
                 <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-full h-screen bg-[#1D242B]/50 z-50">
-                    
                     <UserViewWrapperModal isModalOpen={() => setUserViewWrapperModal(false)} />
                 </div>
             )}
