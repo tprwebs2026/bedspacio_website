@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 import Home from '@/asset/icon/home.svg'
 import Profile from '@/asset/icon/profile.svg'
@@ -12,13 +12,25 @@ import Listings from '@/asset/icon/listing.svg'
 import ArrowDown from '@/asset/icon/arrow-down.svg'
 
 import { useAuth } from "@/context/AuthContext"
+import { logout } from "../../../lib/auth"
+
 
 export default function AdminNavBar () {
 
+    const router = useRouter(); // navigate to other page
     const user  = useAuth();
+
+    console.log('USER ID: ', user?.id);
 
     const path = usePathname();
     const [profileDropdownVisible, setProfileDropdownVisible] = useState<boolean>(false)
+
+    const handleLogout = async () => {
+
+        await logout();
+        router.push('/login');
+    }
+
 
     return (
         <div className="sticky top-0 flex items-center justify-between bg-[#0077C0] px-[8rem] z-10">
@@ -76,7 +88,7 @@ export default function AdminNavBar () {
                 */}
                 {profileDropdownVisible && (
                     <div className="absolute top-12 flex flex-col items-center w-[200px] rounded-[10px] shadow-md bg-[#FFF] border border-[#1D242B]/50 overflow-hidden">
-                        <Link href={`/admin/1`} onClick={() => setProfileDropdownVisible(false)} className="flex items-center justify-between gap-2 w-full p-4 whitespace-nowrap border-b border-[#1D242B]/25 cursor-pointer hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]">
+                        <Link href={`/admin/${user?.id}`} onClick={() => setProfileDropdownVisible(false)} className="flex items-center justify-between gap-2 w-full p-4 whitespace-nowrap border-b border-[#1D242B]/25 cursor-pointer hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]">
                             <Profile className="w-[20px] h-[20px] fill-[#1D242B]" />
                             <span>View Profile</span>
                         </Link>
@@ -86,7 +98,7 @@ export default function AdminNavBar () {
                             <span>Go to Home</span>
                         </Link>
 
-                        <button className="flex items-center justify-between w-full p-4 text-left whitespace-nowrap border-b border-[#1D242B]/25 cursor-pointer hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]">
+                        <button onClick={handleLogout} className="flex items-center justify-between w-full p-4 text-left whitespace-nowrap border-b border-[#1D242B]/25 cursor-pointer hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]">
                             <Logout className="w-[25px] h-[25px] stroke-[#1D242B]" />
                             <span>Log Out</span>
                         </button>

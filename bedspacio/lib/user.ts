@@ -32,3 +32,23 @@ export const getCurrentUser = cache( async () => {
         console.log('Error retrieving user data: ', err);
     }
 });
+
+
+export const getUserInfo = async () => {
+    try {
+        const cookieStore = await cookies();
+        const cookieHeader = cookieStore.toString();
+
+        const response = await axios.get(`${BASE_URL}/user/v1/profile`, {
+            headers: {
+                Cookie: cookieHeader
+            }
+        });
+
+        console.log('response for user info: ', response.data);
+
+        return response.data;
+    } catch (err) {
+        console.error('Error retreiving profile data: ', err);
+    }
+};  

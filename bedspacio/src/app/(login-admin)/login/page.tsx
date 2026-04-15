@@ -4,19 +4,26 @@ import Link from 'next/link'
 import Arrow from '@/asset/icon/arrow-right.svg'
 
 import axios from 'axios'
-import { BASE_URL } from '@/config/config'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+import { BASE_URL } from '@/config/config'
+
 
 export default function Login () {
 
-
+    const router = useRouter();
 
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [passwordShow, setPasswordShow] = useState<boolean>(false)
 
+    const [loading, setLoading] = useState<boolean>(false);
 
-
+    
+    // TODO: ADD A LOADING STATE
+    // Circle animation
+    
     const handleLogin = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -29,6 +36,7 @@ export default function Login () {
             });
 
             console.log('User response: ', response.data);
+            router.push('/admin');
 
         } catch (err) {
             console.error('Failed to login: ', err);

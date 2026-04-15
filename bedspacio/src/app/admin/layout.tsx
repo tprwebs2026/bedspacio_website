@@ -1,16 +1,16 @@
 
-import { getCurrentUser } from "../../../lib/user"
+import { getUserInfo } from "../../../lib/user"
 import { AuthProvider } from "@/context/AuthContext";
 import AdminNavBar from "@/components/admin/AdminNavBar"
 
 export default async function WithNavigation({ children }: { children: React.ReactNode }) {
 
-    const current_user = await getCurrentUser();
+    const user = await getUserInfo();
 
-    console.log('current user: ', current_user)
+    console.log('current user: ', user)
 
     return (
-        <AuthProvider user={current_user}>
+        <AuthProvider user={user}>
             <div className="w-full min-h-screen">
                 <AdminNavBar/>
                 <main>{children}</main>

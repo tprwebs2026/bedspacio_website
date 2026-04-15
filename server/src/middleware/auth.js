@@ -1,8 +1,9 @@
-
-
 export const requireAuth = (req, res, next) => {
-    if (!req.session?.isAuthenticated) {
-        return res.status(401).json({ error: 'Authentication required' });
+    if (!req.session?.user?.id) {
+        return res.status(401).json({ 
+            message: 'Unauthorized', 
+            error: 'Authentication required',
+        });
     }
     next();
 };

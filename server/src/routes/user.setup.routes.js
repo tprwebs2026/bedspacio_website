@@ -38,9 +38,6 @@ userSetupRoute.post('/v1/login', async (req, res) => {
         req.session.user = {
             id: response.id,
             fullname: response.fullname,
-            username: username,
-            contact_number: response.contact_number,
-            email: response.email,
             role: response.role
         };
 
@@ -60,7 +57,19 @@ userSetupRoute.post('/v1/login', async (req, res) => {
 
 
 
-// userSetupRoute.post()
+userSetupRoute.post('/v1/logout', async (req, res) => {
+    const sid = req.sessionID;
+
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Failed to destroy session: ', err);
+            return res.status(500).send('Failed to logout');
+        } 
+
+        res.clearCookie('bedspacio_session');
+        res.send(`Session id ${sid} logged out successfully!`);
+    });
+})
 
 
 
