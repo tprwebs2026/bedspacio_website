@@ -9,16 +9,21 @@ type User = {
     contact: string,
     email: string,
     role: string,
-    is_active: boolean
-} | null;
+    is_active: boolean,
+    profile_image: string
+} | undefined;
 
 interface AuthProviderProp {
     user: User;
     children: React.ReactNode;
 }
 
-const AuthContext = createContext<User>(null);
-export const useAuth = () => useContext(AuthContext);
+const AuthContext = createContext<User>(undefined);
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (context === undefined) throw new Error("useAuth must be used within AuthProvider");
+    return context;
+};
 
 export const AuthProvider = ({
     user,

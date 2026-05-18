@@ -13,12 +13,26 @@ import ArrowDown from '@/asset/icon/arrow-down.svg'
 
 import { useAuth } from "@/context/AuthContext"
 import { logout } from "../../../lib/auth"
+import { DefaultAvatar } from "@/app/admin/manage/DefaultAvatar"
 
+
+type landmark = {
+    landmark: string
+}
+
+export type branchType = {
+    id: number,
+    branch_name: string,
+    address: string,
+    property_manager: string
+    landmarks: landmark
+}
 
 export default function AdminNavBar () {
 
     const router = useRouter(); // navigate to other page
     const user  = useAuth();
+    const base_url='http://localhost:5000'
 
     console.log('USER ID: ', user?.id);
 
@@ -26,7 +40,6 @@ export default function AdminNavBar () {
     const [profileDropdownVisible, setProfileDropdownVisible] = useState<boolean>(false)
 
     const handleLogout = async () => {
-
         await logout();
         router.push('/login');
     }
@@ -48,7 +61,7 @@ export default function AdminNavBar () {
                         </div>
 
                         <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute top-18 flex flex-col items-center bg-[#0077C0] w-[200px] rounded-b-[10px] shadow-md">
-                            <Link href="/admin/room-listing" className="flex items-center gap-2 w-full p-3 hover:bg-[#C7EEFF]/50">
+                            <Link href="/admin/room-listing?page=1" className="flex items-center gap-2 w-full p-3 hover:bg-[#C7EEFF]/50">
                                 <Listings className="w-[30px] h-[30px] stroke-[#FFF] " />
                                 <span className="text-[#FAFAFA]">Room Listings</span>
                             </Link>
@@ -75,9 +88,14 @@ export default function AdminNavBar () {
                         <span className="px-3 text-[#FAFAFA] text-[16px] font-bold leading-tight">{user?.fullname}</span>
                         <span className="px-3 text-[#FAFAFA]/80 leading-tight text-[14px]">{user?.role}</span>
                     </div>
-                    <div className="flex items-center justify-center bg-[#FAFAFA] rounded-full w-[35px] h-[35px] rounded-full bg-[#FAFAFA]">
-
-                        
+                    <div className="flex items-center justify-center rounded-full w-[35px] h-[35px] rounded-full overflow-hidden bg-[#CCC]/50">  
+                        {user?.profile_image ? (
+                            <img src={`${base_url}/file/user/${user?.profile_image}`} alt="profile image" className="w-full h-full object-cover"/>
+                        ) : (
+                            <div className="scale-25 bg-[#FAFAFA]">
+                                <DefaultAvatar name={user?.fullname} />
+                            </div>
+                        )}
                     </div> 
                 </button> 
                 {/* 
@@ -88,7 +106,7 @@ export default function AdminNavBar () {
                 */}
                 {profileDropdownVisible && (
                     <div className="absolute top-12 flex flex-col items-center w-[200px] rounded-[10px] shadow-md bg-[#FFF] border border-[#1D242B]/50 overflow-hidden">
-                        <Link href={`/admin/${user?.id}`} onClick={() => setProfileDropdownVisible(false)} className="flex items-center justify-between gap-2 w-full p-4 whitespace-nowrap border-b border-[#1D242B]/25 cursor-pointer hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]">
+                        <Link href={`/admin/${Number(user?.id)}`} onClick={() => setProfileDropdownVisible(false)} className="flex items-center justify-between gap-2 w-full p-4 whitespace-nowrap border-b border-[#1D242B]/25 cursor-pointer hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]">
                             <Profile className="w-[20px] h-[20px] fill-[#1D242B]" />
                             <span>View Profile</span>
                         </Link>

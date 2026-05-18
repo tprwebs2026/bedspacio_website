@@ -3,6 +3,10 @@ import { db } from '../config/database.js';
 import { requireAuth } from '../middleware/auth.js';
 import bcrypt from 'bcrypt';
 import { generatePassword } from '../utils/generatePassword.js';
+import { userImage } from '../middleware/multer.js';
+
+import fs from 'fs/promises'
+import path from 'path'
 
 
 const userRoute = express.Router();
@@ -42,7 +46,8 @@ userRoute.get('/v1/profile', requireAuth,  async (req, res) => {
                 email,
                 role,
                 created_at,
-                contact_number
+                contact_number,
+                profile_image
             FROM users 
             WHERE id = $1`,
             [ id ]
@@ -115,8 +120,10 @@ userRoute.get('/v1/users', requireAuth, async (req, res) => {
                 fullname,
                 role,
                 is_active,
+                profile_image,
                 last_login
-            FROM users`
+            FROM users
+            ORDER BY id ASC`
         );
 
         console.log(response);
@@ -134,7 +141,7 @@ userRoute.get('/v1/users', requireAuth, async (req, res) => {
 });
 
 
-userRoute.get('/v1/users/:id', requireAuth, async (req, res) => {
+userRoute.get('/v1/users/:id', async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -144,12 +151,14 @@ userRoute.get('/v1/users/:id', requireAuth, async (req, res) => {
 
         const response = await db.one(`
             SELECT
+                id,
                 fullname,
                 username,
                 contact_number,
                 email,
                 role,
-                is_active
+                is_active,
+                profile_image
             FROM users 
             WHERE id = $1
         `, [id]);
@@ -160,6 +169,213 @@ userRoute.get('/v1/users/:id', requireAuth, async (req, res) => {
         console.error('Failed to retreive user data: ', err);
     }
 });
+
+
+userRoute.delete('/v1/users/:id', requireAuth, async (req, res, next) => {
+    try {
+        const id = Number(req.params.id);
+
+        if (isNaN(id)) {
+            throw new Error('Invalid user id')
+        }
+
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: "No authority to delete user" })
+        }
+
+
+        const user = await db.oneOrNone('SELECT * FROM users WHERE id = $1', [id]);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        
+        console.log('user to delete: ', user);
+
+        if (user.profile_image) {
+            const filePath = path.join(
+                process.cwd(),
+                'file/user',
+                user.profile_image
+            );
+
+            try {
+                await fs.unlink(filePath)
+            } catch (err) {
+                console.log('File not found: ', err)
+            }
+        };
+
+        await db.none(
+            `DELETE FROM users WHERE id = $1`,
+            [id]
+        );
+
+        console.log('Deleted: ', user.id);
+
+        res.status(200).json({
+            message: 'Deleted successfully!'
+        })
+
+    } catch (err) {
+        console.error(err);
+
+        res.status(500).json({
+            message: err.message || 'Internal server error'
+        });
+    }
+});
+
+
+
+userRoute.patch('/v1/profile/:id', requireAuth, userImage.single('profile_image'), async (req, res) => {
+    try {
+
+        // TODO 
+        // set update for all fields inside 'users' table (mainly for image)
+
+        const id = Number(req.params.id);
+
+        const user = await db.oneOrNone(
+            `SELECT * FROM users WHERE id = $1`,
+            [id]
+        );
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const { ...userUpdates } = req.body;
+
+
+        if (req.file) {
+            if (user.profile_image) {
+                const old_image = path.join(
+                    process.cwd(),
+                    'file/user',
+                    user.profile_image
+                );
+
+                try {
+                    await fs.unlink(old_image);
+                    console.log('Replaced: ', old_image);
+                } catch (err) {
+                    console.error(err.message);
+                } 
+            };
+
+            userUpdates.profile_image = req.file.filename
+        }
+
+        if ((Object.keys(userUpdates).length > 0)) {
+            const keys = Object.keys(userUpdates);
+
+            const setUserClause = keys
+                .map((key, index) => `${key} = $${index+1}`)
+                .join(', ');
+
+            const values = keys.map(key => userUpdates[key])
+            console.log('Values updated to user: ', values);
+
+            await db.oneOrNone(
+                `UPDATE users 
+                SET ${setUserClause}
+                WHERE id = $${keys.length + 1}
+                RETURNING *`,
+                [...values, user.id]
+            )
+        };
+
+        return res.status(200).json({ success: true })
+
+
+    } catch (err) {
+        console.error('Error updating user profile: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+});
+
+
+userRoute.patch('/v1/users/:id', requireAuth, async (req, res) => {
+    try {
+
+        const id = Number(req.params.id);
+        if (isNaN(id)) {
+            throw new Error('Id must be a number');
+        }
+
+        const user = await db.oneOrNone(
+            `SELECT COUNT(*) FROM users WHERE id = $1`,
+            [id]
+        );
+
+        if (!user) {
+            return res.status(400).json({
+                message: 'User not found'
+            })
+        };
+
+        const { ...userUpdates } = req.body; 
+
+        if (Object.keys(userUpdates).length > 0) {
+            const keys = Object.keys(userUpdates);
+
+            const setUserClause = keys 
+                .map((map, index) => `${keys} = $${index + 1}`)
+                .join(', ');
+
+            const values = keys.map(key => userUpdates[key]);
+
+            await db.oneOrNone(
+                `UPDATE users 
+                SET ${setUserClause}
+                WHERE id = $${keys.length + 1}
+                RETURNING *`,
+                [...values, id]
+            )
+        };
+
+        return res.status(200).json({
+            success: true,
+            message: 'Update successfull'
+        })
+        
+
+    } catch (err) {
+        console.error('Error updating user: ', err);
+        return res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
+})
+
+
+userRoute.get('/v1/property_manager', async (req, res) => {
+    try {
+        const response = await db.manyOrNone(
+            `SELECT 
+                id, 
+                fullname,
+                profile_image
+            FROM users 
+            WHERE 
+                role = 'property_manager' AND
+                is_active = true
+                `
+        );
+
+        if (response.length === 0) {
+            return res.status(200).json({
+                message: 'No property managers found!',
+                data: []
+            })
+        }
+
+        return res.status(200).json(response);
+
+    } catch (err) {
+        console.error('Error retrieving users: ', err);
+    }
+})
 
 
 export default userRoute;

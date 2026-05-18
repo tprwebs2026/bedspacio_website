@@ -43,6 +43,8 @@ export const getRoomListings = cache(async ({
     return response.data ?? [];
 })
 
+
+
 export const getRoomDetails = cache(async (room_id: number) => {
     try {
         const response = await axios.get(`${BASE_URL}/room/v1/detail/${room_id}`);
@@ -59,7 +61,7 @@ export const getRoomDetails = cache(async (room_id: number) => {
 export const getInclusions = cache(async () => {
     try {
         const response = await axios.get(`${BASE_URL}/inclusion/v1`, { withCredentials: true });
-        return response?.data ?? [];
+        return response?.data?.data ?? [];
     } catch (err) {
         console.log('Failed to retrieve inclusions: ', err);
         return [];
@@ -79,3 +81,82 @@ export const getInclusions = cache(async () => {
 //         console.log('Error create new lead record: ', err);
 //     }
 // }
+
+
+
+// From database
+
+export const getRooms = async (page: number) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/room/v1/admin/all?page=${page}`, {
+            withCredentials: true
+        });
+
+        return response.data ?? [];
+    } catch (err) {
+        console.error('Error retrieving rooms: ', err)
+    }
+}
+
+export const getRoomById = async (id: number) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/room/v1/${id}/info`, {
+            withCredentials: true
+        });
+
+        return response.data;
+    } catch (err) {
+        console.error('Error retrieving room: ', err);
+    }
+}
+
+export const getRoomPreviews = async ({
+    page = 1, 
+    pageSize = 8,
+    room_type,
+    branch,
+    minimumBudget,
+    maximumBudget,
+    inclusion
+}: RoomListingParams) => {
+    try {
+
+        const params = new URLSearchParams({
+            page: String(page),
+            pageSize: String(pageSize)
+        });
+
+        if (room_type) params.append("type", room_type);
+        if (branch) params.append("branch", String(branch));
+        if (minimumBudget) params.append("minimumBudget", String(minimumBudget));
+        if (maximumBudget) params.append("maximumBudget", String(maximumBudget));
+
+        if (inclusion ) {
+            const inclusions = Array.isArray(inclusion) ? inclusion : [inclusion];
+            inclusions.forEach(inc => params.append("inclusion", inc));
+        }
+
+
+        const response = await axios.get(`${BASE_URL}/room/v1/preview/details?${params.toString()}`, {
+            withCredentials: true
+        });
+
+        return response.data ?? [];
+    } catch (err) {
+        console.error('Error retrieving rooms: ', err);
+    }
+} 
+
+
+export const getRoomPreviewById = async (id: number) => {
+    try {
+        const result = await axios.get(`${BASE_URL}/room/v1/preview/${id}/details`, {
+            withCredentials: true
+        });
+
+        return result.data;
+
+    } catch (err) {
+        console.error('Error retrieving room details: ', err);
+    }
+}

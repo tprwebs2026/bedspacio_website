@@ -1,37 +1,79 @@
 "use client"
 
 import { useState } from "react"
+import { InclusionType } from "./CreateRoomPageWrapper"
 
-export default function InclusionSelectionWrapper () {
+interface InclusionProp {
+    inclusions: InclusionType[];
+    selectedInclusions: number[];
+    setSelectedInclusions: React.Dispatch<React.SetStateAction<number[]>>;
+    singleSelect?: boolean;
+}
 
-    const [isSelected, setIsSelected] = useState<string[]>([]);
+export default function InclusionSelectionWrapper({
+    inclusions,
+    selectedInclusions,
+    setSelectedInclusions,
+    singleSelect = false
+}: InclusionProp) {
 
-    const handleInclusionChange = (data: string) => {
-        setIsSelected(prev => {
-            if (prev.includes(data)) {
-                return prev.filter(item => item !== data)
-            } else {
-                return [...prev, data]
-            }
-        });
-        console.log('Nigga');   
-    }
+    const [isSelected, setIsSelected] = useState<number[]>([]);
 
-    const inclusion_test = [
-        {id: 1, inclusion: 'Free Wi-Fi'},
-        {id: 2, inclusion: 'Aircon'}
-    ]
+    // const handleInclusionChange = (id: number) => {
+    //     setIsSelected(prev => {
+    //         let updated: number[];
+
+    //         if (singleSelect) {
+    //             updated = prev.includes(id) ? [] : [id];
+    //         } else {
+    //             updated = prev.includes(id)
+    //                 ? prev.filter(item => item !== id)
+    //                 : [...prev, id];
+    //         }
+
+    //         selectedInclusions(updated);
+    //         return updated;
+    //     });
+    // };
+
+    const handleInclusionChange = (id: number) => {
+        if (singleSelect) {
+            setSelectedInclusions(prev =>
+                prev.includes(id) ? [] : [id]
+            );
+        } else {
+            setSelectedInclusions(prev =>
+                prev.includes(id)
+                    ? prev.filter(item => item !== id)
+                    : [...prev, id]
+            );
+        }
+    };
 
     return (
         <div className="flex items-center gap-1 w-full">
+            {inclusions.map(inc => (
+                <label
+                    key={inc.id}
+                    htmlFor={`inc_${inc.id}`}
+                    className={`px-3 py-2 rounded-[10px] border-2 ${
+                        selectedInclusions.includes(inc.id)
+                            ? 'bg-[#1D242B] text-[#FAFAFA]'
+                            : 'border-[#1D242B] hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]'
+                    } cursor-pointer`}
+                >
+                    <span className="font-bold">{inc.inclusion}</span>
 
-            {/* Change text to white and background to black if selected  */}
-            {inclusion_test.map(inc => (
-                <label key={inc.id} htmlFor={`inc_${inc.id}`} className={`px-3 py-2 rounded-[10px] border-2  ${isSelected.includes(inc.inclusion) ? 'bg-[#1D242B] text-[#FAFAFA]' : 'border-[#1D242B] hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]'} cursor-pointer `}>
-                    <span className="font-bold cursor-pointer">{inc.inclusion}</span> 
-                    <input type="checkbox" name="inc" id={`inc_${inc.id}`} value={inc.inclusion} checked={isSelected.includes(inc.inclusion)} onChange={() => handleInclusionChange(inc.inclusion)} hidden className="cursor-pointer"/>
+                    <input
+                        type={singleSelect ? "radio" : "checkbox"}
+                        name="inc"
+                        id={`inc_${inc.id}`}
+                        checked={selectedInclusions.includes(inc.id)}
+                        onChange={() => handleInclusionChange(inc.id)}
+                        hidden
+                    />
                 </label>
             ))}
         </div>
-    )
+    );
 }

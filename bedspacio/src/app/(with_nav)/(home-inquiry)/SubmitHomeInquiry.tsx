@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 import { BASE_URL } from '@/config/config'
-import { InquiryValues } from "@/components/HomeInquiry";
+import { InquiryValues } from "@/app/(with_nav)/(home-inquiry)/HomeInquiry";
 
 export default async function SubmitHomeInquiry (data: InquiryValues) {
 

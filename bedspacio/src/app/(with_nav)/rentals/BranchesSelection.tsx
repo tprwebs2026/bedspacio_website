@@ -32,7 +32,7 @@ export default function BranchSelection ({ branchData, selectedBranch, setSelect
                         ? 'All'
                         : selectedBranchName || 'All'}
                 </span>
-                <ArrowDown className={`${openBranch && 'rotate-180'} w-[30px] h-auto transition-all duration-100`} />
+                <ArrowDown className={`${openBranch && 'rotate-180'} w-[30px] h-auto transition-all duration-100 fill-[#1D242B]`} />
             </button>
 
             {openBranch && (

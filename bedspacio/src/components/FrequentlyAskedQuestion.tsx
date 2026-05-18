@@ -29,14 +29,14 @@ export default function FrequentlyAskedQuestions() {
                             <span className="flex items-center text-[20px] xl:text-[24px] lg:text-[24px] font-bold">{faq.question}</span>
 
                             <button onClick={() => {setQuestionOpen(prev => (prev === faq.id ? null : faq.id))}} className="cursor-pointer rounded-full hover:bg-[#0077C0] active:bg-[#C7EEFF] transition-all duration-100">
-                                <Arrow className={`w-[40px] h-auto ${questionOpen === faq.id ? '-rotate-0' : '-rotate-90'} transition-all duration-100`}/>
+                                <Arrow className={`w-[40px] h-auto fill-[#1D242B] ${questionOpen === faq.id ? '-rotate-0' : '-rotate-90'} transition-all duration-100`}/>
                             </button>
                         </div>
 
                         {questionOpen === faq.id && (
                             <div className={`flex flex-col items-start w-full py-[1rem] gap-2`}>
                                 {typeof faq.answer === "string" ? (
-                                    <span className="text-[18px] xl:text-[20px] lg:text-[20px] text-[#1D242B] leading-[1]">
+                                    <span className="text-[18px] xl:text-[20px] lg:text-[20px] text-[#1D242B] leading-[1] px-2">
                                         {faq.answer}
                                     </span>
                                 ) : (

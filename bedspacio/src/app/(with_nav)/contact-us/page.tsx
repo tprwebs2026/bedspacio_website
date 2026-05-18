@@ -1,16 +1,223 @@
+// "use client"
+
+// import Arrow from '@/asset/icon/arrow-long.svg'
+
+// import Breadcrumbs from "@/components/BreadCrumb";
+// import Link from "next/link";
+// import { useState } from 'react';
+// import { useForm } from "react-hook-form";
+// import SubtmitContactInquiry from './SubtmitContactInquiry';
+
+// export type inquiryFormValues = {
+//     fullname: string,
+//     contactnumber: string,
+//     email: string,
+//     subject: string,
+//     message: string
+// }
+
+// export default function ContactUs() {
+
+//     const [loading, setLoading] = useState<boolean>(false);
+//     const [error, setError] = useState<string>('');
+//     const [isSubmitted, setIsSubmitted] = useState(false);
+
+//     const { register, handleSubmit, reset, formState: { errors, isSubmitSuccessful } } = useForm<inquiryFormValues>();
+    
+//     const onSubmit = async (data: inquiryFormValues) => {
+
+//         setLoading(true);
+//         setError('');
+//         setIsSubmitted(false);
+
+
+//         try {
+//             // Fake loading of 1.5 seconds
+//             await new Promise(resolve => setTimeout(resolve, 1500));
+
+//             const result = await SubtmitContactInquiry(data);
+
+//             if (!result?.success) {
+//                 setError(
+//                     result?.message ||
+//                     'Something went wrong'
+//                 );
+//                 return;
+//             }
+
+//             console.log("Payload: ", data);
+
+//             setIsSubmitted(true)
+//             reset();
+
+//         } catch (err: any) {
+//             console.error('Error submitting inquiry: ', err);
+//             const message =
+//                 err?.response?.data?.message ||
+//                 err?.message ||
+//                 'Unexpected error occurred';
+
+//             setError(message);
+//             setIsSubmitted(false);
+
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+
+//     return (
+//         <div className="flex flex-col min-h-screen w-full items-start justify-start">
+
+//             <div className="flex items-center px-[1rem] xl:px-[8rem] lg:px-[4rem] py-[1rem]">
+//                 <Breadcrumbs />
+//             </div>
+
+//             <div className="flex flex-col xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 px-[1rem] px-[1rem] xl:px-[8rem] lg:px-[4rem] py-[2rem] gap-[2rem] w-full">
+//                 <div className="flex flex-col xl:flex lg:flex xl:flex-col lg:flex-col md:grid md:grid-cols-2 gap-[2rem] xl:gap-[4rem] lg:gap-[4rem]">
+//                     <div className="flex flex-col gap-[2rem]">
+//                         <div className="flex items-center gap-3">
+//                             <Link href="/" className='bg-[#0077C0] hover:bg-[#0077C0]/75 active:bg-[#1D242B] xl:active:bg-[#0077C0] lg:active:bg-[#0077C0] rounded-full '>
+//                                 <Arrow className="-rotate-180 w-[50px] h-[50px] p-3 " />
+//                             </Link>
+//                             <span className="text-[28px] xl:text-[36px] lg:text-[36px] text-[#1D242B] font-[900] whitespace-nowrap">Contact Us</span>
+//                         </div>
+//                         <span className="text-[20px] xl:text-[24px] lg:text-[24px] text-[#1D242B] leading-[1.2]">
+//                             Got questions? We're easy to reach and happy to chat. Whether by call or message, our team is here to help you every step of the way.
+//                         </span>
+//                     </div>
+
+//                     <div className="flex flex-col gap-[2rem]">
+//                         <span className="text-[28px] xl:text-[36px] lg:text-[36px] text-[#0077C0] font-[900] whitespace-nowrap">Reach us on:</span>
+//                         <div className="flex flex-col items-start w-full">
+//                             <span className="text-[20px] text-[#1D242B] leading-[1.2]">Mobile: 0917 849 0044</span>
+//                             <span className="text-[20px] text-[#1D242B] leading-[1.2]">Telephone: (02) 8802 3188</span>
+//                             <span className="text-[20px] text-[#1D242B] leading-[1.2]">Email: bedspacio@gmail.com</span>
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 {!isSubmitted && !loading && (
+//                     <div className="flex flex-col w-full h-auto rounded-[15px] border border-[#1D242B]/50 bg-[#C7EEFF]/50 overflow-hidden">
+//                         <span className="w-full py-[0.5rem] border-b-2 border-dashed border-b-[#1D242B]/50 text-[26px] text-center bg-[#FAFAFA] italic">Inquiry Form</span>
+
+//                         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-[1rem] xl:p-[2rem] lg:p-[2rem] w-full gap-[1rem]">
+//                             <div className="flex flex-col w-full items-start gap-1">
+//                                 <span>Full Name</span>
+//                                 <input type="text" id="full_name" placeholder="Enter your full name here..."
+//                                 {...register('fullname', { required: 'Full name is required' })}
+//                                 className="bg-[#FAFAFA] p-2 rounded-[5px] w-full border border-[#1D242B]/50 focus:outline-none focus:border-2 focus:border-[#0077C0]"
+//                                 />
+//                                 { errors.fullname && (
+//                                     <span className="text-[16px] leading-[1] text-[#FF0000]">{errors.fullname.message}</span>
+//                                 ) }
+//                             </div>
+
+//                             <div className="flex flex-col w-full items-start gap-1">
+//                                 <span>Contact Number</span>
+//                                 <input type="text" id="contact_number" placeholder="Enter your contact number here..." maxLength={11}
+//                                 {...register('contactnumber', { required: 'Contact number is required', 
+//                                     pattern: {
+//                                         value: /^\+?[0-9\s\-()]+$/,
+//                                         message: 'Invalid contact number format',
+//                                     },
+//                                     validate: value =>
+//                                         value.replace(/\D/g, '').length === 11 ||
+//                                         'Contact number must be 11 digits',
+//                                 }) }
+//                                 onInput={(e) => {
+//                                     const target = e.target as HTMLInputElement;
+//                                     target.value = target.value.replace(/[^0-9]/g, '');
+//                                 }}
+//                                 className="bg-[#FAFAFA] p-2 rounded-[5px] w-full border border-[#1D242B]/50 focus:outline-none focus:border-2 focus:border-[#0077C0]"
+//                                 />
+//                                 {errors.contactnumber && (
+//                                     <span className="text-[16px] leading-[1] text-[#FF0000]">{errors.contactnumber.message}</span>
+//                                 )}
+//                             </div>
+
+//                             <div className="flex flex-col w-full items-start gap-1">
+//                                 <span>Email</span>
+//                                 <input type="text" id="email_address" placeholder="Enter your email address here..."
+//                                 {...register('email', { required: 'Email is required', 
+//                                     pattern: {
+//                                         value: /^\S+@\S+$/,
+//                                         message: 'Invalid email address'
+//                                     }
+//                                 })}
+//                                 className="bg-[#FAFAFA] p-2 rounded-[5px] w-full border border-[#1D242B]/50 focus:outline-none focus:border-2 focus:border-[#0077C0]"
+//                                 />
+//                                 {errors.email && (
+//                                     <span className="text-[16px] leading-[1] text-[#FF0000]">{errors.email.message}</span>
+//                                 )}
+//                             </div>
+
+//                             <div className="flex flex-col w-full items-start gap-1">
+//                                 <span>Subject (what your inquiry is about)</span>
+//                                 <input type="text" id="subject" placeholder="Enter the subject of your inquiry here..."
+//                                 {...register('subject', { required: 'Subject is required' })}
+//                                 className="bg-[#FAFAFA] p-2 rounded-[5px] w-full border border-[#1D242B]/50 focus:outline-none focus:border-2 focus:border-[#0077C0]"
+//                                 />
+//                                 {errors.subject && (
+//                                     <span className="text-[16px] leading-[1] text-[#FF0000]">{errors.subject.message}</span>
+//                                 )}
+//                             </div>
+
+//                             <div className="flex flex-col w-full items-start gap-1">
+//                                 <span>Message</span>
+//                                 <textarea id="message" rows={5} placeholder="Enter your message here..."
+//                                 {...register('message', {
+//                                     required: 'Message is required',
+//                                     validate: value =>
+//                                         value.trim().length >= 30 ||
+//                                         'Message must be at least 30 characters',
+//                                 })}
+//                                 className="bg-[#FAFAFA] p-2 rounded-[5px] w-full border border-[#1D242B]/50 focus:outline-none focus:border-2 focus:border-[#0077C0]"></textarea>
+//                                 {errors.message && (
+//                                     <span className="text-[16px] leading-[1] text-[#FF0000]">{errors.message.message}</span>
+//                                 )}
+//                             </div>
+
+//                             <button className="w-fit self-end px-[4rem] py-[0.75rem] bg-[#1D242B] rounded-full text-[#FAFAFA] cursor-pointer hover:bg-[#0077C0] active:bg-[#1D242B] transition-all duration-100">Submit</button>
+//                         </form>
+//                     </div>
+//                 )}
+
+//                 {loading && (
+//                     <div className="flex w-full items-center justify-center py-[2rem] min-[200px]">
+//                         <img src="/loading/loading.gif" alt="loading" className='w-[50px] h-[50px]'/>
+//                     </div>
+//                 )}
+                
+//                 {isSubmitted && isSubmitSuccessful && (
+//                     <div className="flex flex-col w-full h-auto items-center justify-center rounded-[15px] border-2 border-dashed border-[#1D242B]/50 bg-[#C7EEFF]/50 gap-[1rem] p-2 py-[6rem] xl:py-[1rem] lg:py-[1rem]">
+//                         <span className="text-[28px] text-[#0077C0] font-bold">INQUIRY SENT!</span>
+//                         <span className="text-[20px] text-[#1D242B] text-center leading-[1.2] w-full">Thank you! Your inquiry was submitted successfully. We sent you a confirmation email and will be in touch with you soon.</span>
+//                     </div>
+//                 )}
+//             </div>
+//         </div>
+//     )
+// }
+
+
+
+// ------------- POSTGRES ------------- //
+
 "use client"
 
 import Arrow from '@/asset/icon/arrow-long.svg'
 
+import axios from 'axios';
 import Breadcrumbs from "@/components/BreadCrumb";
 import Link from "next/link";
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
-import SubtmitContactInquiry from './SubtmitContactInquiry';
+import { BASE_URL } from '@/config/config';
 
 export type inquiryFormValues = {
     fullname: string,
-    contactnumber: string,
+    contact_number: string,
     email: string,
     subject: string,
     message: string
@@ -35,17 +242,20 @@ export default function ContactUs() {
             // Fake loading of 1.5 seconds
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            const result = await SubtmitContactInquiry(data);
-
-            if (!result?.success) {
-                setError(
-                    result?.message ||
-                    'Something went wrong'
-                );
-                return;
+            const payload = {
+                fullname: data?.fullname,
+                contact_number: data?.contact_number,
+                email: data?.email,
+                subject: data?.subject,
+                message: data?.message
             }
 
+            const inquiry = await axios.post(`${BASE_URL}/inquiry/v1/general-inquiry`, payload,
+                { withCredentials: true }
+            )
+
             console.log("Payload: ", data);
+            console.log('Result of inquiry: ', inquiry);
 
             setIsSubmitted(true)
             reset();
@@ -115,8 +325,8 @@ export default function ContactUs() {
 
                             <div className="flex flex-col w-full items-start gap-1">
                                 <span>Contact Number</span>
-                                <input type="text" id="contact_number" placeholder="Enter your contact number here..."
-                                {...register('contactnumber', { required: 'Contact number is required', 
+                                <input type="text" id="contact_number" placeholder="Enter your contact number here..." maxLength={11}
+                                {...register('contact_number', { required: 'Contact number is required', 
                                     pattern: {
                                         value: /^\+?[0-9\s\-()]+$/,
                                         message: 'Invalid contact number format',
@@ -125,10 +335,14 @@ export default function ContactUs() {
                                         value.replace(/\D/g, '').length === 11 ||
                                         'Contact number must be 11 digits',
                                 }) }
+                                onInput={(e) => {
+                                    const target = e.target as HTMLInputElement;
+                                    target.value = target.value.replace(/[^0-9]/g, '');
+                                }}
                                 className="bg-[#FAFAFA] p-2 rounded-[5px] w-full border border-[#1D242B]/50 focus:outline-none focus:border-2 focus:border-[#0077C0]"
                                 />
-                                {errors.contactnumber && (
-                                    <span className="text-[16px] leading-[1] text-[#FF0000]">{errors.contactnumber.message}</span>
+                                {errors.contact_number && (
+                                    <span className="text-[16px] leading-[1] text-[#FF0000]">{errors.contact_number.message}</span>
                                 )}
                             </div>
 

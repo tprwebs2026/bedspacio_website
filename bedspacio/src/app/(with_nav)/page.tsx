@@ -1,7 +1,7 @@
 
 import SearchFilter from '@/components/SearchFilter'
 import FrequentlyAskedQuestions from '@/components/FrequentlyAskedQuestion'
-import HomeInquiry from '@/components/HomeInquiry'
+import HomeInquiry from '@/app/(with_nav)/(home-inquiry)/HomeInquiry'
 
 import Bed from '@/asset/icon/bed.svg'
 import Heart from '@/asset/icon/heart.svg'
@@ -59,17 +59,17 @@ export default function Home() {
 
 
             <section className='flex xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 md:grid md:grid-cols-2 w-full xl:min-h-[800px] lg:min-h-[800px] bg-[#FAFAFA] xl:px-[8rem] lg:px-[6rem] py-[3rem] xl:py-[6rem] lg:py-[6rem] md:py-[3rem]  gap-[1rem]'>
-                <div className='hidden xl:grid lg:grid md:grid sm:hidden xl:grid-rows-2 lg:grid-rows-2 md:grid-rows-2 w-full gap-2'>
+                <div className='hidden xl:flex lg:flex md:flex flex-col w-full h-auto gap-2'>
                     <div className='flex items-center justify-center h-[325px] md:min-h-[325px] lg:min-h-[325px] sm:min-h-[325px] bg-[#C7EEFF] rounded-[15px] overflow-hidden'>
-                        <img src="/image/why_choose_us_1.jpg" alt="" className='w-full h-full object-cover'/>
+                        <img src="/image/why_choose_us/image_1.jpg" alt="" className='w-full h-full object-cover'/>
                     </div>
 
                     <div className='grid grid-cols-2 w-full gap-2'>
                         <div className='flex items-center justify-center h-[325px] w-full bg-[#C7EEFF] rounded-[15px] overflow-hidden'>
-                            <img src="/image/why_choose_us_2.jpg" alt="" className='w-full h-full object-cover'/>
+                            <img src="/image/why_choose_us/image_2.jpg" alt="" className='w-full h-full object-cover'/>
                         </div>
                         <div className='flex items-center justify-center h-[325px] w-full bg-[#C7EEFF] rounded-[15px] overflow-hidden'>
-                            <img src="/image/why_choose_us_3.jpg" alt="" className='w-full h-full object-cover'/>
+                            <img src="/image/why_choose_us/image_4.jpg" alt="" className='w-full h-full object-cover'/>
                         </div>
                     </div>
                 </div>

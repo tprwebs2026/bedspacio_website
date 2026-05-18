@@ -9,6 +9,7 @@ export default async function PageWrapper () {
     const users = await getAllUsers();
     console.log('All users: ', users);
 
+    
 
     return <Manage users={users} />
 }

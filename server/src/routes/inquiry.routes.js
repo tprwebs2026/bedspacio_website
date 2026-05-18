@@ -1,9 +1,11 @@
 import express from 'express';
 import axios from 'axios'
+import { db } from '../config/database.js';
 import { searchRead, readByIds, executeKw, createInquiryRecord, createCrmRecord } from '../odoo/odoo.service.js';
 import { getOdooClient } from '../odoo/session.js';
 import { extractOdooError } from '../utils/errorExtract.js';
-import { rateLimitMiddleware } from '../middleware/rateLimit.js';
+import { rateLimitMiddleware, inquiryLimiter } from '../middleware/rateLimit.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const ODOO_URL = process.env.ODOO_URL;
 const inquiryRoutes = express.Router();
@@ -270,6 +272,206 @@ inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) 
     }
 });
 
+
+
+// FROM POSTGRES
+
+inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware,  async (req, res) => {
+    try {
+        const { 
+            room_uuid,
+            expected_revenue,
+            fullname,
+            email,
+            contact_number,
+            schedule,
+            target_move_in,
+            months_of_stay,
+            message,
+            type = 'room_inquiry',
+            status = 'pending'
+        } = req.body;
+
+        const ip_address = req.ip;
+
+        const inquiry = await db.one(
+            `
+                INSERT INTO inquiries (
+                    room_uuid, 
+                    expected_revenue,
+                    fullname,
+                    email,
+                    contact_number,
+                    schedule,
+                    target_move_in,
+                    months_of_stay,
+                    message,
+                    ip_address,
+                    type,
+                    status
+                ) VALUES (
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+                ) RETURNING id
+            `, [
+                room_uuid,
+                expected_revenue,
+                fullname,
+                email,
+                contact_number,
+                schedule,
+                target_move_in,
+                months_of_stay,
+                message,
+                ip_address,
+                type,
+                status
+            ]
+        );
+
+        console.log(inquiry)
+
+        return res.status(200).json(inquiry)
+
+    } catch (err) {
+        console.log('Error creating inquiry data: ', err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+});
+
+
+inquiryRoutes.post('/v1/general-inquiry', inquiryLimiter, async (req, res) => {
+    try {
+        const {
+            fullname,
+            contact_number,
+            email,
+            subject,
+            message,
+            type='general_inquiry'
+        } = req.body;
+
+        const ip_address = req.ip;
+
+        const inquiry = await db.one(
+            `INSERT INTO inquiries (
+                fullname,
+                contact_number,
+                email,
+                subject,
+                message,
+                type,
+                ip_address
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7
+            ) RETURNING id;`, 
+            [fullname, contact_number, email, subject, message, type, ip_address]
+        );
+
+        console.log('Created general inquiry ID: ', inquiry.id);
+
+        return res.status(200).json(inquiry);
+
+    } catch (err) {
+        console.log('Error submitting inquiry: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+})
+
+
+inquiryRoutes.get('/v1', async (req, res) => {
+    try {
+
+        const result = await db.manyOrNone(
+            `SELECT 
+                id,
+                type,
+                fullname,
+                email,
+                status,
+                created_at
+            FROM inquiries 
+            ORDER BY id ASC`
+        )
+
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.error('Error retrieving room inquiries: ', err);
+        return res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
+});
+
+inquiryRoutes.get('/v1/details/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        if(isNaN(id)) {
+            throw new Error('Id must be a number');
+        }
+
+        const result = await db.oneOrNone(
+            `SELECT 
+                i.*,
+                rm.id as room_id
+            FROM inquiries i
+            LEFT JOIN rooms rm ON rm.room_uuid = i.room_uuid
+            WHERE i.id = $1`,
+            [id]
+        );
+
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.error('Error retrieving inquiry: ', err);
+
+        return res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
+});
+
+
+inquiryRoutes.patch('/v1/status/:id', requireAuth, async (req, res) => {
+    try {
+
+        const id = Number(req.params.id);
+        const check_inquiry = await db.oneOrNone(
+            'SELECT COUNT(*) FROM inquiries WHERE id = $1',
+            [id]   
+        ); 
+
+        if (!check_inquiry) {
+            return res.status(404).json({ message: 'Inquiry not found' })
+        }
+
+        const { status } = req.body;
+
+        const update = await db.oneOrNone(
+            `UPDATE inquiries SET status = $1
+            WHERE id = $2`,
+            [status, id]
+        );
+
+        return res.status(200).json({ success: true, message: 'Update successful' })
+        
+    } catch (err) {
+        console.error('Error updating status: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+})
 
 
 export default inquiryRoutes;

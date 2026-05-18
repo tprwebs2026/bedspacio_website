@@ -10,6 +10,7 @@ import CreatedUserModal from "./CreatedUserModal";
 
 interface ModalProp {
     isModalOpen: () => void;
+    onSuccess: () => void;
 }
 
 type UserType = {
@@ -26,7 +27,7 @@ type Data = {
     password: string
 }
 
-export default function UserCreateWrapperModal ({ isModalOpen }: ModalProp) {
+export default function UserCreateWrapperModal ({ isModalOpen, onSuccess }: ModalProp) {
 
     const [createdUser, setCreatedUser] = useState<Data | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -56,9 +57,10 @@ export default function UserCreateWrapperModal ({ isModalOpen }: ModalProp) {
             });
 
             console.log(result);
-            setCreatedUser(result.data)
-            setModalOpen(true)
-            reset()
+            setCreatedUser(result.data);
+            onSuccess();
+            setModalOpen(true);
+            reset();
 
             return result.data;
 

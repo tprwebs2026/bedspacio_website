@@ -1,43 +1,39 @@
-export default function Inquiry () {
+"use server"
 
-    return (
-        <div className="flex w-full min-h-screen">
-            <div className="flex flex-col w-full px-[8rem] py-[2rem] gap-[2rem]">
+import InquiryPageWrapper from "./InquiryPageWrapper"
+import { getAllInquiry } from "../../../../lib/inquiry"
 
-                <div className="flex items-center justify-between w-full">
-                    <span className="text-[28px] text-[#1D242B] font-bold leading-tight">Inquiry</span>
-                </div>
 
-                <div className="flex flex-col w-full">
+export type InquiryPageType = {
+    id: number,
+    fullname: string,
+    email: string,
+    type: string,
+    status: string,
+    created_at: string
+}
 
-                    <div className="grid grid-cols-5 border-b border-b-[#1D242B]/45 px-[1rem] py-1">
-                        <span className="text-[14px] text-[#1D242B]/75">Inqiury Type</span>
-                        <span className="text-[14px] text-[#1D242B]/75">Public Room ID</span>
-                        <span className="text-[14px] text-[#1D242B]/75">Name of Inquirer</span>
-                        <span className="text-[14px] text-[#1D242B]/75">Status</span>
-                        <span className="text-[14px] text-[#1D242B]/75">Submitted at</span>
-                    </div>
+export type InquiryModalType = {
+    id: number,
+    room_uuid: string,
+    room_id: number,
+    fullname: string,
+    email: string,
+    contact_number: string,
+    schedule: string,
+    target_move_in: string,
+    months_of_stay: number,
+    message: string,
+    type: string,
+    status: string,
+    ip_address: string,
+    created_at: string
+}
 
-                    <div className="flex flex-col w-full">
-                        <button className="grid grid-cols-5 border-b border-b-[#1D242B]/15 py-3 place-items-center justify-items-start hover:bg-[#C7EEFF]/50 active:bg-[#FAFAFA] cursor-pointer px-[1rem] transition-all duration-100">
-                            <span>Tenant Inquiry</span>
-                            <span>123456</span>
-                            <span>Angelo Cabangal</span>
-                            <span className="px-2 py-1 text-[14px] font-bold text-[#007C00] bg-[#007C00]/15 w-fit rounded-full">Accepted</span>
-                            <span>04-13-2026</span>
-                        </button>
+export default async function Inquiry () {
 
-                        <button className="grid grid-cols-5 border-b border-b-[#1D242B]/15 py-3 place-items-center justify-items-start hover:bg-[#C7EEFF]/50 active:bg-[#FAFAFA] cursor-pointer px-[1rem] transition-all duration-100">
-                            <span>Contact Inquiry</span>
-                            <span>123456</span>
-                            <span>Angelo Cabangal</span>
-                            <span className="px-2 py-1 text-[14px] font-bold text-[#E70C0E] bg-[#E70C0E]/15 w-fit rounded-full">Rejected</span>
-                            <span>04-13-2026</span>
-                        </button>
-                    </div>
+    const inquiries = await getAllInquiry();
 
-                </div>
-            </div>
-        </div>
-    )
+    return <InquiryPageWrapper inquiries={inquiries}/>
+    
 }

@@ -16,10 +16,10 @@ type Branches = {
 }
 
 type BranchProp = {
-    branchData: Branches[]
+    branches: Branches[]
 }
 
-export default function SearchFilterClient ({ branchData }: BranchProp) {
+export default function SearchFilterClient ({ branches }: BranchProp) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -35,7 +35,7 @@ export default function SearchFilterClient ({ branchData }: BranchProp) {
 
     const handleSearch = () => {
         const params = new URLSearchParams(searchParams.toString())
-        const selectedBranchObj = branchData.find(
+        const selectedBranchObj = branches.find(
             b => b.id.toString() === selectedBranch
             );
 
@@ -92,7 +92,7 @@ export default function SearchFilterClient ({ branchData }: BranchProp) {
         <div className="relative flex flex-col xl:flex-row lg:flex-row  items-end justify-center rounded-[10px] w-fit gap-4 xl:gap-2 lg:gap-1">
 
             <BranchSelection 
-                branchData={branchData}
+                branchData={branches}
                 selectedBranch={selectedBranch}
                 setSelectedBranch={setSelectedBranch}
             />

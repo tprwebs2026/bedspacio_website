@@ -37,3 +37,20 @@ export function rateLimitMiddleware(req, res, next) {
     req.ipAddress = ip;
     next();
 }
+
+
+// using this on postgres
+// keep the top open if Odoo is preferred
+
+import rateLimit from "express-rate-limit";
+
+export const inquiryLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many inquiries. Please try again later."
+    }
+});
