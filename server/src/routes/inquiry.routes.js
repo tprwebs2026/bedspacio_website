@@ -397,6 +397,7 @@ inquiryRoutes.get('/v1', async (req, res) => {
                 status,
                 created_at
             FROM inquiries 
+            WHERE is_archived = false
             ORDER BY id ASC`
         )
 
@@ -421,10 +422,29 @@ inquiryRoutes.get('/v1/details/:id', async (req, res) => {
         const result = await db.oneOrNone(
             `SELECT 
                 i.*,
-                rm.id as room_id
+                rm.id as room_id,
+                COALESCE(
+                    json_agg(
+                        json_build_object(
+                            'id', il.id,
+                            'note', il.note,
+                            'noter', u.fullname,
+                            'noted_at', TO_CHAR(
+                                il.created_at,
+                                'YYYY-MM-DD "at" FMHH12:MI am'
+                            )
+                        )
+                        ORDER BY il.created_at ASC
+                    ) FILTER (WHERE il.id IS NOT NULL),
+                    '[]'
+                ) AS inquiry_logs
+
             FROM inquiries i
             LEFT JOIN rooms rm ON rm.room_uuid = i.room_uuid
-            WHERE i.id = $1`,
+            LEFT JOIN inquiry_logs il ON il.inquiry_id = i.id
+            LEFT JOIN users u ON u.id = il.created_by
+            WHERE i.id = $1
+            GROUP BY i.id, rm.id`,
             [id]
         );
 
@@ -471,7 +491,561 @@ inquiryRoutes.patch('/v1/status/:id', requireAuth, async (req, res) => {
             message: 'Internal server error'
         })
     }
+});
+
+
+// delete multiple inquiries at once
+
+/*
+inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
+    try {
+        const ids  = req.body;
+
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Ids must be a non-empty array'
+            });
+        }
+
+        const inquiries = await db.any(
+            `SELECT id, status FROM inquiries WHERE id = ANY($1::int[])`,
+            [ids]
+        );
+
+        const deletable = inquiries
+            .filter(inq => inq.status === 'closed')
+            .map(inq => inq.id);
+        
+        const skippable = inquiries
+            .filter(inq => inq.status !== 'closed')
+
+                
+
+        if (deletable.length > 0 ) {
+            await db.none(
+                `DELETE FROM inquiries WHERE id = ANY($1::int[])`,
+                [deletable]
+            );
+        }
+
+        return res.status(200).json({
+            success: true,
+            deleted: deletable,
+            skipped: skippable
+        })
+
+    } catch (err) {
+        console.error('Error deleting inquiries: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
 })
+*/
+
+inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
+    try {
+        const ids = req.body;
+
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Ids must be a non-empty array'
+            });
+        }
+
+        const inquiries = await db.any(
+            `SELECT id, status FROM inquiries WHERE id = ANY($1::int[])`,
+            [ids]
+        );
+
+        const foundIds = inquiries.map(i => i.id);
+
+        const notFound = ids
+            .filter(id => !foundIds.includes(id))
+            .map(id => ({
+                id,
+                message: 'Inquiry not found'
+            }));
+
+        const deletable = inquiries
+            .filter(i => i.status === 'closed')
+            .map(i => i.id);
+
+        const notClosed = inquiries
+            .filter(i => i.status !== 'closed')
+            .map(i => ({
+                id: i.id,
+                status: i.status,
+                message: 'Only closed inquiries can be deleted'
+            }));
+
+        if (deletable.length > 0) {
+            await db.none(
+                `DELETE FROM inquiries WHERE id = ANY($1::int[])`,
+                [deletable]
+            );
+        }
+
+        return res.status(200).json({
+            success: true,
+            summary: {
+                requested: ids.length,
+                deleted: deletable.length,
+                not_closed: notClosed.length,
+                not_found: notFound.length
+            },
+            deleted: deletable,
+            not_closed: notClosed,
+            not_found: notFound
+        });
+
+    } catch (err) {
+        console.error('Error deleting inquiries: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+
+
+inquiryRoutes.patch('/v1/archive/multiple', requireAuth, async (req, res) => {
+    try {
+        const ids = req.body;
+
+        console.log('ids? : ', ids);
+
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Ids must be a non-empty array'
+            });
+        }
+
+        const archives = await db.any(
+            `SELECT id, status FROM inquiries WHERE id = ANY($1::int[]) AND is_archived = false`,
+            [ids]
+        );
+
+        const foundIds = archives.map(i => i.id);
+
+        if (foundIds.length > 0) {
+            await db.none(
+                `UPDATE inquiries SET is_archived = true WHERE id = ANY($1::int[])`,
+                [foundIds]
+            );
+        }
+
+        return res.status(200).json({
+            success: true,
+            archived: foundIds
+        });
+
+    } catch (err) {
+        console.error('Error deleting inquiries: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+
+
+
+inquiryRoutes.delete('/v1/archived/:id', requireAuth, async (req, res) => {
+    try {
+
+        const id = Number(req.params.id);
+
+        if (isNaN(id)) {
+            throw new Error('Id must be a number')
+        };
+
+        const inquiry = await db.oneOrNone(
+            `SELECT * FROM inquiries WHERE id = $1`,
+            [id]
+        );
+
+        if (!inquiry) {
+            return res.status(404).json({
+                success:false,
+                message: 'Inquiry not found'
+            });
+        }
+
+        await db.none(
+            `DELETE FROM inquiries WHERE id = $1`,
+            [id]
+        )
+
+        return res.status(200).json({
+            success: true,
+            message: 'Inquiry deleted successfully'
+        })
+
+    } catch (err) {
+        console.error('Error deleting inquiry: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+})
+
+
+
+// Delete single inqiury
+inquiryRoutes.delete('/v1/:id', requireAuth, async (req, res) => {
+    try {
+
+        const id = Number(req.params.id);
+
+        if (isNaN(id)) {
+            throw new Error('Id must be a number')
+        };
+
+        const inquiry = await db.oneOrNone(
+            `SELECT * FROM inquiries WHERE id = $1`,
+            [id]
+        );
+
+        if (!inquiry) {
+            return res.status(404).json({
+                success:false,
+                message: 'Inquiry not found'
+            });
+        }
+
+        if (inquiry.status !== 'closed' ) {
+            return res.status(400).json({
+                success: false,
+                message: 'Only closed inquiries can be deleted'
+            })
+        };
+
+        await db.none(
+            `DELETE FROM inquiries WHERE id = $1`,
+            [id]
+        )
+
+        return res.status(200).json({
+            success: true,
+            message: 'Inquiry deleted successfully'
+        })
+
+
+    } catch (err) {
+        console.error('Error deleting inquiry: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+})
+
+
+
+
+// adding a note on the inquiry
+// each note submits the time and the user who added the note
+
+inquiryRoutes.post('/v1/:id/note', requireAuth, async (req, res) => {
+    try {
+        
+        const id = Number(req.params.id);
+
+        if (isNaN(id)) {
+            throw new Error('Id must be a number');
+        };
+
+        const check_inquiry = await db.oneOrNone(
+            `SELECT * FROM inquiries WHERE id = $1`,
+            [id]
+        )
+
+        if (!check_inquiry) {
+            res.status(404).json({
+                success: false,
+                message: 'Missing inquiry'
+            })
+        }
+
+        const {
+            note,
+            created_by
+        } = req.body;
+
+        if (!note.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Note can not be empty'
+            })
+        }
+
+
+        if (!note || !created_by) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields'
+            })
+        }
+
+
+        const newNote = await db.one(
+            `INSERT INTO inquiry_logs ( 
+                inquiry_id, note, created_by 
+            )
+            VALUES ( $1, $2, $3 )
+            RETURNING
+                note,
+                created_by AS noted_by,
+                LOWER(
+                    TO_CHAR(
+                        created_at,
+                        'YYYY-MM-DD "at" FMHH12:MI AM'
+                    )
+                ) AS noted_at
+            `,
+            [ id, note, created_by ]
+        );
+
+        const user = await db.oneOrNone(
+            `SELECT fullname FROM users WHERE id = $1`,
+            [created_by]
+        );
+        
+
+        return res.status(200).json({
+            success: true,
+            message: 'Note added successfully',
+            data: {
+                ...newNote,
+                noter: user?.fullname || 'Unknown User'
+            }
+        });
+        
+
+
+    } catch (err) {
+        console.log('Error adding notes in the inquiry: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        })
+    }
+})
+
+
+
+// archive an inquiry 
+// all inquiry status can be archive if the user chooses to
+// all archived inquiries are moved to another page
+
+// This is to archive a single inquiry
+inquiryRoutes.patch('/v1/archive/:id', requireAuth, async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        if (isNaN(id)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid inquiry ID'
+            });
+        }
+
+        const inquiry = await db.oneOrNone(
+            `SELECT * FROM inquiries WHERE id = $1`,
+            [id]
+        );
+
+        if (!inquiry) {
+            return res.status(400).json({
+                success: false,
+                message: 'Inquiry not found'
+            })
+        }
+
+        if (inquiry.is_archived) {
+            return res.status(400).json({
+                success: false,
+                message: 'Inquiry is already archived'
+            });
+        }
+
+        const result = await db.one(
+            `UPDATE inquiries 
+            SET is_archived = true, updated_at = now()
+            WHERE id = $1 
+            RETURNING *`,
+            [id]
+        );
+
+
+        return res.status(200).json({
+            success: true,
+            message: 'Inquiry archived successfully',
+            data: result
+        })
+
+
+    } catch (err) {
+        console.error('Error archiving inquiry: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+
+// restore inquiry to unarchived (is_archived = false)
+inquiryRoutes.patch('/v1/unarchive/:id', requireAuth, async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        if (isNaN(id)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid inquiry ID'
+            });
+        }
+
+        const inquiry = await db.oneOrNone(
+            `SELECT * FROM inquiries WHERE id = $1`,
+            [id]
+        );
+
+        if (!inquiry) {
+            return res.status(400).json({
+                success: false,
+                message: 'Inquiry not found'
+            })
+        }
+
+        if (!inquiry.is_archived) {
+            return res.status(400).json({
+                success: false,
+                message: 'Inquiry is not archived'
+            });
+        }
+
+        const result = await db.one(
+            `UPDATE inquiries 
+            SET is_archived = false, updated_at = now()
+            WHERE id = $1 
+            RETURNING *`,
+            [id]
+        );
+
+
+        return res.status(200).json({
+            success: true,
+            message: 'Inquiry restored successfully',
+            data: result
+        })
+
+
+    } catch (err) {
+        console.error('Error restoring inquiry: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+
+// all archived inquiries
+inquiryRoutes.get('/v1/archived', async (req, res) => {
+    try {
+
+        const result = await db.manyOrNone(
+            `SELECT 
+                id,
+                type,
+                fullname,
+                email,
+                status,
+                created_at,
+                updated_at
+            FROM inquiries 
+            WHERE is_archived = true
+            ORDER BY id ASC`
+        )
+
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.error('Error retrieving room inquiries: ', err);
+        return res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
+});
+
+
+
+// check for the details of an archived inquiry based on ID
+inquiryRoutes.get('/v1/details/:id/archived', async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        if(isNaN(id)) {
+            throw new Error('Id must be a number');
+        }
+
+        const result = await db.oneOrNone(
+            `SELECT 
+                i.*,
+                rm.id as room_id,
+                COALESCE(
+                    json_agg(
+                        json_build_object(
+                            'id', il.id,
+                            'note', il.note,
+                            'noter', u.fullname,
+                            'noted_at', TO_CHAR(
+                                il.created_at,
+                                'YYYY-MM-DD "at" FMHH12:MI am'
+                            )
+                        )
+                        ORDER BY il.created_at ASC
+                    ) FILTER (WHERE il.id IS NOT NULL),
+                    '[]'
+                ) AS inquiry_logs
+
+            FROM inquiries i
+            LEFT JOIN rooms rm ON rm.room_uuid = i.room_uuid
+            LEFT JOIN inquiry_logs il ON il.inquiry_id = i.id
+            LEFT JOIN users u ON u.id = il.created_by
+            WHERE i.id = $1 AND i.is_archived = true
+            GROUP BY i.id, rm.id`,
+            [id]
+        );
+
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.error('Error retrieving inquiry: ', err);
+
+        return res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
+});
 
 
 export default inquiryRoutes;

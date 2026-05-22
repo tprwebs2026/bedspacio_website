@@ -5,9 +5,10 @@ import { cookies } from "next/headers";
 import axios from 'axios'
 import { BASE_URL } from "@/config/config";
 import { error } from "console";
+import { redirect } from "next/navigation";
 
 
-export const getCurrentUser = cache( async () => {
+export const getCurrentUser = async () => {
     try {
         const cookieStore = await cookies();
 
@@ -32,7 +33,17 @@ export const getCurrentUser = cache( async () => {
     } catch (err) {
         console.log('Error retrieving user data: ', err);
     }
-});
+};
+
+export async function requireUser() {
+    const user = await getCurrentUser();
+
+    if (!user) {
+        redirect("/login");
+    }
+
+    return user;
+}
 
 
 export const getCurrentUserInfo = async () => {

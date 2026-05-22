@@ -10,6 +10,8 @@ import BranchSelectionWrapper from "./BranchSelectionWrapper"
 
 import ErrorToast from "@/components/admin/Toast/ErrorToast"
 import SuccessToast from "@/components/admin/Toast/SuccessToast"
+import { stringify } from "querystring"
+import Link from "next/link"
 
 type PaymentTerms = {
     term: string,
@@ -76,7 +78,7 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
 
 
     const [error, setError] = useState<string>('');
-    const [errorToastMessage, setErrorToastMessage] = useState<string>();
+    const [errorToastMessage, setErrorToastMessage] = useState<string>('');
     const [successToastMessage, setSuccessToastMessage] = useState<string>('')
     
     const [paymentTermPair, setPaymentTermPair] = useState<PaymentTerms[]>([
@@ -133,6 +135,22 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
                 formData.append('lower_deck_total', String(totalLowerDecks));
                 formData.append('upper_deck_available', String(availableUpperDecks));
                 formData.append('lower_deck_available', String(availableLowerDecks));
+
+
+
+                if (totalUpperDecks < availableUpperDecks) {
+                    setErrorToastMessage('Available upper decks should be lower or equal to the total upper decks');
+                    setTimeout(() => setErrorToastMessage(''), 2500);
+
+                    return;
+                }
+
+                if (totalLowerDecks < availableLowerDecks) {
+                    setErrorToastMessage('Available lower decks should be lower or equal to the total lower decks');
+                    setTimeout(() => setErrorToastMessage(''), 2500);
+
+                    return;
+                }
             }
 
             formData.append('slot', String(finalSlot))
@@ -151,7 +169,39 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
                 }
             });
     
-            console.log('Room name', roomName);
+            
+            // Error handling 
+            // Show ErrorToast if error is made 
+            if (!roomName.trim()) {
+                setErrorToastMessage('Room name is required');
+                setTimeout(() => setErrorToastMessage(''),2500);
+                return;
+            }
+
+            if (!roomDescription.trim()) {
+                setErrorToastMessage('Description is required');
+                setTimeout(() => setErrorToastMessage(''),2500);
+                return;
+            }
+
+            if (roomPrice <= 0 || isNaN(roomPrice)) {
+                setErrorToastMessage('Price is required and must be not be 0.')
+                setTimeout(() => setErrorToastMessage(''), 2500);
+                return;
+            }
+
+            if (!selectedBranch) {
+                setErrorToastMessage('Please select a branch')
+                setTimeout(() => setErrorToastMessage(''), 2500);
+                return;
+            }
+
+            if (images.length === 0) {
+                setErrorToastMessage('Please upload at least one room image');
+                setTimeout(() => setErrorToastMessage(''), 2500);
+                return;
+            }
+
     
             await axios.post(`${base_url}/room/v1/new-room`, formData, {
                 withCredentials: true
@@ -179,7 +229,7 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
 
         } catch (err) {
             console.error('Failed to create new room: ', err);
-            setErrorToastMessage('');
+            setErrorToastMessage('Failed to create room');
             setTimeout(() => setErrorToastMessage(''), 3500)
         }
     }
@@ -297,7 +347,7 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
                                                 <span className="whitespace-nowrap">Total Upper Decks</span>
                                                 <input type="text" placeholder="Enter max number of upper decks" 
                                                 value={totalUpperDecks} onChange={(e) => setTotalUpperDecks(Number(e.target.value))} className="w-full p-2 border border-[#1D242B]/50 bg-[#FAFAFA] rounded-[10px] focus:outline-[#0077C0]"/>
-                                            </div>
+                                            </div> 
 
                                             <div className="flex items-center gap-1 w-full">
                                                 <span className="whitespace-nowrap">Total Lower Decks</span>
@@ -423,7 +473,7 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
 
                     <div className="flex items-center w-full items-end justify-end gap-1">
                         <button onClick={handleSubmitNewRoom} className="flex items-center px-4 py-2 border-2 border-[#0077C0] bg-[#0077C0] text-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">Save</button>
-                        <button className="flex items-center px-4 py-2 border-2 border-[#0077C0] text-[#0077C0] font-bold rounded-[10px] cursor-pointer">Cancel</button>
+                        <Link href={'/admin/room-listing'} className="flex items-center px-4 py-2 border-2 border-[#0077C0] text-[#0077C0] hover:bg-[#0077C0]/15 active:bg-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">Cancel</Link>
                     </div>
                 </div>
             </div>

@@ -1,17 +1,20 @@
 "use server"
 
-import InquiryPageWrapper from "./InquiryPageWrapper"
-import { getAllInquiry } from "../../../../lib/inquiry"
-import { requireUser } from "../../../../lib/user";
+import { getArchivedInquiries } from "../../../../../lib/inquiry"
+import { requireUser } from "../../../../../lib/user"
+import ArchivePageWrapper from "./ArchivePageWrapper"
 
-export type InquiryPageType = {
+
+export type ArchiveType = {
     id: number,
+    type: string,
     fullname: string,
     email: string,
-    type: string,
     status: string,
-    created_at: string
+    created_at: string,
+    updated_at: string
 }
+
 
 type InquiryLogsType = {
     id: number,
@@ -20,7 +23,7 @@ type InquiryLogsType = {
     noted_at: string
 }
 
-export type InquiryModalType = {
+export type ArchiveModalType = {
     id: number,
     room_uuid: string,
     room_id: number,
@@ -39,11 +42,14 @@ export type InquiryModalType = {
     inquiry_logs: InquiryLogsType[]
 }
 
-export default async function Inquiry () {
-
+export default async function ArchivePage () {
     const user = await requireUser()
-    const inquiries = await getAllInquiry();
-
-    return <InquiryPageWrapper inquiries={inquiries}/>
     
+    const archives = await getArchivedInquiries()
+
+    return (
+        <ArchivePageWrapper 
+            archives={archives}
+        />
+    )
 }

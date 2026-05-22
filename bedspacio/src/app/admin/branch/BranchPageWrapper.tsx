@@ -15,6 +15,8 @@ import ErrorToast from '@/components/admin/Toast/ErrorToast';
 import SuccessToast from '@/components/admin/Toast/SuccessToast';
 import DeleteToast from '@/components/admin/Toast/DeleteToast';
 import AlertTaost from '@/components/admin/Toast/AlertToast';
+import ConfirmWindow from '@/components/admin/Toast/ConfirmWindow'
+
 
 type Landmark = {
     id: number,
@@ -42,13 +44,15 @@ export type branchProp = {
 export default function BranchPageWrapper ({ branches: initialBranches }: branchProp) {
 
     const [ isModalOpen, setIsModalOpen ] = useState<boolean>(false);
-    const [ isViewModalOpen, setIsViewModalOpen ] = useState<boolean>(false);
+    const [ isViewModalOpen, setIsViewModalOpen ] = useState<boolean>(false);   
+    const [ confirmOpen, setConfirmOpen ] = useState<boolean>(false)
+
     const [ propertyManager, setPropertyManager ] = useState<Manager[]>([]);
     const [ branches, setBranches ] = useState<branchType[]>(initialBranches);
     const [ selectedBranch, setSelectedBranch ] = useState<branchType | null>(null)
 
     const [message, setMessage] = useState<string>('');
-    const [errorsMessage, setErrorMessage] = useState<string>('');
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const [deleteMessage, setDeleteMessage] = useState<string>('');
     const [alertMessage, setAlertMessage] = useState<string>('');
 
@@ -121,6 +125,7 @@ export default function BranchPageWrapper ({ branches: initialBranches }: branch
                             isModalOpen={() =>  setIsModalOpen(false)}
                             onSuccess={loadAllBranch}
                             toastMessage={(msg) => setMessage(msg)}
+                            errorMessage={(msg => setErrorMessage(msg))}
                             alertMessage={(msg) => setAlertMessage(msg)}
                         />
                 </div>
@@ -136,7 +141,7 @@ export default function BranchPageWrapper ({ branches: initialBranches }: branch
                                 setIsViewModalOpen(false);
                                 setSelectedBranch(null);
                             }}
-                            onDeleteBranch={() => handleDeleteBranch(selectedBranch)}
+                            onDeleteBranch={() => setConfirmOpen(true)}
                             onSuccess={loadAllBranch}
                             setSuccessMessage={(msg) => setMessage(msg)}
                         />
@@ -146,9 +151,18 @@ export default function BranchPageWrapper ({ branches: initialBranches }: branch
 
             <div className='fixed inset 0 z-50'>
                 {message && <SuccessToast message={message} />}
-                {errorsMessage && <ErrorToast message={errorsMessage} />}
+                {errorMessage && <ErrorToast message={errorMessage} />}
                 {alertMessage && <AlertTaost message={alertMessage} />}
                 {deleteMessage && <DeleteToast message={deleteMessage} />}
+
+                {confirmOpen && selectedBranch && (
+                    <ConfirmWindow 
+                        title={'Delete Branch'}
+                        message={`You will be deleting '${selectedBranch.branch_name}'. Do you want to proceed?`}
+                        onCancel={() => setConfirmOpen(false)}
+                        onConfirm={() => handleDeleteBranch(selectedBranch)}
+                    />
+                )}
             </div>
         </>
     )

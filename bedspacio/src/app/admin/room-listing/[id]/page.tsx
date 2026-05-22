@@ -1,9 +1,11 @@
 "use server"
 
+import { redirect } from "next/navigation";
 import RoomViewPageWrapper from "./RoomViewPageWrapper"
 import { getBranchInfo } from "../../../../../lib/branch"
 import { getRoomById } from "../../../../../lib/room";
 import { getInclusions } from "../../../../../lib/inclusion";
+import { getCurrentUser } from "../../../../../lib/user";
 
 export type InclusionViewType = {
     id: number,
@@ -50,10 +52,15 @@ export type RoomViewType = {
 
 export default async function RoomViewPage ({ params }: { params: Promise<{ id: string }> }) {
 
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+        redirect('/login')
+    }
+
     const { id } = await params;
     console.log('Parameter ID: ', id);
 
-    
     const roomId = Number(id);
 
     const roomData = await getRoomById(roomId);

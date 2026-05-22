@@ -2,6 +2,7 @@
 
 import { getRooms } from "../../../../lib/room"
 import RoomPageWrapper from "./RoomPageWrapper"
+import { requireUser } from "../../../../lib/user"
 
 type RoomData = {
     id: number,
@@ -21,6 +22,7 @@ export type AllRoomType = {
 
 export default async function RoomPage ({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
 
+    const user = await requireUser();
 
     const params = await searchParams;
     const pageNumber = Number(params.page) || 1;  

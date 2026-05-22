@@ -10,6 +10,7 @@ interface CreateBranchModalProp {
     propertyManager: Manager[];
     onSuccess: () => void;
     toastMessage: (msg: string) => void;
+    errorMessage: (msg: string) => void;
     alertMessage: (msg: string) => void;
 }
 
@@ -21,7 +22,9 @@ import ChangeImage from '@/asset/icon/change-image.svg'
 
 import { useState } from 'react';
 
-export default function CreateBranchModal ({ isModalOpen, propertyManager, onSuccess, toastMessage, alertMessage }:CreateBranchModalProp ) {
+export default function CreateBranchModal ({ 
+    isModalOpen, propertyManager, onSuccess, toastMessage, errorMessage, alertMessage 
+}: CreateBranchModalProp ) {
 
     const [landmarks, setLandmarks] = useState<string[]>([])
     const [branchImagePreview, setBranchImagePreview] = useState<string | undefined>(undefined)
@@ -32,9 +35,6 @@ export default function CreateBranchModal ({ isModalOpen, propertyManager, onSuc
     const [address, setAddress] = useState('');
     const [selectedManager, setSelectedManager] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-
-    const [error, setError] = useState<string>('');
-    
 
     const handleAddLandmark = () => {
         setLandmarks(prev => [...prev, ''])
@@ -68,9 +68,9 @@ export default function CreateBranchModal ({ isModalOpen, propertyManager, onSuc
 
     const handleSubmit = async () => {
         if (!name || !address || !selectedManager || !branchImageBlob) {
-            alertMessage('Please fill all required fields');
+            errorMessage('Please fill all required fields');
 
-            setTimeout(() => alertMessage(''), 3000);
+            setTimeout(() => errorMessage(''), 3000);
             return;
         }
 

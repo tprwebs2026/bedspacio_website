@@ -14,7 +14,7 @@ export default function ConfirmWindow ({ title, message, onConfirm, onCancel }: 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1D242B]/50">
 
-            <div className="bg-[#FAFAFA] flex flex-col w-[500px] h-auto rounded-[15px] p-[2rem]">
+            <div className="bg-[#FAFAFA] flex flex-col w-[500px] h-auto rounded-[15px] p-[2rem] gap-[1rem]">
                 <div className="flex flex-col gap-2">
                     <span className="text-[22px] font-bold text-[#1D242B]">
                         {title}
@@ -37,7 +37,7 @@ export default function ConfirmWindow ({ title, message, onConfirm, onCancel }: 
                         onClick={onConfirm}
                         className="px-4 py-2 rounded-[10px] bg-[#FE230A] text-white hover:opacity-90 cursor-pointer"
                     >
-                        Delete
+                        Proceed
                     </button>
                 </div>
             </div>
