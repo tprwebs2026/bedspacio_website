@@ -26,6 +26,12 @@ import dashboardRoute from './src/routes/dashboard.routes.js';
 import userRoute from './src/routes/user.routes.js';
 import userSetupRoute from './src/routes/user.setup.routes.js';
 
+// Routes for Kommo
+import leadRoute from './src/kommo/routes/leads.route.js';
+
+// Routes for GoHighLevel
+import highRoute from './src/gohighlevel/routes/leads.route.js';
+
 
 const app = express();
 
@@ -73,6 +79,13 @@ app.use('/manager', managerRoute);
 app.use('/inclusion', inclusionRoute);
 app.use('/inquiry', inquiryRoutes);
 app.use('/dashboard', dashboardRoute)
+
+// for Kommo
+app.use('/kommo', leadRoute);
+
+
+// for GoHighLevel
+app.use('/gohighlevel', highRoute);
 
 
 app.get('/', (req, res) => {

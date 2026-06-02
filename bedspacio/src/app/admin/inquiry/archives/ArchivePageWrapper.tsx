@@ -151,58 +151,67 @@ export default function ArchivePageWrapper ({ archives }: ArchiveProp) {
                             <span></span>
                             <span className="text-[14px] text-[#1D242B]/75">Inqiury Type</span>
                             <span className="text-[14px] text-[#1D242B]/75">Name</span>
-                            <span className="text-[14px] text-[#1D242B]/75">Email</span>
+                            <span className="text-[14px] text-[#1D242B]/75">Contact #</span>
                             <span className="text-[14px] text-[#1D242B]/75">Status</span>
                             <span className="text-[14px] text-[#1D242B]/75">Submitted at (yyy-mm-dd)</span>
                         </div>
 
                         <div className="flex flex-col w-full">
-                                {archiveList.map(arch => (
-                                    <div key={arch.id} 
-                                    className="grid grid-cols-[5%_10%_15%_20%_20%_20%_10%] border-b border-b-[#1D242B]/15 py-3 place-items-center justify-items-center hover:bg-[#C7EEFF]/25 px-[1rem] transition-all duration-100">
-                                        <input type="checkbox" name="inquiry_checker" id={`inquiry_${arch.id}`} 
-                                            checked={checkList.includes(arch.id)}
-                                            onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setCheckList( prev => [arch.id, ...prev] )
-                                                    } else {
-                                                        setCheckList( prev => prev.filter(id => id !== arch.id))
+
+                                {archiveList.length > 0 ? (
+                                    archiveList.map(arch => (
+                                        <div key={arch.id} 
+                                        className="grid grid-cols-[5%_10%_15%_20%_20%_20%_10%] border-b border-b-[#1D242B]/15 py-3 place-items-center justify-items-center hover:bg-[#C7EEFF]/25 px-[1rem] transition-all duration-100">
+                                            <input type="checkbox" name="inquiry_checker" id={`inquiry_${arch.id}`} 
+                                                checked={checkList.includes(arch.id)}
+                                                onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setCheckList( prev => [arch.id, ...prev] )
+                                                        } else {
+                                                            setCheckList( prev => prev.filter(id => id !== arch.id))
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        />    
-
-                                        <span className={` px-2 py-1 rounded-full text-[14px] font-bold
-                                                ${arch.type === 'room_inquiry' 
-                                                    ? 'bg-[#0077C0]/25 text-[#0077C0]' 
-                                                    : 'bg-[#1D242B]/25 text-[#1D242B]/75'}
-                                            `}>
-                                            {arch.type}
-                                        </span>
-                                        <span>{arch.fullname}</span>
-                                        <span>{arch.email}</span>
-                                        <span 
-                                            className={`px-2 py-1 text-[14px] font-bold w-fit rounded-full
-                                            ${arch.status === 'pending' 
-                                                ? 'text-[#1D242B] bg-[#1D242B]/15'
-                                                : arch.status === 'contacted' 
-                                                    ? 'text-[#FF6308]/75 bg-[#FFEF90]/25'
-                                                    : arch.status === 'converted'
-                                                        ? 'text-[#007C00] bg-[#007C00]/15'
-                                                        : 'text-[#FE230A] bg-[#FE230A]/15'
-                                            }
-                                        `}>{arch.status}</span>
-                                        <span>{arch.created_at.split("T")[0].split("-").join('-')}</span>
-                                        <button onClick={() => {
-                                            viewInquiryModal(arch.id);
-                                            setSender(arch.fullname)
-                                            setSelectedId(arch.id);
-                                        }} className="flex items-center cursor-pointer rounded-full bg-[#1D242B]/10 hover:bg-[#0077C0]/25 active:bg-[#1D242B]/10 px-2">
-                                            <span className="px-2 text-[#1D242B] text-[14px] font-bold">View</span>
-                                            <Arrow className="w-[20px] h-[29px]" />
-                                        </button>
+                                            />    
+    
+                                            <span className={` px-2 py-1 rounded-full text-[14px] font-bold
+                                                    ${arch.type === 'room_inquiry' 
+                                                        ? 'bg-[#0077C0]/25 text-[#0077C0]' 
+                                                        : 'bg-[#1D242B]/25 text-[#1D242B]/75'}
+                                                `}>
+                                                {arch.type}
+                                            </span>
+                                            <span>{arch.fullname}</span>
+                                            <span>{arch.contact_number}</span>
+                                            <span 
+                                                className={`px-2 py-1 text-[14px] font-bold w-fit rounded-full
+                                                ${arch.status === 'pending' 
+                                                    ? 'text-[#1D242B] bg-[#1D242B]/15'
+                                                    : arch.status === 'contacted' 
+                                                        ? 'text-[#FF6308]/75 bg-[#FFEF90]/25'
+                                                        : arch.status === 'converted'
+                                                            ? 'text-[#007C00] bg-[#007C00]/15'
+                                                            : 'text-[#FE230A] bg-[#FE230A]/15'
+                                                }
+                                            `}>{arch.status}</span>
+                                            <span>{arch.created_at.split("T")[0].split("-").join('-')}</span>
+                                            <button onClick={() => {
+                                                viewInquiryModal(arch.id);
+                                                setSender(arch.fullname)
+                                                setSelectedId(arch.id);
+                                            }} className="flex items-center cursor-pointer rounded-full bg-[#1D242B]/10 hover:bg-[#0077C0]/25 active:bg-[#1D242B]/10 px-2">
+                                                <span className="px-2 text-[#1D242B] text-[14px] font-bold">View</span>
+                                                <Arrow className="w-[20px] h-[29px]" />
+                                            </button>
+                                        </div>
+                                    )
+                                )) : (
+                                    <div className="flex items-center justify-center h-[200px]">
+                                        <span className="text-[16px] font-bold">Nothing to show yet..</span>
                                     </div>
-                                ))}
+                                )}
+                                
+                                
                             </div>
                         
                     </div>

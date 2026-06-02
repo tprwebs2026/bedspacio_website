@@ -63,60 +63,81 @@
 // -------------- POSTGRES --------------- // 
 
 
-"use client"
+"use client";
 
-import Arrow from '@/asset/icon/arrow-down.svg'
-import Link from 'next/link'
-
+import Arrow from '@/asset/icon/arrow-down.svg';
+import Link from 'next/link';
 import { usePathname, useSearchParams } from "next/navigation";
 
 type PageType = {
-    page: number,
-    pageSize: number,
-    totalRecords: number,
-    totalPage: number
-}
+    page: number;
+    pageSize: number;
+    totalRecords: number;
+    totalPage: number;     // ← should be totalPages
+};
 
 type PageProp = {
-    pageDetails: PageType,
-    currentPage: number
-}
+    pageDetails: PageType;
+    currentPage: number;
+};
 
-export default function Pagination ({ pageDetails, currentPage }: PageProp) {
-
+export default function Pagination({ pageDetails, currentPage }: PageProp) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
     const createPageURL = (pageNumber: number) => {
         const params = new URLSearchParams(searchParams.toString());
-        params.set("page", String(pageNumber))
-
+        params.set("page", String(pageNumber));
         return `${pathname}?${params.toString()}`;
-    }
+    };
 
     const prevPage = Math.max(1, currentPage - 1);
-    const nextPage = Math.min(pageDetails.totalRecords, currentPage + 1);
+    const nextPage = Math.min(pageDetails.totalPage, currentPage + 1);
 
-    if (pageDetails.totalRecords <= 0) {
+    // Don't render if no records
+    if (pageDetails.totalRecords <= 0 || pageDetails.totalPage <= 0) {
         return null;
     }
 
+    const isFirstPage = currentPage <= 1;
+    const isLastPage = currentPage >= pageDetails.totalPage;
+
     return (
         <div className="flex items-center justify-center w-full px-[1rem] py-[2rem] gap-[1rem]">
-            <Link href={createPageURL(prevPage)} 
-                className={`${currentPage <= 1 ? 'pointer-events-none opacity-25' : 'opacity-100 hover:bg-[#1D242B]/10 active:bg-[#0077C0]'} flex items-center justify-between gap-2 cursor-pointer p-1 min-w-[150px] rounded-[5px] border-2 border-[#1D242B]/25 `}>
+            {/* Previous Button */}
+            <Link
+                href={createPageURL(prevPage)}
+                className={`flex items-center justify-between gap-2 cursor-pointer p-1 min-w-[150px] rounded-[5px] border-2 border-[#1D242B]/25 transition-colors
+                    ${isFirstPage 
+                        ? 'pointer-events-none opacity-25' 
+                        : 'hover:bg-[#1D242B]/10 active:bg-[#0077C0]'
+                    }`}
+            >
                 <Arrow className="rotate-90 w-[30px] h-[30px] fill-[#1D242B]" />
-                <span className='pr-2'>Previous</span>
+                <span className="pr-2">Previous</span>
             </Link>
 
-            <div className="flex items-center gap-[0.5rem] ">
-                <div className='flex items-center justify-center px-[1rem] h-[42px] text-[#1D242B] rounded-[5px] border-2 border-[#1D242B]/25 gap-1'><strong>{currentPage}</strong> of {pageDetails.totalPage}</div>
+            {/* Page Info */}
+            <div className="flex items-center gap-[0.5rem]">
+                <div className="flex items-center justify-center px-[1rem] h-[42px] text-[#1D242B] font-medium rounded-[5px] border-2 border-[#1D242B]/25">
+                    <strong>{currentPage}</strong>
+                    <span className="mx-1.5 text-[#1D242B]/60">of</span>
+                    <span>{pageDetails.totalPage}</span>
+                </div>
             </div>
-            <Link href={createPageURL(nextPage)}
-                className={`flex items-center justify-between gap-2 cursor-pointer p-1 min-w-[150px] rounded-[5px] border-2 border-[#1D242B]/25 ${pageDetails.totalRecords === currentPage ? 'pointer-events-none opacity-25' : 'hover:bg-[#1D242B]/10 active:bg-[#0077C0]'}`}>
-                    <span className='pl-2'>Next</span>
+
+            {/* Next Button */}
+            <Link
+                href={createPageURL(nextPage)}
+                className={`flex items-center justify-between gap-2 cursor-pointer p-1 min-w-[150px] rounded-[5px] border-2 border-[#1D242B]/25 transition-colors
+                    ${isLastPage 
+                        ? 'pointer-events-none opacity-25' 
+                        : 'hover:bg-[#1D242B]/10 active:bg-[#0077C0]'
+                    }`}
+            >
+                <span className="pl-2">Next</span>
                 <Arrow className="-rotate-90 w-[30px] h-[30px] fill-[#1D242B]" />
             </Link>
         </div>
-    )
+    );
 }

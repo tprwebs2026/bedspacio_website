@@ -1,4 +1,6 @@
 export const requireAuth = (req, res, next) => {
+    
+
     const user = req.session?.user;
 
     if (!user?.id) {
@@ -9,6 +11,10 @@ export const requireAuth = (req, res, next) => {
     }
 
     req.user = user;
+
+    console.log('AUTH MIDDLEWARE HIT');
+    console.log(req.session);
+    console.log(req.user);
 
     next();
 };

@@ -24,9 +24,6 @@ export const getCurrentUser = async () => {
         }
 
         const data = await response.json();
-
-        console.log('user: ', data.user);
-
         return data.user;
 
     } catch (err) {
@@ -55,9 +52,6 @@ export const getCurrentUserInfo = async () => {
                 Cookie: cookieHeader
             }
         });
-
-        console.log('response for user info: ', response.data);
-
         return response.data;
     } catch (err) {
         console.error('Error retreiving profile data: ', err);
@@ -131,5 +125,37 @@ export const deleteUser = async (id: number) => {
     } catch (err) {
         console.error('Failed to delete user: ', err);
         throw err;
+    }
+}
+
+
+export const changePassword = async (
+    oldPass: string,
+    newPass: string,
+    confirmPass: string
+) => {
+
+    
+    try {
+
+        console.log(axios.patch.toString());
+        console.log("REQUEST METHOD: PATCH");
+
+        const password = await axios.patch(
+            `${BASE_URL}/user/v1/password`, 
+                {
+                    old_password: oldPass,
+                    new_password: newPass,
+                    confirm_password: confirmPass
+                },
+                {
+                    withCredentials: true
+                }
+        );
+
+        return password.data;
+
+    } catch (error: any) {
+        throw error;
     }
 }

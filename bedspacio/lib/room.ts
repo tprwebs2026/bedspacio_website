@@ -133,9 +133,15 @@ export const getRooms = async ({
 
 
 
-export const getRoomById = async (id: number) => {
+export const getRoomById = async (room_uuid: number) => {
     try {
-        const response = await axios.get(`${BASE_URL}/room/v1/${id}/info`, {
+
+        if (Number.isNaN(room_uuid)) {
+            throw new Error('room_uuid is NaN');
+        }
+
+
+        const response = await axios.get(`${BASE_URL}/room/v1/${room_uuid}/info`, {
             withCredentials: true
         });
 

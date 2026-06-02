@@ -161,14 +161,8 @@ branchRoute.get('/v1/name', async (req, res) => {
             JOIN users u ON b.property_manager_id = u.id`
         );
         
-        if (result.length === 0) {
-            return res.status(200).json({
-                message: 'No branches found',
-                data: []
-            })
-        }
-
         return res.status(200).json(result)
+
     } catch(err) {
         console.log('Error retrieving branch names: ', err);
     }
@@ -183,7 +177,7 @@ branchRoute.get('/v1/preview', async (req, res) => {
             `
         );
 
-        if (response.length === 0) {
+        if (!response) {
             return res.status(204).json({
                 success: true,
                 message: 'No branch found'

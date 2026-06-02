@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { cache } from 'react';
 import { BASE_URL } from '@/config/config'
-import { error } from 'console';
+import { cookies } from "next/headers";
 
 
 // export const getAllInquiry = async () => {
@@ -19,13 +19,13 @@ import { error } from 'console';
 
 
 export const getAllInquiry = async (params: {
-    status?: string;
+    ghl_status?: string;
     page?: number;
     search?: string;
 } = {}) => {
     const response = await axios.get(`${BASE_URL}/inquiry/v1`, {
         params: {
-            status: params.status || undefined,
+            ghl_status: params.ghl_status || undefined,
             page: params.page || 1,
             search: params.search || undefined,
         },
@@ -52,10 +52,27 @@ export const getInquiryById = async (id: number) => {
 };
 
 
+export const getRoomID = async () => {
+    try {
+        const response = await axios.get(`${BASE_URL}/inquiry/v1/room_uuid`, {
+            withCredentials: true
+        });
+
+        return response.data ?? [];
+    } catch (err) {
+        throw err;
+    }
+}
+
+
 export const updateStatusById = async (id: number, status: string) => {
     try {
+
         const response = await axios.patch(`${BASE_URL}/inquiry/v1/status/${id}`, 
-            { status: status }, { withCredentials: true }
+            { status: status }, 
+            { 
+                withCredentials: true,
+            },
         );
 
         return response.data;

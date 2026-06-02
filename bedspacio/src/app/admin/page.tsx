@@ -5,16 +5,27 @@ import { requireUser } from "../../../lib/user"
 import { getBestRooms, getInquiryCounts, getRecentInquiries } from "../../../lib/dashboard";
 
 export type InquiryType = {
-    status: string,
+    ghl_status: string,
     count: number
 }
 
+// export type RecentInquiryType = {
+//     id: number,
+//     room_uuid: string,
+//     fullname: string,
+//     target_move_in: string,
+//     ghl_status: string,
+//     created_at: string
+// }
+
+// aligned with GHL 
+// removed target_move_in and replaced by ghl_pipeline_stage
 export type RecentInquiryType = {
     id: number,
     room_uuid: string,
     fullname: string,
-    target_move_in: string,
-    status: string,
+    ghl_pipeline_stage: string,
+    ghl_status: string,
     created_at: string
 }
 

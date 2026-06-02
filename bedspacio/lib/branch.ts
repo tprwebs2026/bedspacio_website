@@ -14,13 +14,7 @@ export const getBranches = cache( async () => {
     return response.data ?? [];
 });
 
-export const getBranchInfo = async () => {
-    const response = await axios.get(`${BASE_URL}/branch/v1/name`, {
-        withCredentials: true
-    })
 
-    return response.data ?? [];
-}
 
 // Get Property Manager data from Odoo
 export const getManagers = cache( async () => {
@@ -40,6 +34,14 @@ export  const GetPropertyManager = async () => {
 
 
 // -------------- Database - Postgres -------------- //
+
+export const getBranchInfo = async () => {
+    const response = await axios.get(`${BASE_URL}/branch/v1/name`, {
+        withCredentials: true
+    })
+
+    return response.data;
+}
 
 export const getAllBranches = async () => {
     const response = await axios.get(`${BASE_URL}/branch/v1/all`, { withCredentials: true });

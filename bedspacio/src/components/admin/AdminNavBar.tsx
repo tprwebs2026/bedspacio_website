@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 
 import Home from '@/asset/icon/home.svg'
@@ -30,11 +30,11 @@ export type branchType = {
 
 export default function AdminNavBar () {
 
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter(); // navigate to other page
     const user  = useAuth();
     const base_url='http://localhost:5000'
 
-    console.log('USER ID: ', user?.id);
 
     const path = usePathname();
     const [profileDropdownVisible, setProfileDropdownVisible] = useState<boolean>(false)
@@ -44,9 +44,31 @@ export default function AdminNavBar () {
         router.push('/login');
     }
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setProfileDropdownVisible(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
+        };
+    }, []);
+
+
+
 
     return (
-        <div className="sticky top-0 flex items-center justify-between bg-[#0077C0] px-[1rem] xl:px-[8rem] lg:px-[1rem] z-10">
+        <div className="sticky top-0 flex items-center justify-between bg-[#0077C0] px-[1rem] xl:px-[8rem] z-10">
             
             <section className="flex items-center">
                 <div className="flex w-full justify-start font-bold text-[28px] text-[#FAFAFA] border-r border-r-[#1D242B] whitespace-nowrap pr-[1rem]">BEDSPACIO ADMIN</div>
@@ -84,7 +106,7 @@ export default function AdminNavBar () {
                 </div>
             </section>
 
-            <div className="group relative flex flex-col items-end justify-end w-full">
+            <div ref={dropdownRef} className="group relative flex flex-col items-end justify-end w-full">
                 <button onClick={() => setProfileDropdownVisible(prev => !prev)} className="flex items-center justify-center bg-[#C7EEFF]/25 hover:bg-[#1D242B]/25 active:bg-[#0077C0] cursor-pointer gap-2 px-2 py-2 rounded-full transition-all duration-100">
                     <div className="flex flex-col items-start justify-center">
                         <span className="px-3 text-[#FAFAFA] text-[16px] font-bold leading-tight">{user?.fullname}</span>
@@ -108,7 +130,7 @@ export default function AdminNavBar () {
                 */}
                 {profileDropdownVisible && (
                     <div className="absolute top-12 flex flex-col items-center w-[200px] rounded-[10px] shadow-md bg-[#FFF] border border-[#1D242B]/50 overflow-hidden">
-                        <Link href={`/admin/${Number(user?.id)}`} onClick={() => setProfileDropdownVisible(false)} className="flex items-center justify-between gap-2 w-full p-4 whitespace-nowrap border-b border-[#1D242B]/25 cursor-pointer hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]">
+                        <Link href={`/admin/user/${Number(user?.id)}`} onClick={() => setProfileDropdownVisible(false)} className="flex items-center justify-between gap-2 w-full p-4 whitespace-nowrap border-b border-[#1D242B]/25 cursor-pointer hover:bg-[#1D242B]/10 active:bg-[#FAFAFA]">
                             <Profile className="w-[20px] h-[20px] fill-[#1D242B]" />
                             <span>View Profile</span>
                         </Link>

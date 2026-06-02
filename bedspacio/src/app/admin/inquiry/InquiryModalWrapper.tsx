@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { InquiryModalType } from "./page"
 import { BASE_URL } from '@/config/config'
@@ -14,8 +15,9 @@ import Delete from '@/asset/icon/delete.svg'
 import Add from '@/asset/icon/add.svg'
 import Note from '@/asset/icon/note.svg'
 import Archive from '@/asset/icon/archive.svg'
+import Check from '@/asset/icon/check-circle.svg'
 
-import { addNewNote, updateStatusById } from "../../../../lib/inquiry";
+import { addNewNote, updateStatusById, getInquiryById } from "../../../../lib/inquiry";
 
 import { useAuth } from "@/context/AuthContext";
 
@@ -33,11 +35,12 @@ interface InquiryModalProps {
 export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, onDelete, onArchiveSingle, successMessage, errorMessage }: InquiryModalProps) {
 
     const { id, fullname } = useAuth();
+    const router = useRouter();
 
     console.log('Let us check the inquiry info: ', inquiry);
 
     const [inquiryData, setInquiryData] = useState(inquiry);
-    const [status, setStatus] = useState(inquiry.status)
+    const [status, setStatus] = useState(inquiry.ghl_status)
     const [notesOpen, setNotesOpen] = useState(
         inquiryData.inquiry_logs.length > 0
     );
@@ -46,12 +49,17 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
     const [loading, setLoading] = useState<boolean>(false);
     const [note, setNote] = useState<string>('');
 
+    const [statusUpdatedMessage, setStatusUpdatedMessage] = useState<string>('')
+
 
     const handleUpdateStatus = async (id: number, status: string) => {
         setLoading(true);
         
         try {
-            if (status === inquiry.status) return;
+            if (status === inquiryData.ghl_status) {
+                setLoading(false);
+                return;
+            }
 
             await new Promise<void>((resolve) => {
                 setTimeout(() => {
@@ -60,18 +68,33 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
                 }, 1500);
             });
 
-            await updateStatusById(id, status); 
+            const response = await updateStatusById(id, status); 
+            if (!response?.success) {
+                throw new Error('Update failed');
+            }
 
-            console.log('converted');
+            const newLog = response.log;
+            setInquiryData(prev => ({
+                ...prev,
+                status,
+                inquiry_logs: [
+                    ...prev.inquiry_logs,
+                    newLog
+                ]
+            }));
+
+            setStatus(status);
+
+            setStatusUpdatedMessage(`Status updated to ${status}`);
+            setTimeout(() => setStatusUpdatedMessage(''), 3500);
+
 
             onSuccess();
-            successMessage(`Status updated to ${status}`);
-            setTimeout(() => successMessage(''), 3500)
-            modalOpen();
+            // modalOpen();
 
             return console.log('Status updated');
-        } catch (err) {
-            console.error('Failed to update status');
+        } catch (err: any) {
+            console.error('Response data:', err?.response?.data);
         } finally {
             setLoading(false)
         }
@@ -100,6 +123,7 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
             const newLog = response.data;
             setInquiryData(prev => ({
                 ...prev,
+                status,
                 inquiry_logs: [
                     ...prev.inquiry_logs,
                     newLog
@@ -127,7 +151,11 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
                 <div className={`relative grid ${notesOpen  ? 'grid-cols-[auto_auto]' : 'grid-cols-[auto_auto]'} overflow-x-hidden`}>
                     <div className={`relative flex flex-col w-[500px] max-h-[600px]  gap-[1rem]`}>
                         <div className="flex items-center w-full justify-between">
-                            <span className="text-[28px] font-bold">Inquiry Information</span>
+
+                            <div className="flex items-center gap-2">
+                                <span className="text-[28px] font-bold">Inquiry Information</span>
+                                <span className="text-[14px] text-[#1D242B]/75 font-bold bg-[#1D242B]/10 rounded-full px-3">{inquiryData.type}</span>
+                            </div>
 
                             <div className="relative flex">
                                 <button onClick={() => setMenuOpen(prev => !prev)} className="cursor-pointer bg-[#1D242B]/10 hover:bg-[#1D242B]/20 active:bg-[#1D242B]/10 rounded-full p-2">
@@ -152,10 +180,10 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
 
                         <div className="flex flex-col w-full gap-[1rem] h-full overflow-y-scroll thin-scrollbar">
 
-                            <div className="flex flex-col items-start w-full">
+                            {/* <div className="flex flex-col items-start w-full">
                                 <span className="font-bold">Type </span>
                                 <span className="w-full py-2 px-3 rounded-[10px] border border-[#1D242B]/25">{inquiryData.type}</span>
-                            </div>
+                            </div> */}
 
                             <div className="flex flex-col items-start w-full">
                                 <span className="font-bold">Sent by</span>
@@ -182,15 +210,19 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
                             {inquiryData.type === 'room_inquiry' && (
                                 <>
                                     <div className="flex flex-col items-start w-full">
+                                        <span className="font-bold">Reference Number</span>
+                                        <span className="w-full py-2 px-3 rounded-[10px] border border-[#1D242B]/25">{inquiryData.reference_number}</span>
+                                    </div>
+                                    
+                                    <div className="flex flex-col items-start w-full">
                                         <span className="font-bold">Room ID</span>
 
                                         <div className="flex items-center justify-between w-full py-2 px-3 rounded-[10px] border border-[#1D242B]/25">
                                             <span className="w-full">{inquiryData.room_uuid}</span>
                                             
                                             {inquiryData.room_id ? (
-                                                <Link href={`/admin/room-listing/${Number(inquiryData.room_id)}`} target={'_blank'} className="flex items-center whitespace-nowrap text-[14px] text-[#1D242B]/90 font-bold opacity-50 hover:opacity-100 active:opacity-75 cursor-pointer">
+                                                <Link href={`/admin/room-listing/${parseInt(inquiryData.room_uuid)}`} target={'_blank'} className="flex items-center whitespace-nowrap text-[14px] text-[#1D242B]/90 font-bold opacity-50 hover:opacity-100 active:opacity-75 cursor-pointer">
                                                     <span className="px-2">Check room</span>
-                                                    <Arrow className="w-[22px] h-[22px] fill-none" />
                                                 </Link>
                                             ) : (
                                                 <span className=" cursor-not-allowed whitespace-nowrap text-[14px] text-[#1D242B]/90 font-bold opacity-50">Room deleted</span>
@@ -210,7 +242,7 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
 
                                     <div className="flex flex-col items-start w-full">
                                         <span className="font-bold">Work Schedule</span>
-                                        <span className="w-full py-2 px-3 rounded-[10px] border border-[#1D242B]/25">{inquiryData.schedule}</span>
+                                        <span className="w-full py-2 px-3 rounded-[10px] border border-[#1D242B]/25">{inquiryData.work_schedule}</span>
                                     </div>
                                 </>
                             )}
@@ -221,8 +253,25 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
                                 <textarea id="messagge" rows={5} disabled value={inquiryData.message} className="resize-none w-full py-2 px-3 rounded-[10px] border border-[#1D242B]/25"></textarea>
                             </div>
 
-                            <div className="flex flex-col items-start w-full">
-                                <span className="font-bold">Status</span>
+
+                            {/* 
+                                REASON FOR COMMENTING THIS BLOCK
+                                > GoHighLevel Integration
+                                > GHL will provide the status and stage of Inquiry
+                                > This modal will only display the status
+                                > Status are changed to: open, won, lost, and abandoned
+                                > Stages are added by GHL.
+                             */}
+
+                            {/* <div className="flex flex-col items-start w-full">
+                                <div className="flex items-center justify-between w-full pb-2">
+                                    <span className="font-bold">Status</span>
+                                    {statusUpdatedMessage && (
+                                        <div className="flex items-center gap-1 h-full rounded-full bg-[#007C00]/10 px-2 animate-slide-in">
+                                            <span className="font-bold text-[12px] text-[#007C00]">{statusUpdatedMessage}</span>
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="flex items-center w-full border-2 border-dashed border-[#1D242B]/25">
                                     
                                     <label htmlFor="pending" className={`flex items-center justify-center w-full font-bold p-2 border-r-2 border-dashed border-r-[#1D242B]/25 cursor-pointer hover:bg-[#1D242B]/15 ${status === 'pending' ? 'bg-[#1D242B]/15 text-[#1D242B]/75' : 'bg-[#FAFAFA] text-[#1D242B]'}`}>
@@ -246,9 +295,23 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
                                         <span>Closed</span>
                                     </label>
                                 </div>
+                            </div> */}
+
+                            <div className="grid grid-cols-2 place-items-center justify-items-center w-full gap-2">
+                                <div className="flex flex-col w-full items-center justify-center">
+                                    <span className="font-bold">Status</span>
+                                    <span className="text-center border border-[#1D242B]/35 rounded-[10px] w-full py-1">{inquiry.ghl_status}</span>
+                                </div>
+
+                                <div className="flex flex-col w-full items-center justify-center">
+                                    <span className="font-bold">Stage</span>
+                                    <span className="text-center border border-[#1D242B]/35 rounded-[10px] w-full py-1">{inquiry.ghl_pipeline_stage}</span>
+                                </div>
                             </div>
 
-                            <span className="text-[14px] opacity-75">Submitted at {inquiryData.created_at.split("T")[0].split("-").join('-')} by user with IP: {inquiryData.ip_address}</span>
+
+                            {/* 
+                            <span className="text-[14px] opacity-75">Submitted at {inquiryData.created_at.split("T")[0].split("-").join('-')} by user with IP: {inquiryData.ip_address}</span> */}
                         </div>
 
                     </div>

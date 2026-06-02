@@ -9,7 +9,7 @@ export type ArchiveType = {
     id: number,
     type: string,
     fullname: string,
-    email: string,
+    contact_number: string,
     status: string,
     created_at: string,
     updated_at: string

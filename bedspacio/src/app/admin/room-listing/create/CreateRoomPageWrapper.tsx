@@ -456,10 +456,13 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
                             </div>
 
                             <div className="flex flex-col items-center w-full p-[1rem] border-dashed border-2 border-[#1D242B]/25 rounded-[10px] gap-2">
-                                <div className="flex flex-col items-center gap-1">
-                                    <span className="text-[14px] text-[#1D242B] font-bold">Inclusions</span>
-                                    <span className="text-[14px] text-[#1D242B] italic">(Select all that applies)</span>
-                                </div>
+                                <span className="text-[14px] text-[#1D242B] font-bold">Inclusions</span>
+                                
+                                {inclusions.length > 0 && (
+                                    <div className="flex flex-col items-center gap-1">
+                                        <span className="text-[14px] text-[#1D242B] italic">(Select all that applies)</span>
+                                    </div>
+                                )}
                                 
                                 {/* Selection of Property Manager and Branch */}
                                 <InclusionSelectionWrapper 
@@ -472,7 +475,7 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
                     </div>
 
                     <div className="flex items-center w-full items-end justify-end gap-1">
-                        <button onClick={handleSubmitNewRoom} className="flex items-center px-4 py-2 border-2 border-[#0077C0] bg-[#0077C0] text-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">Save</button>
+                        <button onClick={handleSubmitNewRoom} className="flex items-center px-4 py-2 border-2 border-[#0077C0] bg-[#0077C0] hover:bg-[#006BAC] active:bg-[#0077C0] text-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">Create</button>
                         <Link href={'/admin/room-listing'} className="flex items-center px-4 py-2 border-2 border-[#0077C0] text-[#0077C0] hover:bg-[#0077C0]/15 active:bg-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">Cancel</Link>
                     </div>
                 </div>

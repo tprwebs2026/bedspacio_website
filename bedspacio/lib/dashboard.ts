@@ -9,7 +9,7 @@ export const getInquiryCounts = async () => {
             withCredentials: true
         });
 
-        return stats.data;
+        return stats.data ?? [];
 
     } catch (err) {
         throw err;
@@ -21,7 +21,7 @@ export const getRecentInquiries = async () => {
     try {
 
         const result = await axios.get(
-            `${BASE_URL}/dashboard/v1/inquiry/pending`,
+            `${BASE_URL}/dashboard/v1/inquiry/new-leads`,
             { withCredentials: true }
         );
 

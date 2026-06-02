@@ -1035,9 +1035,10 @@ roomRoute.get('/v1/admin/all', async (req, res) => {
 // });
 
 
-roomRoute.get('/v1/:id/info', async (req, res) => {
+roomRoute.get('/v1/:room_uuid/info', async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const room_uuid = Number(req.params.room_uuid);
+        console.log('room_uuid:', req.params.room_uuid);
 
         const room = await db.one(
             `
@@ -1083,9 +1084,9 @@ roomRoute.get('/v1/:id/info', async (req, res) => {
                     GROUP BY room_id
                 ) img ON img.room_id = r.id
 
-                WHERE r.id = $1;
+                WHERE r.room_uuid = $1;
             `,
-            [id]
+            [room_uuid]
         );
 
         return res.status(200).json(room);
@@ -1293,7 +1294,8 @@ roomRoute.get('/v1/preview/:id/details', async (req, res) => {
                         'id', u.id,
                         'fullname', u.fullname,
                         'contact_number', u.contact_number,
-                        'email', u.email
+                        'email', u.email,
+                        'profile_image', u.profile_image
                     ) AS property_manager,
 
                     COALESCE(inc.inclusions, '[]') AS inclusions,

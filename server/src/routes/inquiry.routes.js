@@ -343,13 +343,125 @@ inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) 
 //     }
 // });
 
+
+// Reason for commenting: 
+/*
+    This is used on the version where GHL or any other third party CRM is used.
+    This holds on to the status used on the inquiries table on the database (postgres)
+    - If GHL is used, no need to qury for status, instead use ghl_status 
+*/
+
+// inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware, async (req, res) => {
+
+//     try {
+
+//         const {
+//             room_uuid,
+//             expected_revenue,
+//             fullname,
+//             email,
+//             contact_number,
+//             schedule,
+//             target_move_in,
+//             months_of_stay,
+//             message,
+//             type = 'room_inquiry',
+//             status = 'pending'
+//         } = req.body;
+
+//         const ip_address = req.ip;
+
+//         const nanoid = customAlphabet(
+//             'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
+//             8
+//         );
+
+//         const reference_number = `INQ-${nanoid()}`;
+
+//         const result = await db.tx(async t => {
+
+//             // STEP 1: Insert inquiry
+//             const inquiry = await t.one(
+//                 `
+//                 INSERT INTO inquiries (
+//                     room_uuid,
+//                     expected_revenue,
+//                     fullname,
+//                     email,
+//                     contact_number,
+//                     schedule,
+//                     target_move_in,
+//                     months_of_stay,
+//                     message,
+//                     ip_address,
+//                     type,
+//                     status
+//                 ) VALUES (
+//                     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+//                 )
+//                 RETURNING id, created_at
+//                 `,
+//                 [
+//                     room_uuid,
+//                     expected_revenue,
+//                     fullname,
+//                     email,
+//                     contact_number,
+//                     schedule,
+//                     target_move_in,
+//                     months_of_stay,
+//                     message,
+//                     ip_address,
+//                     type,
+//                     reference_number,
+//                     status
+//                 ]
+//             );
+
+//             // STEP 2: Update inquiry with reference number
+//             const updatedInquiry = await t.one(
+//                 `
+//                 UPDATE inquiries
+//                 SET reference_number = $1
+//                 WHERE id = $2
+//                 RETURNING
+//                     id,
+//                     reference_number,
+//                     created_at
+//                 `,
+//                 [reference_number, inquiry.id]
+//             );
+
+//             return updatedInquiry;
+//         });
+
+//         return res.status(200).json({
+//             success: true,
+//             inquiry_id: result.id,
+//             reference_number: result.reference_number,
+//             expected_response_time: 'Within 24 hours'
+//         });
+
+//     } catch (err) {
+
+//         console.error('Error creating inquiry:', err);
+
+//         return res.status(500).json({
+//             success: false,
+//             message: 'Internal server error'
+//         });
+//     }
+// });
+
+
+
 inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware, async (req, res) => {
 
     try {
 
         const {
             room_uuid,
-            expected_revenue,
+            starting_price,
             fullname,
             email,
             contact_number,
@@ -357,8 +469,7 @@ inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware, async (req, res) => 
             target_move_in,
             months_of_stay,
             message,
-            type = 'room_inquiry',
-            status = 'pending'
+            type = 'room_inquiry'
         } = req.body;
 
         const ip_address = req.ip;
@@ -370,67 +481,48 @@ inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware, async (req, res) => 
 
         const reference_number = `INQ-${nanoid()}`;
 
-        const result = await db.tx(async t => {
 
-            // STEP 1: Insert inquiry
-            const inquiry = await t.one(
-                `
-                INSERT INTO inquiries (
-                    room_uuid,
-                    expected_revenue,
-                    fullname,
-                    email,
-                    contact_number,
-                    schedule,
-                    target_move_in,
-                    months_of_stay,
-                    message,
-                    ip_address,
-                    type,
-                    status
-                ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
-                )
-                RETURNING id, created_at
-                `,
-                [
-                    room_uuid,
-                    expected_revenue,
-                    fullname,
-                    email,
-                    contact_number,
-                    schedule,
-                    target_move_in,
-                    months_of_stay,
-                    message,
-                    ip_address,
-                    type,
-                    status,
-                    reference_number
-                ]
-            );
-
-            // STEP 2: Update inquiry with reference number
-            const updatedInquiry = await t.one(
-                `
-                UPDATE inquiries
-                SET reference_number = $1
-                WHERE id = $2
-                RETURNING
-                    id,
-                    reference_number,
-                    created_at
-                `,
-                [reference_number, inquiry.id]
-            );
-
-            return updatedInquiry;
-        });
+        // STEP 1: Insert inquiry
+        const inquiry = await db.one(
+            `
+            INSERT INTO inquiries (
+                room_uuid,
+                starting_price,
+                fullname,
+                email,
+                contact_number,
+                schedule,
+                target_move_in,
+                months_of_stay,
+                message,
+                ip_address,
+                type, 
+                reference_number
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+            )
+            RETURNING id, created_at
+            `,
+            [
+                room_uuid,
+                starting_price,
+                fullname,
+                email,
+                contact_number,
+                schedule,
+                target_move_in,
+                months_of_stay,
+                message,
+                ip_address,
+                type,
+                reference_number
+            ]
+        );
 
         return res.status(200).json({
             success: true,
-            inquiry_id: result.id,
-            reference_number: result.reference_number,
+            inquiry_id: inquiry.id,
+            reference_number: inquiry.reference_number,
             expected_response_time: 'Within 24 hours'
         });
 
@@ -444,6 +536,8 @@ inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware, async (req, res) => 
         });
     }
 });
+
+
 
 
 
@@ -541,16 +635,120 @@ inquiryRoutes.post('/v1/general-inquiry', inquiryLimiter, async (req, res) => {
 
 
 
+
+/*
+    Reason for commenting ('/inquiry/v1'): 
+    This is used on the version where GHL or any other third party CRM is used.
+    This holds on to the status used on the inquiries table on the database (postgres)
+    - If GHL is used, no need to qury for status, instead use ghl_status 
+*/
+
+// inquiryRoutes.get('/v1', async (req, res) => {
+//     try {
+//         const status = req.query.status;
+//         const search = req.query.search; 
+
+//         const page = parseInt(req.query.page) || 1;
+//         const limit = 25;
+//         const offset = (page - 1) * limit;
+
+//         console.log('STATUS:', status);
+//         console.log('SEARCH:', search);
+//         console.log('PAGE:', page);
+
+//         // MAIN QUERY (paginated)
+//         const result = await db.manyOrNone(
+//             `
+//             SELECT 
+//                 id,
+//                 type,
+//                 reference_number,
+//                 fullname,
+//                 contact_number,
+//                 room_uuid,
+//                 status,
+//                 created_at
+//             FROM inquiries
+//             WHERE 
+//                 is_archived = false
+
+//                 AND ($1::text IS NULL OR status = $1)
+
+//                 AND (
+//                     $2::text IS NULL OR
+//                     reference_number ILIKE '%' || $2 || '%' OR
+//                     fullname ILIKE '%' || $2 || '%' OR
+//                     contact_number ILIKE '%' || $2 || '%' OR
+//                     room_uuid ILIKE '%' || $2 || '%'
+//                 )
+
+//             ORDER BY id DESC
+//             LIMIT $3 OFFSET $4
+//             `,
+//             [
+//                 status || null,
+//                 search || null,
+//                 limit,
+//                 offset
+//             ]
+//         );
+
+//         // COUNT QUERY
+//         const countResult = await db.one(
+//             `
+//             SELECT COUNT(*)::int AS total
+//             FROM inquiries
+//             WHERE 
+//                 is_archived = false
+
+//                 AND ($1::text IS NULL OR status = $1)
+
+//                 AND (
+//                     $2::text IS NULL OR
+//                     reference_number ILIKE '%' || $2 || '%' OR
+//                     fullname ILIKE '%' || $2 || '%' OR
+//                     contact_number ILIKE '%' || $2 || '%' OR
+//                     room_uuid ILIKE '%' || $2 || '%'
+//                 )
+//             `,
+//             [
+//                 status || null,
+//                 search || null
+//             ]
+//         );
+
+//         const totalPages = Math.ceil(countResult.total / limit);
+
+//         return res.status(200).json({
+//             data: result,
+//             pagination: {
+//                 page,
+//                 limit,
+//                 total: countResult.total,
+//                 totalPages
+//             }
+//         });
+
+//     } catch (err) {
+//         console.error('Error retrieving inquiries:', err);
+//         return res.status(500).json({
+//             message: 'Internal server error'
+//         });
+//     }
+// });
+
+
+
 inquiryRoutes.get('/v1', async (req, res) => {
     try {
-        const status = req.query.status;
-        const search = req.query.search; // 👈 NEW unified search
+        const ghl_status = req.query.ghl_status;
+        const search = req.query.search; 
 
         const page = parseInt(req.query.page) || 1;
         const limit = 25;
         const offset = (page - 1) * limit;
 
-        console.log('STATUS:', status);
+        console.log('STATUS:', ghl_status);
         console.log('SEARCH:', search);
         console.log('PAGE:', page);
 
@@ -562,16 +760,16 @@ inquiryRoutes.get('/v1', async (req, res) => {
                 type,
                 reference_number,
                 fullname,
-                email,
                 contact_number,
                 room_uuid,
-                status,
+                ghl_status,
+                ghl_pipeline_stage,
                 created_at
             FROM inquiries
             WHERE 
                 is_archived = false
 
-                AND ($1::text IS NULL OR status = $1)
+                AND ($1::text IS NULL OR ghl_status = $1)
 
                 AND (
                     $2::text IS NULL OR
@@ -585,7 +783,7 @@ inquiryRoutes.get('/v1', async (req, res) => {
             LIMIT $3 OFFSET $4
             `,
             [
-                status || null,
+                ghl_status || null,
                 search || null,
                 limit,
                 offset
@@ -600,7 +798,7 @@ inquiryRoutes.get('/v1', async (req, res) => {
             WHERE 
                 is_archived = false
 
-                AND ($1::text IS NULL OR status = $1)
+                AND ($1::text IS NULL OR ghl_status = $1)
 
                 AND (
                     $2::text IS NULL OR
@@ -611,7 +809,7 @@ inquiryRoutes.get('/v1', async (req, res) => {
                 )
             `,
             [
-                status || null,
+                ghl_status || null,
                 search || null
             ]
         );
@@ -635,6 +833,32 @@ inquiryRoutes.get('/v1', async (req, res) => {
         });
     }
 });
+
+
+
+/*
+    > Getting all the room_uuid of all available rooms
+    > Used for manually creating room inquiry on admin page (Inquiry)
+*/
+
+inquiryRoutes.get('/v1/room_uuid', async (req, res) => {
+    try {
+        const rooms = await db.manyOrNone(
+            `SELECT room_uuid, type FROM rooms WHERE slot > 0`
+        );
+
+        return res.status(200).json(rooms);
+
+    } catch (err) {
+        console.log('Error fetching room_uuid: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+})
+
 
 
 inquiryRoutes.get('/v1/details/:id', async (req, res) => {
@@ -686,91 +910,80 @@ inquiryRoutes.get('/v1/details/:id', async (req, res) => {
 });
 
 
-inquiryRoutes.patch('/v1/status/:id', requireAuth, async (req, res) => {
-    try {
-
-        const id = Number(req.params.id);
-        const check_inquiry = await db.oneOrNone(
-            'SELECT COUNT(*) FROM inquiries WHERE id = $1',
-            [id]   
-        ); 
-
-        if (!check_inquiry) {
-            return res.status(404).json({ message: 'Inquiry not found' })
-        }
-
-        const { status } = req.body;
-
-        const update = await db.oneOrNone(
-            `UPDATE inquiries SET status = $1
-            WHERE id = $2`,
-            [status, id]
-        );
-
-        return res.status(200).json({ success: true, message: 'Update successful' })
-        
-    } catch (err) {
-        console.error('Error updating status: ', err);
-
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        })
-    }
-});
-
-
-// delete multiple inquiries at once
-
 /*
-inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
-    try {
-        const ids  = req.body;
-
-        if (!Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'Ids must be a non-empty array'
-            });
-        }
-
-        const inquiries = await db.any(
-            `SELECT id, status FROM inquiries WHERE id = ANY($1::int[])`,
-            [ids]
-        );
-
-        const deletable = inquiries
-            .filter(inq => inq.status === 'closed')
-            .map(inq => inq.id);
-        
-        const skippable = inquiries
-            .filter(inq => inq.status !== 'closed')
-
-                
-
-        if (deletable.length > 0 ) {
-            await db.none(
-                `DELETE FROM inquiries WHERE id = ANY($1::int[])`,
-                [deletable]
-            );
-        }
-
-        return res.status(200).json({
-            success: true,
-            deleted: deletable,
-            skipped: skippable
-        })
-
-    } catch (err) {
-        console.error('Error deleting inquiries: ', err);
-
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        });
-    }
-})
+    Reason for commenting ('/inquiry/v1/status/:id'): 
+    > with GHL integration, updating the status on the inquiry page manually is not an option anymore
+    > The purpose of the inquiry page is to display the inquiry information and handle all updates on the GHL directly
 */
+
+// inquiryRoutes.patch('/v1/status/:id', requireAuth, async (req, res) => {
+
+//     try {
+//         const id = Number(req.params.id);
+//         const { status } = req.body;
+//         const update = await db.oneOrNone(
+//             `UPDATE inquiries 
+//             SET 
+//                 status = $1,
+//                 updated_at = NOW()
+//             WHERE id = $2 
+//             RETURNING updated_at`,
+//             [status, id]
+//         );
+
+//         console.log('Update result:', update);
+        
+//         if (!update) {
+//             return res.status(404).json({ message: 'Inquiry not found' });
+//         }
+
+//         const note = `Status updated to ${status}.`
+
+//         const newLog = await db.one(
+//     `
+//             INSERT INTO inquiry_logs 
+//             (
+//                 inquiry_id,
+//                 note
+//             )
+//             VALUES
+//             ( $1, $2 )
+//             RETURNING
+//                 id,
+//                 note,
+//                 created_at
+//             `,
+//             [id, note]
+//         );
+
+//         return res.status(200).json({ 
+//             success: true, 
+//             message: 'Update successful',
+//             log: {
+//                 id: newLog.id,
+//                 note: newLog.note,
+//                 noted_at: newLog.created_at,
+//                 noter: req.user?.fullname || fullname
+//             }
+//         })
+        
+//     } catch (err) {
+//         console.error(err);
+//         console.error('Error message:', err.message);
+//         console.error('Error detail:', err.detail);
+//         console.error('Error stack:', err.stack);
+
+//         return res.status(500).json({
+//             success: false,
+//             message: 'Internal server error'
+//         })
+//     }
+// });
+
+
+
+
+
 
 inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
     try {
@@ -838,6 +1051,8 @@ inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
         });
     }
 });
+
+
 
 
 inquiryRoutes.delete('/v1/archive/multiple', requireAuth, async (req, res) => {
@@ -1291,8 +1506,9 @@ inquiryRoutes.get('/v1/archived', async (req, res) => {
             `SELECT 
                 id,
                 type,
+                reference_number,
                 fullname,
-                email,
+                contact_number,
                 status,
                 created_at,
                 updated_at

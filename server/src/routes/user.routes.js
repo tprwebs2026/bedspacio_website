@@ -397,19 +397,118 @@ userRoute.get('/v1/property_manager', async (req, res) => {
                 `
         );
 
-        if (response.length === 0) {
-            return res.status(200).json({
-                message: 'No property managers found!',
-                data: []
-            })
-        }
-
         return res.status(200).json(response);
 
     } catch (err) {
         console.error('Error retrieving users: ', err);
     }
-})
+});
+
+
+
+userRoute.patch('/v1/password', requireAuth, async (req, res) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized (missing user id)'
+            });
+        }
+
+        const {
+            old_password,
+            new_password,
+            confirm_password
+        } = req.body;
+
+        console.log('Request body:', req.body);
+
+        if (!old_password || !new_password || !confirm_password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please complete all required fields.'
+            });
+        }
+
+        if (new_password !== confirm_password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Passwords do not match'
+            });
+        }
+
+        const password_regex =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{12,}$/;
+
+        if (!password_regex.test(new_password)) {
+            return res.status(400).json({
+                success: false,
+                message:
+                    'Password must be at least 12 characters and contain uppercase, lowercase, number, and special character'
+            });
+        }
+
+        const user = await db.oneOrNone(
+            `SELECT id, password FROM users WHERE id = $1`,
+            [userId]
+        );
+
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const isMatch = await bcrypt.compare(old_password, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: 'Old password is incorrect'
+            });
+        }
+
+        const same_password = await bcrypt.compare(new_password, user.password);
+
+        if (same_password) {
+            return res.status(400).json({
+                success: false,
+                message: 'New password must be different from old password'
+            });
+        }
+
+        const hashed_password = await bcrypt.hash(new_password, 10);
+
+        await db.none(
+            `
+            UPDATE users
+            SET password = $1,
+                updated_at = NOW()
+            WHERE id = $2
+            `,
+            [hashed_password, userId]
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: 'Password updated successfully'
+        });
+
+    } catch (err) {
+        console.log('Error changing password: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+
 
 
 export default userRoute;

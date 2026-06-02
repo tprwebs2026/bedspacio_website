@@ -72,7 +72,7 @@ export default function CreateBranchModal ({
 
             setTimeout(() => errorMessage(''), 3000);
             return;
-        }
+        } 
 
         setLoading(true);
         toastMessage('')

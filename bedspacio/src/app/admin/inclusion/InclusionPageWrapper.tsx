@@ -37,7 +37,7 @@ export default function InclusionPageWrapper ({ inclusions: initialInclusion }: 
     
     return (
         <>
-            <div className="relative flex flex-col w-full min-h-screen">
+            <div className="relative flex flex-col w-full h-auto">
                 <div className="flex flex-col w-full px-[1rem] xl:px-[8rem] lg:px-[6rem] py-[1rem] gap-[2rem]">
                     <div className="flex items-center justify-between w-full">
                         <span className="text-[28px] text-[#1D242B] font-[900]">Inclusions</span>
@@ -53,17 +53,23 @@ export default function InclusionPageWrapper ({ inclusions: initialInclusion }: 
                             <span>Actions</span>
                         </div>
 
-                        <div className='flex flex-col w-full gap-1'>
-                            {allInclusions.map((inc) => (
-                                <InclusionItem 
-                                    key={inc.id}
-                                    id={inc.id}
-                                    inclusion={inc.inclusion} 
-                                    onSuccess={loadInclusions}
-                                    onMessage={(msg) => setDeleteMessage(msg)}
-                                />
-                            ))}
-                        </div>
+                        {allInclusions.length > 0 ? (
+                            <div className='flex flex-col w-full gap-1 h-[500px] overflow-y-auto'>
+                                {allInclusions.map((inc) => (
+                                    <InclusionItem 
+                                        key={inc.id}
+                                        id={inc.id}
+                                        inclusion={inc.inclusion} 
+                                        onSuccess={loadInclusions}
+                                        onMessage={(msg) => setDeleteMessage(msg)}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className='flex w-full items-center justify-center h-[500px]'>
+                                <span className='text-[18px] font-bold'>Nothing to show yet...</span>
+                            </div>
+                        )}
                     </div>
 
                 </div>

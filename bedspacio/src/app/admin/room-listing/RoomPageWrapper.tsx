@@ -265,7 +265,7 @@ export default function RoomPageWrapper ({
 
     return (
         <>
-            <div className="flex w-full min-h-screen">
+            <div className="flex w-full h-auto overflow-y-auto">
                 <div className="flex flex-col w-full px-[1rem] xl:px-[8rem] lg:px-[1rem] py-[1rem] gap-[4rem]">
 
                     <div className="flex items-center justify-between w-full">
@@ -357,12 +357,12 @@ export default function RoomPageWrapper ({
                             <span>Price</span>
                         </div>
 
-                        <div className='flex flex-col w-full h-[450px]'>
+                        <div className='flex flex-col w-full h-[450px] overflow-y-auto'>
                             {rooms?.data?.length > 0 ? (
                                 rooms.data.map((room, index) => (
                                     <Link
                                         key={room.id}
-                                        href={`/admin/room-listing/${room.id}`}
+                                        href={`/admin/room-listing/${Number(room.room_uuid)}`}
                                         className='grid grid-cols-[5%_10%_25%_15%_15%_15%_15%] w-full justify-items-center py-3 cursor-pointer border-b border-b-[#1D242B]/25 hover:bg-[#C7EEFF]/50 active:bg-[#FAFAFA] transition-all duration-100'
                                     >
                                         <span className='text-[12px] opacity-50'>

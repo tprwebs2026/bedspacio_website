@@ -30,8 +30,6 @@ export default async function WithNavigation({ children }: { children: React.Rea
 
     const user = await getCurrentUserInfo();
 
-    console.log("current user:", user);
-
     if (!user) {
         redirect("/login");
     }

@@ -43,13 +43,25 @@ userSetupRoute.post('/v1/login', async (req, res) => {
             role: response.role
         };
 
-        console.log('User logged in: ', req.session.user);
+        req.session.save((err) => {
 
-        return res.json({
-            message: 'Login successful!',
-            sucess: true,
-            user: req.session.user
-        })
+            if (err) {
+                console.error('Session save error:', err);
+
+                return res.status(500).json({
+                    success: false,
+                    message: 'Session failed to save'
+                });
+            }
+
+            console.log('SESSION AFTER SAVE:', req.session);
+
+            return res.json({
+                message: 'Login successful!',
+                success: true,
+                user: req.session.user
+            });
+        });
         
     } catch (err) {
         console.error('Login Error: ', err);

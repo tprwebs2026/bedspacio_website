@@ -188,7 +188,7 @@ export default function BranchViewModal ({ propertyManagers, branch, isModalOpen
                                             <span className='text-[#1D242B] '>Change</span>
                                         </div>
                                     </label>
-                                </div>
+                                </div>  
 
                                 <img src={imageSrc} alt="branch-image" className='w-full h-full object-cover'/>
                             </div>
@@ -254,7 +254,7 @@ export default function BranchViewModal ({ propertyManagers, branch, isModalOpen
                     {DataChanges && (
                         <button onClick={() => handleBranchChange(branch.id)} className='bg-[#0077C0] text-[#FAFAFA] font-bold rounded-[10px] p-2 px-4 cursor-pointer hover:bg-[#0077C0]/90 active:bg-[#0077C0]'>Save</button>
                     )}  
-                    <button onClick={isModalOpen} className='bg-[#1D242B]/15 text-[#1D242B] font-bold rounded-[10px] p-2 cursor-pointer hover:bg-[#1D242B]/30 active:bg-[#FAFAFA]'>Cancel</button>
+                    <button onClick={isModalOpen} className='bg-[#1D242B]/15 text-[#1D242B] font-bold rounded-[10px] p-2 cursor-pointer hover:bg-[#1D242B]/30 active:bg-[#FAFAFA]'>Close</button>
                 </div>
             </div>
         </div>

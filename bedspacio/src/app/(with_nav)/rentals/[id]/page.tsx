@@ -284,11 +284,11 @@ export default async function RoomDetails ({ params }: Props ) {
                         <div className="flex flex-col items-start gap-[1rem] w-full">
                             <span className="text-[20px] text-[#1D242B] font-[900]">Capacity</span>
                             <div className="flex items-center gap-2">
-                                <ArrowLong className="w-[25px] h-full" />
+                                <ArrowLong className="w-[25px] h-full stroke-[#1D242B] stroke-2" />
                                 <span>Maximum Pax: <strong>{room.capacity}</strong></span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <ArrowLong className="w-[25px] h-full" />
+                                <ArrowLong className="w-[25px] h-full stroke-[#1D242B] stroke-2" />
                                 <span className={`${room.slot === 0 ? 'text-[#F60002]' : 'text-[#007C01]' }`}>Available Slot: <strong>{room.slot}</strong></span>
                             </div>
                             {/* {room.room_type === "bedspace" ? (
@@ -323,13 +323,13 @@ export default async function RoomDetails ({ params }: Props ) {
                                 <div className="flex flex-col gap-[0.5rem] items-start">
                                     {room.payment_term.length <= 0 ? (
                                         <div className="flex items-center gap-2">
-                                            <ArrowLong className="w-[25px] h-full" />
+                                            <ArrowLong className="w-[25px] h-full stroke-[#1D242B] stroke-2" />
                                             <span>None</span>
                                         </div>
                                     ) : (
                                         room.payment_term?.map((term: PaymentTerms, index: number) => (
                                             <div key={index} className="flex items-center gap-2">
-                                                <ArrowLong className="w-[25px] h-auto" />
+                                                <ArrowLong className="w-[25px] h-auto stroke-[#1D242B] stroke-2" />
                                                 <span className="text-[18px] text-[#1D242B] leading-[1]">{term?.term}</span>
                                             </div>
                                         ))
@@ -355,7 +355,7 @@ export default async function RoomDetails ({ params }: Props ) {
                             <div className="flex flex-col gap-[0.5rem] items-start w-full">
                                 {room.branch.landmarks.map((lm: {id:number, name: string, landmark: string}) => (
                                     <div key={lm.id} className="flex items-center gap-2">
-                                        <ArrowLong className="w-[25px] h-auto" />
+                                        <ArrowLong className="w-[25px] h-auto stroke-[#1D242B] stroke-2" />
                                         <span key={lm.id} className="text-[18px] text-[#1D242B] leading-[1]">
                                             {lm.landmark}
                                         </span>
