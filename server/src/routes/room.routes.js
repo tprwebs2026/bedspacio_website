@@ -1037,7 +1037,7 @@ roomRoute.get('/v1/admin/all', async (req, res) => {
 
 roomRoute.get('/v1/:room_uuid/info', async (req, res) => {
     try {
-        const room_uuid = Number(req.params.room_uuid);
+        const room_uuid = req.params.room_uuid;
         console.log('room_uuid:', req.params.room_uuid);
 
         const room = await db.one(

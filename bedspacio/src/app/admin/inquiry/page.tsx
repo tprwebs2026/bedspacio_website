@@ -61,6 +61,7 @@ export default async function Inquiry({
 }) {
 
     const user = await requireUser();
+    
 
     const params = await searchParams;
     const clean = (v?: string) =>

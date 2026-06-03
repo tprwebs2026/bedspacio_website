@@ -820,6 +820,8 @@ export default function InquiryPageWrapper ({ inquiries, pagination, currentStat
             router.refresh();
         }, 3000);
 
+        console.log('Refreshing inquiry page');
+
         return () => clearInterval(interval);
     }, [router]);
 

@@ -21,18 +21,14 @@
 
 
 import { redirect } from "next/navigation";
-import { getCurrentUserInfo } from "../../../lib/user";
+import { getCurrentUserInfo, requireUser } from "../../../lib/user";
 
 import { AuthProvider } from "@/context/AuthContext";
 import AdminNavBar from "@/components/admin/AdminNavBar";
 
 export default async function WithNavigation({ children }: { children: React.ReactNode }) {
 
-    const user = await getCurrentUserInfo();
-
-    if (!user) {
-        redirect("/login");
-    }
+    const user = await requireUser();
 
     return (
         <AuthProvider user={user}>

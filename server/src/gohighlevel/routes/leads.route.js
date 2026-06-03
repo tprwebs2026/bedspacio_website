@@ -27,39 +27,6 @@ highRoute.post(`/submissions`, async(req , res) => {
         // Generate your inquiry reference number locally using nanoid
         const referenceNumber = `INQ-${nanoid(10).toUpperCase()}`;
 
-        // saving the record to POSTGRES first
-        const inquiry = await db.oneOrNone(
-            `
-                INSERT INTO inquiries (
-                    reference_number, 
-                    room_uuid,
-                    starting_price,
-                    type,
-                    fullname,
-                    contact_number,
-                    email,
-                    work_schedule,
-                    target_move_in,
-                    months_of_stay,
-                    message
-                ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
-                ) RETURNING *
-            `,
-            [ 
-                referenceNumber, 
-                room_uuid, 
-                starting_price, 
-                type, fullname, 
-                contact_number, 
-                email,  
-                work_schedule,
-                target_move_in,
-                months_of_stay,
-                message
-            ]
-        );
-
         let ghlContactId;
 
         // Check if contact already exists in GHL
@@ -76,32 +43,40 @@ highRoute.post(`/submissions`, async(req , res) => {
 
         const existingContact = duplicateContactResponse.data?.contact;
 
-        if (existingContact) {
+        if (existingContact?.id) {
+            ghlContactId = existingContact.id;
+
             console.log(
                 'Existing GHL Contact Found:',
-                existingContact.id
+                ghlContactId
             );
-
-            ghlContactId = existingContact.id;
         } else {
-            const GoHighLevelPayload = {
+            const contactPayload = {
                 name: fullname,
                 email: email,
                 phone: contact_number,
                 locationId: process.env.GHL_LOCATION_ID,
-                tags: [ 'Rental Inquiry', `Room-ID-${room_uuid}` ],
+                tags: [ 
+                    'Rental Inquiry', 
+                    `Room-ID-${room_uuid}` 
+                ]
             };
     
             const contactResponse = await goHighLevelClient.post(
                 `/contacts/`,
-                GoHighLevelPayload
+                contactPayload
             );
     
             ghlContactId = contactResponse.data.contact.id;
 
+            if (!ghlContactId) {
+                throw new Error(
+                    'Failed to create GHL contact'
+                );
+            }
+
             console.log('New GHL contact created: ', ghlContactId);
         }
-
 
 
         const opportunityPayload = {
@@ -126,7 +101,62 @@ highRoute.post(`/submissions`, async(req , res) => {
         console.log('Sending Opportunity Payload to GHL...');
         const opportunityResponse = await goHighLevelClient.post('/opportunities/', opportunityPayload);
 
-        
+        const ghlOpportunityId = opportunityResponse.data?.opportunity?.id;
+
+        if (!ghlOpportunityId) {
+            throw new Error('Failed to create GHL opportunity');
+        }
+
+        console.log('GHL Opportunity Created:', ghlOpportunityId );
+
+        // saving the record to POSTGRES first
+        const inquiry = await db.oneOrNone(
+            `
+            INSERT INTO inquiries (
+                reference_number, 
+                room_uuid,
+                starting_price,
+                type,
+                fullname,
+                contact_number,
+                email,
+                work_schedule,
+                target_move_in,
+                months_of_stay,
+                message,
+                ghl_contact_id,
+                ghl_opportunity_id,
+                ghl_pipeline_stage,
+                ghl_status
+            ) VALUES (
+                $1, $2, $3, $4, $5,
+                $6, $7, $8, $9, $10,
+                $11, $12, $13, $14, $15
+            ) RETURNING *
+            `,
+            [ 
+                referenceNumber, 
+                room_uuid, 
+                starting_price, 
+                type, fullname, 
+                contact_number, 
+                email,  
+                work_schedule,
+                target_move_in,
+                months_of_stay,
+                message,
+                ghlContactId,
+                ghlOpportunityId,
+                'New Lead',
+                'open'
+            ]
+        );
+
+        console.log(
+            'Inquiry Saved To Database:',
+            inquiry.id
+        );
+
         // Response back to your Next.js frontend
         return res.status(200).json({
             success: true,
@@ -136,7 +166,6 @@ highRoute.post(`/submissions`, async(req , res) => {
             crm_opportunity_id: opportunityResponse.data.opportunity.id,
             data: inquiry
         });
-
 
 
     } catch (error) {
@@ -309,6 +338,151 @@ highRoute.post('/submissions/manual', async (req, res) => {
 })
 
 
+
+/*
+    This is a fallback if a user tries to create an Opportunity inside GHL directly and not on the Inquiry page on website
+    
+*/
+highRoute.post('/fallback/opportunity-created', async (req, res) => {
+    try {
+        const secret = req.headers['x-webhook-secret'];
+
+        if (secret !== process.env.WEBHOOK_SECRET) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid webhook secret'
+            });
+        }
+
+        const {
+            room_uuid,
+            message,
+            work_schedule,
+            target_move_in,
+            months_of_stay,
+            contact_id,
+            id: opportunity_id,
+            full_name,
+            email,
+            phone,
+            status,
+            pipleline_stage
+        } = req.body;
+
+        console.log('=================================');
+        console.log('GHL FALLBACK OPPORTUNITY CREATED');
+        console.log(req.body);
+        console.log('=================================');
+
+        // Prevent duplicate creation
+        const existingInquiry = await db.oneOrNone(
+            `
+            SELECT id
+            FROM inquiries
+            WHERE ghl_opportunity_id = $1
+            `,
+            [opportunity_id]
+        );
+
+        if (existingInquiry) {
+            return res.status(200).json({
+                success: true,
+                message: 'Inquiry already exists'
+            });
+        }
+
+        const referenceNumber =
+            `INQ-${nanoid(10).toUpperCase()}`;
+
+        const inquiry = await db.one(
+            `
+            INSERT INTO inquiries (
+                type,
+                fullname,
+                contact_number,
+                email,
+                reference_number,
+                ghl_contact_id,
+                ghl_opportunity_id,
+                ghl_pipeline_stage,
+                ghl_status
+            )
+            VALUES (
+                $1,$2,$3,$4,$5,$6,$7,$8,$9
+            )
+            RETURNING *
+            `,
+            [   
+                'room_inquiry',
+                full_name || '',
+                phone || '',
+                email || '',
+                referenceNumber,
+                contact_id,
+                opportunity_id,
+                pipleline_stage || 'New Lead',
+                status || 'open'
+            ]
+        );
+
+        // Update the GHL opportunity with the generated reference number
+        await goHighLevelClient.put(
+            `/opportunities/${opportunity_id}`,
+            {
+                customFields: [
+                    {
+                        key: "reference_number",
+                        value: referenceNumber
+                    }
+                ]
+            }
+        );
+
+        const { customData } = req.body;
+
+        await db.none(
+            `
+            UPDATE inquiries
+            SET
+                room_uuid = $1,
+                message = $2,
+                work_schedule = $3,
+                target_move_in = $4,
+                months_of_stay = $5,
+                updated_at = NOW()
+            WHERE ghl_opportunity_id = $6
+            `,
+            [
+                customData.room_uuid,
+                customData.message,
+                customData.work_schedule,
+                customData.target_move_in,
+                Number(customData.months_of_stay),
+                opportunity_id
+            ]
+        );
+
+        return res.status(200).json({
+            success: true,
+            data: inquiry
+        });
+
+    } catch (err) {
+        console.log(
+            JSON.stringify(err.response?.data, null, 2)
+        );
+
+        return res.status(500).json({
+            success: false
+        });
+
+        return res.status(500).json({
+            success: false
+        });
+    }
+});
+
+
 /*
     Shows the status of inquiries on the admin Inquiry page when updating the status on  GoHighLevel
 
@@ -318,15 +492,19 @@ highRoute.post('/status-change', async (req, res) => {
     try {
         const secret = req.headers["x-webhook-secret"];
 
-        if (secret !== "bedspacio_webhook_secret_2026") {
+        if (secret !== process.env.WEBHOOK_SECRET) {
             return res.status(401).json({
                 success: false,
                 message: "Invalid webhook secret"
             });
         }
 
+        console.log('=================================');
         console.log("WEBHOOK VERIFIED");
         console.log(req.body);
+        console.log(JSON.stringify(req.body, null, 2));
+        console.log('=================================');
+
 
         const {
             contact_id,
@@ -336,30 +514,92 @@ highRoute.post('/status-change', async (req, res) => {
             customData
         } = req.body;
 
+        console.log({
+            contact_id,
+            opportunity_id,
+            status,
+            pipleline_stage,
+            customData
+        });
+
         const referenceNumber = customData?.referenceNumber;
 
-        await db.none(
+        if (!referenceNumber) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing reference number'
+            });
+        }
+
+
+        // await db.none(
+        //     `
+        //     UPDATE inquiries
+        //     SET
+        //         ghl_contact_id = $1,
+        //         ghl_opportunity_id = $2,
+        //         ghl_pipeline_stage = $3,
+        //         ghl_status = $4,
+        //         updated_at = NOW()
+        //     WHERE reference_number = $5
+        //     `,
+        //     [
+        //         contact_id,
+        //         opportunity_id,
+        //         pipleline_stage,
+        //         status,
+        //         referenceNumber
+        //     ]
+        // );
+
+        const updates = [];
+        const values = [];
+
+        if (contact_id) {
+            updates.push(
+                `ghl_contact_id = $${values.length + 1}`
+            );
+            values.push(contact_id);
+        };
+
+        if (opportunity_id) {
+            updates.push(
+                `ghl_opportunity_id = $${values.length + 1}`
+            );
+            values.push(opportunity_id);
+        };
+
+        if (pipleline_stage) {
+            updates.push(
+                `ghl_pipeline_stage = $${values.length + 1}`
+            );
+            values.push(pipleline_stage);
+        };
+
+        if (status) {
+            updates.push(
+                `ghl_status = $${values.length + 1}`
+            );
+            values.push(status);
+        };
+
+        updates.push('updated_at = NOW()');
+        values.push(referenceNumber);
+
+        const result = await db.result(
             `
             UPDATE inquiries
-            SET
-                ghl_contact_id = $1,
-                ghl_opportunity_id = $2,
-                ghl_pipeline_stage = $3,
-                ghl_status = $4,
-                updated_at = NOW()
-            WHERE reference_number = $5
+            SET ${updates.join(', ')}
+            WHERE reference_number = $${values.length}
             `,
-            [
-                contact_id,
-                opportunity_id,
-                pipleline_stage,
-                status,
-                referenceNumber
-            ]
+            values
         );
 
+        console.log(`Rows Updated: ${result.rowCount}`);
+
         return res.status(200).json({
-            success: true
+            success: true,
+            updated_rows: result.rowCount
         });
 
 

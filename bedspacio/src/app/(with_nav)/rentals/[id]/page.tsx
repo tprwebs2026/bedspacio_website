@@ -227,7 +227,7 @@ type RoomDetailType = {
     gender: string,
     description: string,
     branch_address: string,
-    starting_price: number,
+    price: number,
     property_manager: string,
     property_manager_contact: string,
     capacity: number,
@@ -270,7 +270,7 @@ export default async function RoomDetails ({ params }: Props ) {
                             <span className="text-[22px] xl:text-[24px] lg:text-[24px] text-[#1D242B] font-[900] leading-tight break-words w-full">{room.title}</span>
                             <div className="flex flex-col items-start gap-1">
                                 <div className="flex items-center gap-1">
-                                    <span className="text-[#0077C0] text-[24px] font-[900] leading-[1]">Php {room.starting_price}</span>
+                                    <span className="text-[#0077C0] text-[24px] font-[900] leading-[1]">Php {room.price}</span>
                                     <span className="text-[#0077C0] text-[28px] font-bold leading-[0.75] opacity-50">/monthly</span>
                                 </div>
                             </div>

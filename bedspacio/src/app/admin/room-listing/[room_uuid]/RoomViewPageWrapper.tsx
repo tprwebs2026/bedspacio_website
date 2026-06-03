@@ -299,7 +299,7 @@ export default function RoomViewPageWrapper ({room, inclusions, branches }: Room
                 <div className="flex flex-col items-start w-full px-[1rem] xl:px-[8rem] py-[1rem]">
 
                     <div className="flex items-center justify-between w-full">
-                        <span className="text-[28px] text-[#1D242B] font-[900]">Room ID: {room.room_uuid}</span>
+                        <span className="text-[28px] text-[#1D242B] font-[900]">Room ID: {Number(room.room_uuid)}</span>
 
                         <div className="flex items-center gap-2">
                             <div className=" relative flex">

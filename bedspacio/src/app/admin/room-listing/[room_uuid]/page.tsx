@@ -32,7 +32,7 @@ export type BranchViewType = {
 
 export type RoomViewType = {
     id: number,
-    room_uuid: string,
+    room_uuid: number,
     title: string,
     description: string,
     price: string,
@@ -59,9 +59,10 @@ export default async function RoomViewPage ({ params }: { params: Promise<{ room
     }
 
     const { room_uuid } = await params;
-    console.log('Parameter ID: ', room_uuid);
+    console.log('Parameter ID: ', typeof room_uuid);
 
     const roomId = Number(room_uuid);
+    console.log('room uuid type: ', typeof roomId);
 
     const roomData = await getRoomById(roomId);
     const branches = await getBranchInfo();

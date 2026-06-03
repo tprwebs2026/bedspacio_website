@@ -37,8 +37,6 @@ export default function InquiryModalWrapper ({ modalOpen, inquiry, onSuccess, on
     const { id, fullname } = useAuth();
     const router = useRouter();
 
-    console.log('Let us check the inquiry info: ', inquiry);
-
     const [inquiryData, setInquiryData] = useState(inquiry);
     const [status, setStatus] = useState(inquiry.ghl_status)
     const [notesOpen, setNotesOpen] = useState(

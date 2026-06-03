@@ -12,28 +12,39 @@ export const getCurrentUser = async () => {
         const cookieStore = await cookies();
 
         const response = await fetch(`${BASE_URL}/user/v1`, {
-            method: 'GET',
+            method: "GET",
             headers: {
                 Cookie: cookieStore.toString()
             },
-            cache: 'no-store'
-        })
+            cache: "no-store"
+        });
+
+        if (response.status === 401) {
+            return null;
+        }
 
         if (!response.ok) {
-            throw new Error('Failed to retrieve user credentials');
+            throw new Error(
+                `Failed to retrieve user (${response.status})`
+            );
         }
 
         const data = await response.json();
         return data.user;
 
-    } catch (err) {
-        console.log('Error retrieving user data: ', err);
+    } catch (err: any) {
+        console.error("getCurrentUser failed:", err.message);
+
+        return null;
     }
 };
+
+
 
 export async function requireUser() {
     const user = await getCurrentUser();
 
+    // Actual unauthenticated user
     if (!user) {
         redirect("/login");
     }
@@ -47,14 +58,22 @@ export const getCurrentUserInfo = async () => {
         const cookieStore = await cookies();
         const cookieHeader = cookieStore.toString();
 
-        const response = await axios.get(`${BASE_URL}/user/v1/profile`, {
-            headers: {
-                Cookie: cookieHeader
+        const response = await axios.get(
+            `${BASE_URL}/user/v1/profile`, 
+            {
+                headers: {
+                    Cookie: cookieHeader
+                }
             }
-        });
+        );
         return response.data;
-    } catch (err) {
-        console.error('Error retreiving profile data: ', err);
+    } catch (err: any) {
+        console.error(
+            "Profile fetch failed:",
+            err?.message
+        );
+
+        throw err;
     }
 };  
 

@@ -45,9 +45,9 @@ export const getRoomListings = cache(async ({
 
 
 
-export const getRoomDetails = cache(async (room_id: number) => {
+export const getRoomDetails = cache(async (room_uuid: number) => {
     try {
-        const response = await axios.get(`${BASE_URL}/room/v1/detail/${room_id}`);
+        const response = await axios.get(`${BASE_URL}/room/v1/detail/${room_uuid}`);
 
         console.log(response.data);
         return response.data ;
