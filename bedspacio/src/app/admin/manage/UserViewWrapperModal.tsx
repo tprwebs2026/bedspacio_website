@@ -76,8 +76,6 @@ export default function UserViewWrapperModal ({ isModalOpen, user, onSuccess, su
 
         try {
             const deleteResponse = await deleteUser(id);
-            console.log('Deleted: ', deleteResponse);
-            console.log('user to delete: ', id);
 
             deleteMessage('Delete successful');
             setTimeout(() => deleteMessage(''), 3500);
@@ -122,7 +120,6 @@ export default function UserViewWrapperModal ({ isModalOpen, user, onSuccess, su
                 withCredentials: true
             });
     
-            console.log('user update response: ', response);
             successMessage('Updated successful');
 
             onSuccess();

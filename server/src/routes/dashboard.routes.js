@@ -83,7 +83,7 @@ dashboardRoute.get('/v1/inquiry/new-leads', async (req, res) => {
         const result = await db.manyOrNone(
             `SELECT 
                 id,
-                room_uuid,
+                reference_number,
                 fullname,
                 ghl_status,
                 ghl_pipeline_stage,
@@ -94,7 +94,7 @@ dashboardRoute.get('/v1/inquiry/new-leads', async (req, res) => {
                 is_archived = false AND
                 ghl_pipeline_stage = 'New Lead' AND
                 type = 'room_inquiry'
-            ORDER BY created_at ASC
+            ORDER BY created_at DESC
             LIMIT 8 OFFSET 0
             `
         )

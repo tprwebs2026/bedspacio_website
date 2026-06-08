@@ -84,195 +84,204 @@ const inquiryRoutes = express.Router();
 // });
 
 
-inquiryRoutes.post('/v1/crm-record/opportunity', rateLimitMiddleware, async (req, res, next) => {
-    try {
-        const {
-            public_room_id,
-            starting_price,
-            fullname,
-            contactNumber,
-            email,
-            schedule,
-            targetMoveIn,
-            monthsOfStay,
-            other
-        } = req.body;
+
+/*
+    USED IN ODOO CRM
+*/
+
+// inquiryRoutes.post('/v1/crm-record/opportunity', rateLimitMiddleware, async (req, res, next) => {
+//     try {
+//         const {
+//             public_room_id,
+//             starting_price,
+//             fullname,
+//             contactNumber,
+//             email,
+//             schedule,
+//             targetMoveIn,
+//             monthsOfStay,
+//             other
+//         } = req.body;
 
 
-        const inquiry_result = await createInquiryRecord({
-            model: "bedspacio.inquiry",
-            values: {
-                public_room_id: Number(public_room_id),
-                form_type: 'room',
-                starting_price: Number(starting_price),
-                full_name: fullname,
-                contact_number: contactNumber,
-                email: email,
-                work_schedule: schedule,
-                target_move_in: new Date(targetMoveIn).toISOString().split('T')[0],
-                months_of_stay: Number(monthsOfStay),
-                others: other,
+//         const inquiry_result = await createInquiryRecord({
+//             model: "bedspacio.inquiry",
+//             values: {
+//                 public_room_id: Number(public_room_id),
+//                 form_type: 'room',
+//                 starting_price: Number(starting_price),
+//                 full_name: fullname,
+//                 contact_number: contactNumber,
+//                 email: email,
+//                 work_schedule: schedule,
+//                 target_move_in: new Date(targetMoveIn).toISOString().split('T')[0],
+//                 months_of_stay: Number(monthsOfStay),
+//                 others: other,
 
-                ip_address: req.ipAddress
-            }
-        });
+//                 ip_address: req.ipAddress
+//             }
+//         });
 
-        if (!inquiry_result?.length) {
-            return res.status(50).json({
-                success: false,
-                message: "Failed to create inquiry record"
-            })
-        };
+//         if (!inquiry_result?.length) {
+//             return res.status(50).json({
+//                 success: false,
+//                 message: "Failed to create inquiry record"
+//             })
+//         };
 
-        const inquiryId = inquiry_result[0];
+//         const inquiryId = inquiry_result[0];
 
-        if (inquiry_result) {
-            const result = await createCrmRecord({
-                model: "crm.lead",
-                values: {
-                    name: `Opportunity - ${fullname} (${public_room_id})`,
-                    type: 'opportunity',
-                    contact_name: fullname,
-                    email_from: email,
-                    phone: contactNumber,
-                    date_deadline: targetMoveIn,
-                    expected_revenue: `${monthsOfStay * starting_price}`,
-                    description:`
-                        <strong>Work Schedule: </strong> ${schedule}, <br/>
-                        <strong>Target Move-In: </strong> ${targetMoveIn}, <br/>
-                        <strong>Month/s of Stay: </strong> ${monthsOfStay}, <br/>
-                        <strong>Other: </strong> ${other}
-                    `
-                }
-            });
+//         if (inquiry_result) {
+//             const result = await createCrmRecord({
+//                 model: "crm.lead",
+//                 values: {
+//                     name: `Opportunity - ${fullname} (${public_room_id})`,
+//                     type: 'opportunity',
+//                     contact_name: fullname,
+//                     email_from: email,
+//                     phone: contactNumber,
+//                     date_deadline: targetMoveIn,
+//                     expected_revenue: `${monthsOfStay * starting_price}`,
+//                     description:`
+//                         <strong>Work Schedule: </strong> ${schedule}, <br/>
+//                         <strong>Target Move-In: </strong> ${targetMoveIn}, <br/>
+//                         <strong>Month/s of Stay: </strong> ${monthsOfStay}, <br/>
+//                         <strong>Other: </strong> ${other}
+//                     `
+//                 }
+//             });
     
-            const new_id = Array.isArray(result) && result.length > 0 ? result[0] : null;
-            console.log('[CreateCrmRecord] New ID: ', new_id);
+//             const new_id = Array.isArray(result) && result.length > 0 ? result[0] : null;
+//             console.log('[CreateCrmRecord] New ID: ', new_id);
 
-            try {
-                if (new_id) {
-                    await executeKw({
-                        model: "bedspacio.inquiry",
-                        method: "update_crm_status",
-                        kwargs: {
-                            record_id: inquiryId,
-                            status: "sent",
-                            crm_id: new_id
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error("Failed to update CRM status:", e);
-            }
+//             try {
+//                 if (new_id) {
+//                     await executeKw({
+//                         model: "bedspacio.inquiry",
+//                         method: "update_crm_status",
+//                         kwargs: {
+//                             record_id: inquiryId,
+//                             status: "sent",
+//                             crm_id: new_id
+//                         }
+//                     });
+//                 }
+//             } catch (e) {
+//                 console.error("Failed to update CRM status:", e);
+//             }
             
-            return res.json({
-                success: true,
-                data: result,
-                message: '[Opportunity] Form submitted successfully'
-            });
-        }
+//             return res.json({
+//                 success: true,
+//                 data: result,
+//                 message: '[Opportunity] Form submitted successfully'
+//             });
+//         }
 
 
-    } catch (err) {
-        console.error('Error creating crm record: ', err);
+//     } catch (err) {
+//         console.error('Error creating crm record: ', err);
 
-        const odooMessage = extractOdooError(err)
+//         const odooMessage = extractOdooError(err)
 
-        return res.status(500).json({
-            success: false,
-            message: odooMessage
-        })
-    }
-});
+//         return res.status(500).json({
+//             success: false,
+//             message: odooMessage
+//         })
+//     }
+// });
 
 
 
-inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) => {
-    try {
-        const {
-            fullname, 
-            contactNumber,
-            email,
-            subject,
-            message
-        } = req.body;
+/*
+    USED IN ODOO CRM
+*/
 
-        const check_inquiry = await createInquiryRecord({
-            model: "bedspacio.inquiry", 
-            values: {
-                form_type: 'contact',
-                full_name: fullname,
-                contact_number: contactNumber,
-                email: email,
-                others: message,
-                ip_address: req.ipAddress
-            }
-        })
+// inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) => {
+//     try {
+//         const {
+//             fullname, 
+//             contactNumber,
+//             email,
+//             subject,
+//             message
+//         } = req.body;
 
-        if (!check_inquiry?.length) {
-            return res.status(50).json({
-                success: false,
-                message: "Failed to create inquiry record"
-            })
-        }
+//         const check_inquiry = await createInquiryRecord({
+//             model: "bedspacio.inquiry", 
+//             values: {
+//                 form_type: 'contact',
+//                 full_name: fullname,
+//                 contact_number: contactNumber,
+//                 email: email,
+//                 others: message,
+//                 ip_address: req.ipAddress
+//             }
+//         })
 
-        const inquiryId = check_inquiry[0];
+//         if (!check_inquiry?.length) {
+//             return res.status(50).json({
+//                 success: false,
+//                 message: "Failed to create inquiry record"
+//             })
+//         }
 
-        if (check_inquiry) {
-            const result = await createCrmRecord({
-                model: "crm.lead",
-                values: {
-                    name: `Lead - ${fullname} (${subject})`,
-                    type: "lead",
-                    contact_name: fullname,
-                    email_from: email,
-                    phone: contactNumber,
-                    description: message
-                }
-            });
+//         const inquiryId = check_inquiry[0];
 
-            const new_id = Array.isArray(result) && result.length > 0 ? result[0] : null;
+//         if (check_inquiry) {
+//             const result = await createCrmRecord({
+//                 model: "crm.lead",
+//                 values: {
+//                     name: `Lead - ${fullname} (${subject})`,
+//                     type: "lead",
+//                     contact_name: fullname,
+//                     email_from: email,
+//                     phone: contactNumber,
+//                     description: message
+//                 }
+//             });
+
+//             const new_id = Array.isArray(result) && result.length > 0 ? result[0] : null;
     
-            if (!new_id) {
-                throw new Error("[lead] CRM record creation failed");
-            }
+//             if (!new_id) {
+//                 throw new Error("[lead] CRM record creation failed");
+//             }
 
-            try {
-                if (new_id) {
-                    await executeKw({
-                        model: "bedspacio.inquiry",
-                        method: "update_crm_status",
-                        kwargs: {
-                            record_id: inquiryId,
-                            status: "sent",
-                            crm_id: new_id
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error("Failed to update CRM status:", e);
-            }
+//             try {
+//                 if (new_id) {
+//                     await executeKw({
+//                         model: "bedspacio.inquiry",
+//                         method: "update_crm_status",
+//                         kwargs: {
+//                             record_id: inquiryId,
+//                             status: "sent",
+//                             crm_id: new_id
+//                         }
+//                     });
+//                 }
+//             } catch (e) {
+//                 console.error("Failed to update CRM status:", e);
+//             }
             
-            console.log('[CreateCrmRecord] New ID: ', new_id);
+//             console.log('[CreateCrmRecord] New ID: ', new_id);
     
-            return res.json({
-                success: true,
-                data: result,
-                message: '[Lead] Form submitted successfully'
-            });
-        }
+//             return res.json({
+//                 success: true,
+//                 data: result,
+//                 message: '[Lead] Form submitted successfully'
+//             });
+//         }
         
-    } catch (err) {
-        console.error('Error creating crm record: ', err);
+//     } catch (err) {
+//         console.error('Error creating crm record: ', err);
 
-        const odooMessage = extractOdooError(err)
+//         const odooMessage = extractOdooError(err)
 
-        return res.status(500).json({
-            success: false,
-            message: odooMessage
-        })
-    }
-});
+//         return res.status(500).json({
+//             success: false,
+//             message: odooMessage
+//         })
+//     }
+// });
 
 
 
@@ -346,12 +355,12 @@ inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) 
 
 // Reason for commenting: 
 /*
-    This is used on the version where GHL or any other third party CRM is used.
+    This is used on the version where GHL or any other third party CRM is NOT used.
     This holds on to the status used on the inquiries table on the database (postgres)
-    - If GHL is used, no need to qury for status, instead use ghl_status 
+    - If GHL is used, no need to query for status, instead use ghl_status 
 */
 
-// inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware, async (req, res) => {
+// inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
 
 //     try {
 
@@ -366,14 +375,13 @@ inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) 
 //             months_of_stay,
 //             message,
 //             type = 'room_inquiry',
-//             status = 'pending'
 //         } = req.body;
 
 //         const ip_address = req.ip;
 
 //         const nanoid = customAlphabet(
 //             'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
-//             8
+//             10
 //         );
 
 //         const reference_number = `INQ-${nanoid()}`;
@@ -395,9 +403,9 @@ inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) 
 //                     message,
 //                     ip_address,
 //                     type,
-//                     status
+//                     reference_number
 //                 ) VALUES (
-//                     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+//                     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
 //                 )
 //                 RETURNING id, created_at
 //                 `,
@@ -414,7 +422,6 @@ inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) 
 //                     ip_address,
 //                     type,
 //                     reference_number,
-//                     status
 //                 ]
 //             );
 
@@ -455,10 +462,17 @@ inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) 
 
 
 
-inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware, async (req, res) => {
 
+/*
+    1. Whenever a user submits a form inquiry from /rentals page,
+    the data from the form will be created to the inquiries table on the database.
+    2. GoHighLevel is also storing the inquiry data from the form using webhook that calls this POST endpoint.
+    3. Two records are made, one from database and one for GoHighLevel
+
+*/
+
+inquiryRoutes.post('/v1/room-inquiry', inquiryLimiter, async (req, res) => {
     try {
-
         const {
             room_uuid,
             starting_price,
@@ -523,11 +537,8 @@ inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware, async (req, res) => 
             success: true,
             inquiry_id: inquiry.id,
             reference_number: inquiry.reference_number,
-            expected_response_time: 'Within 24 hours'
         });
-
     } catch (err) {
-
         console.error('Error creating inquiry:', err);
 
         return res.status(500).json({
@@ -538,9 +549,98 @@ inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware, async (req, res) => 
 });
 
 
+/*
+    1. Used to store the inquiry form submission to database only
+    2. Fallback POST request if GoHighLevel is not integrated
+*/
+inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
+    try {
+        const {
+            room_uuid,
+            starting_price,
+            fullname,
+            email,
+            contact_number,
+            work_schedule,
+            target_move_in,
+            months_of_stay,
+            message,
+            type = 'room_inquiry'
+        } = req.body;
+
+        const ip_address = req.ip;
+
+        const nanoid = customAlphabet(
+            'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
+            8
+        );
+
+        const reference_number = `INQ-${nanoid()}`;
 
 
+        // STEP 1: Insert inquiry
+        const inquiry = await db.one(
+            `
+            INSERT INTO inquiries (
+                room_uuid,
+                starting_price,
+                fullname,
+                email,
+                contact_number,
+                work_schedule,
+                target_move_in,
+                months_of_stay,
+                message,
+                ip_address,
+                type, 
+                reference_number
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+            )
+            RETURNING id, created_at, reference_number
+            `,
+            [
+                room_uuid,
+                starting_price,
+                fullname,
+                email,
+                contact_number,
+                work_schedule,
+                target_move_in,
+                months_of_stay,
+                message,
+                ip_address,
+                type,
+                reference_number
+            ]
+        );
 
+        console.log({
+            inquiry_id: inquiry.id,
+            reference_number: inquiry.reference_number
+        })
+
+        return res.status(200).json({
+            success: true,
+            inquiry_id: inquiry.id,
+            reference_number: inquiry.reference_number,
+        });
+
+
+    } catch (err) {
+        console.error('Error creating inquiry:', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+
+/*
+    PLANNING TO REMOVE - general-inquiry post route - 6/8/2026
+*/
 
 inquiryRoutes.post('/v1/general-inquiry', inquiryLimiter, async (req, res) => {
     try {
@@ -739,6 +839,7 @@ inquiryRoutes.post('/v1/general-inquiry', inquiryLimiter, async (req, res) => {
 
 
 
+
 inquiryRoutes.get('/v1', async (req, res) => {
     try {
         const ghl_status = req.query.ghl_status;
@@ -748,9 +849,6 @@ inquiryRoutes.get('/v1', async (req, res) => {
         const limit = 25;
         const offset = (page - 1) * limit;
 
-        console.log('STATUS:', ghl_status);
-        console.log('SEARCH:', search);
-        console.log('PAGE:', page);
 
         // MAIN QUERY (paginated)
         const result = await db.manyOrNone(
@@ -837,10 +935,131 @@ inquiryRoutes.get('/v1', async (req, res) => {
 
 
 /*
+    1. Used as fallback if GoHighLevel is not integrated
+*/
+inquiryRoutes.get('/v2/fallback', async (req, res) => {
+    try {
+        const inq_status = req.query.inq_status;
+        const search = req.query.search; 
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 25;
+        const offset = (page - 1) * limit;
+
+
+        // MAIN QUERY (paginated)
+        const result = await db.manyOrNone(
+            `
+            SELECT 
+                id,
+                type,
+                reference_number,
+                fullname,
+                contact_number,
+                room_uuid,
+                inq_status,
+                created_at
+            FROM inquiries
+            WHERE 
+                is_archived = false
+
+                AND ($1::text IS NULL OR inq_status = $1)
+
+                AND (
+                    $2::text IS NULL OR
+                    reference_number ILIKE '%' || $2 || '%' OR
+                    fullname ILIKE '%' || $2 || '%' OR
+                    contact_number ILIKE '%' || $2 || '%' OR
+                    room_uuid ILIKE '%' || $2 || '%'
+                )
+
+            ORDER BY id DESC
+            LIMIT $3 OFFSET $4
+            `,
+            [
+                inq_status || null,
+                search || null,
+                limit,
+                offset
+            ]
+        );
+
+        // COUNT QUERY
+        const countResult = await db.one(
+            `
+            SELECT COUNT(*)::int AS total
+            FROM inquiries
+            WHERE 
+                is_archived = false
+
+                AND ($1::text IS NULL OR inq_status = $1)
+
+                AND (
+                    $2::text IS NULL OR
+                    reference_number ILIKE '%' || $2 || '%' OR
+                    fullname ILIKE '%' || $2 || '%' OR
+                    contact_number ILIKE '%' || $2 || '%' OR
+                    room_uuid ILIKE '%' || $2 || '%'
+                )
+            `,
+            [
+                inq_status || null,
+                search || null
+            ]
+        );
+
+        const totalPages = Math.ceil(countResult.total / limit);
+
+        return res.status(200).json({
+            data: result,
+            pagination: {
+                page,
+                limit,
+                total: countResult.total,
+                totalPages
+            }
+        });
+
+    } catch (err) {
+        console.error('Error retrieving inquiries:', err);
+        return res.status(500).json({
+            message: 'Internal server error'
+        });
+    }
+});
+
+
+
+/*
+    1. Get the version using the date from updated_at field on the inquiries table
+    2. Used to check if the table have any changes coming from the updates on stages/status/fields from the leads/opportunity from GoHighLevel
+*/
+inquiryRoutes.get("/v1/version", async (req, res) => {
+    try {
+        const result = await db.one(`
+            SELECT MAX(updated_at) AS version
+            FROM inquiries
+        `);
+
+        return res.status(200).json({
+            version: result.version,
+        });
+        
+    } catch (err) {
+        console.error("Error fetching inquiry version:", err);
+
+        return res.status(500).json({
+            message: "Failed to fetch version",
+        });
+    }
+});
+
+
+
+/*
     > Getting all the room_uuid of all available rooms
     > Used for manually creating room inquiry on admin page (Inquiry)
 */
-
 inquiryRoutes.get('/v1/room_uuid', async (req, res) => {
     try {
         const rooms = await db.manyOrNone(
@@ -872,6 +1091,10 @@ inquiryRoutes.get('/v1/details/:id', async (req, res) => {
         const result = await db.oneOrNone(
             `SELECT 
                 i.*,
+                TO_CHAR(
+                    i.target_move_in AT TIME ZONE 'Asia/Manila',
+                    'YYYY-MM-DD'
+                ) AS target_move_in,
                 rm.id as room_id,
                 COALESCE(
                     json_agg(
@@ -914,71 +1137,143 @@ inquiryRoutes.get('/v1/details/:id', async (req, res) => {
     Reason for commenting ('/inquiry/v1/status/:id'): 
     > with GHL integration, updating the status on the inquiry page manually is not an option anymore
     > The purpose of the inquiry page is to display the inquiry information and handle all updates on the GHL directly
+
+
+    !!!! UNCOMMENTING TEMPORARILY TO CREATE FALLBACKS - 6/8/2026
 */
 
-// inquiryRoutes.patch('/v1/status/:id', requireAuth, async (req, res) => {
 
-//     try {
-//         const id = Number(req.params.id);
-//         const { status } = req.body;
-//         const update = await db.oneOrNone(
-//             `UPDATE inquiries 
-//             SET 
-//                 status = $1,
-//                 updated_at = NOW()
-//             WHERE id = $2 
-//             RETURNING updated_at`,
-//             [status, id]
-//         );
+inquiryRoutes.patch('/v1/status/:id', requireAuth, async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const { inq_status } = req.body;
+        const update = await db.oneOrNone(
+            `UPDATE inquiries 
+            SET 
+                inq_status = $1,
+                updated_at = NOW()
+            WHERE id = $2 
+            RETURNING updated_at`,
+            [inq_status, id]
+        );
 
-//         console.log('Update result:', update);
+        console.log('Update result:', update);
         
-//         if (!update) {
-//             return res.status(404).json({ message: 'Inquiry not found' });
-//         }
+        if (!update) {
+            return res.status(404).json({ message: 'Inquiry not found' });
+        }
 
-//         const note = `Status updated to ${status}.`
+        const note = `Status updated to ${inq_status}.`
 
-//         const newLog = await db.one(
-//     `
-//             INSERT INTO inquiry_logs 
-//             (
-//                 inquiry_id,
-//                 note
-//             )
-//             VALUES
-//             ( $1, $2 )
-//             RETURNING
-//                 id,
-//                 note,
-//                 created_at
-//             `,
-//             [id, note]
-//         );
+        const newLog = await db.one(
+    `
+            INSERT INTO inquiry_logs 
+            (
+                inquiry_id,
+                note
+            )
+            VALUES
+            ( $1, $2 )
+            RETURNING
+                id,
+                note,
+                created_at
+            `,
+            [id, note]
+        );
 
-//         return res.status(200).json({ 
-//             success: true, 
-//             message: 'Update successful',
-//             log: {
-//                 id: newLog.id,
-//                 note: newLog.note,
-//                 noted_at: newLog.created_at,
-//                 noter: req.user?.fullname || fullname
-//             }
-//         })
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Update successful',
+            log: {
+                id: newLog.id,
+                note: newLog.note,
+                noted_at: newLog.created_at,
+                noter: req.user?.fullname || fullname
+            }
+        })
         
-//     } catch (err) {
-//         console.error(err);
-//         console.error('Error message:', err.message);
-//         console.error('Error detail:', err.detail);
-//         console.error('Error stack:', err.stack);
+    } catch (err) {
+        console.error(err);
+        console.error('Error message:', err.message);
+        console.error('Error detail:', err.detail);
+        console.error('Error stack:', err.stack);
 
-//         return res.status(500).json({
-//             success: false,
-//             message: 'Internal server error'
-//         })
-//     }
-// });
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+});
+
+
+/* 
+    USE THIS AS FALLBACK IF GHL is not INTEGRATED
+    ---- 06-08-2026
+*/
+inquiryRoutes.patch('/v2/status/:id/fallback', requireAuth, async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const { inq_status } = req.body;
+        const update = await db.oneOrNone(
+            `UPDATE inquiries 
+            SET 
+                inq_status = $1,
+                updated_at = NOW()
+            WHERE id = $2 
+            RETURNING updated_at`,
+            [inq_status, id]
+        );
+
+        console.log('Update result:', update);
+        
+        if (!update) {
+            return res.status(404).json({ message: 'Inquiry not found' });
+        }
+
+        const note = `Status updated to ${inq_status}.`
+
+        const newLog = await db.one(
+    `
+            INSERT INTO inquiry_logs 
+            (
+                inquiry_id,
+                note
+            )
+            VALUES
+            ( $1, $2 )
+            RETURNING
+                id,
+                note,
+                created_at
+            `,
+            [id, note]
+        );
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Update successful',
+            log: {
+                id: newLog.id,
+                note: newLog.note,
+                noted_at: newLog.created_at,
+                noter: req.user?.fullname || fullname
+            }
+        })
+        
+    } catch (err) {
+        console.error(err);
+        console.error('Error message:', err.message);
+        console.error('Error detail:', err.detail);
+        console.error('Error stack:', err.stack);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+});
+
 
 
 
@@ -997,7 +1292,7 @@ inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
         }
 
         const inquiries = await db.any(
-            `SELECT id, status FROM inquiries WHERE id = ANY($1::int[])`,
+            `SELECT id, inq_status FROM inquiries WHERE id = ANY($1::int[])`,
             [ids]
         );
 
@@ -1011,14 +1306,14 @@ inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
             }));
 
         const deletable = inquiries
-            .filter(i => i.status === 'closed')
+            .filter(i => i.inq_status === 'Closed - Lost')
             .map(i => i.id);
 
         const notClosed = inquiries
-            .filter(i => i.status !== 'closed')
+            .filter(i => i.inq_status !== 'Closed - Lost')
             .map(i => ({
                 id: i.id,
-                status: i.status,
+                status: i.inq_status,
                 message: 'Only closed inquiries can be deleted'
             }));
 
@@ -1028,6 +1323,7 @@ inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
                 [deletable]
             );
         }
+
 
         return res.status(200).json({
             success: true,
@@ -1069,7 +1365,7 @@ inquiryRoutes.delete('/v1/archive/multiple', requireAuth, async (req, res) => {
         }
 
         const archives = await db.any(
-            `SELECT id, status FROM inquiries WHERE id = ANY($1::int[]) AND is_archived = true`,
+            `SELECT id, inq_status FROM inquiries WHERE id = ANY($1::int[]) AND is_archived = true`,
             [ids]
         );
 
@@ -1113,7 +1409,7 @@ inquiryRoutes.patch('/v1/archive/multiple', requireAuth, async (req, res) => {
         }
 
         const archives = await db.any(
-            `SELECT id, status FROM inquiries WHERE id = ANY($1::int[]) AND is_archived = false`,
+            `SELECT id, inq_status FROM inquiries WHERE id = ANY($1::int[]) AND is_archived = false`,
             [ids]
         );
 
@@ -1143,7 +1439,6 @@ inquiryRoutes.patch('/v1/archive/multiple', requireAuth, async (req, res) => {
 
 
 
-
 inquiryRoutes.patch('/v1/unarchive/multiple', requireAuth, async (req, res) => {
     try {
         const { ids } = req.body;
@@ -1158,7 +1453,7 @@ inquiryRoutes.patch('/v1/unarchive/multiple', requireAuth, async (req, res) => {
         }
 
         const archives = await db.any(
-            `SELECT id, status FROM inquiries WHERE id = ANY($1::int[]) AND is_archived = true`,
+            `SELECT id, inq_status FROM inquiries WHERE id = ANY($1::int[]) AND is_archived = true`,
             [ids]
         );
 
@@ -1509,7 +1804,39 @@ inquiryRoutes.get('/v1/archived', async (req, res) => {
                 reference_number,
                 fullname,
                 contact_number,
-                status,
+                ghl_status,
+                created_at,
+                updated_at
+            FROM inquiries 
+            WHERE is_archived = true
+            ORDER BY id ASC`
+        )
+
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.error('Error retrieving room inquiries: ', err);
+        return res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
+});
+
+
+/*
+    USE THIS AS FALLBACK IF GHL IS NOT INTEGRATED
+*/
+inquiryRoutes.get('/v2/archived/fallback', async (req, res) => {
+    try {
+
+        const result = await db.manyOrNone(
+            `SELECT 
+                id,
+                type,
+                reference_number,
+                fullname,
+                contact_number,
+                inq_status,
                 created_at,
                 updated_at
             FROM inquiries 

@@ -243,8 +243,6 @@ export default async function RoomDetails ({ params }: Props ) {
     const { id } = await params
 
     const room = await getRoomPreviewById(id);
-    console.log('Room details: ', room);
-    console.log('Starting price: --', room.price);
 
     return (
         <div className="flex flex-col items-start w-full min-h-screen">

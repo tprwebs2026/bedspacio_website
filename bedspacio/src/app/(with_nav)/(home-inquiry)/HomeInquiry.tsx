@@ -216,8 +216,6 @@ export default function HomeInquiry() {
                 `${BASE_URL}/inquiry/v1/general-inquiry`, payload, { withCredentials: true }
             );
 
-            console.log('General inquiry: ', inquiry);
-
             setIsSubmitted(true)
             reset();
 

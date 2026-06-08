@@ -25,7 +25,7 @@ export default function ArchiveModalWrapper ({ archives, modalOpen, setErrorMess
 
     const [menuOpen, setMenuOpen] = useState<boolean>(false)
 
-    const [status, setStatus] = useState(archives.status)
+    const [status, setStatus] = useState(archives.inq_status)
     const [notesOpen, setNotesOpen] = useState(
         archives.inquiry_logs.length > 0
     );
@@ -57,7 +57,7 @@ export default function ArchiveModalWrapper ({ archives, modalOpen, setErrorMess
                 return;
             }
 
-            return console.log('Unarchived goooooood');
+            return;
 
         } catch (err) {
             console.error('Failed to unarchive inquiry: ', err);
@@ -80,7 +80,7 @@ export default function ArchiveModalWrapper ({ archives, modalOpen, setErrorMess
             <div className="flex flex-col w-auto h-auto bg-[#FAFAFA] rounded-[10px] border-2 border-[#1D242B]/50 p-[2rem] gap-[1rem]">
 
                 <div className={`relative grid ${notesOpen  ? 'grid-cols-[auto_auto]' : 'grid-cols-[auto_auto]'} overflow-x-hidden`}>
-                    <div className={`relative flex flex-col w-[500px] max-h-[600px]  gap-[1rem]`}>
+                    <div className={`relative flex flex-col w-[600px] max-h-[600px]  gap-[1rem]`}>
                         <div className="flex items-center w-full justify-between">
                             <div className='flex items-center gap-2'>
                                 <span className="text-[28px] font-bold">Inquiry Information</span>
@@ -166,7 +166,7 @@ export default function ArchiveModalWrapper ({ archives, modalOpen, setErrorMess
 
                                     <div className="flex flex-col items-start w-full">
                                         <span className="font-bold">Work Schedule</span>
-                                        <span className="w-full py-2 px-3 rounded-[10px] border border-[#1D242B]/25">{archives.schedule}</span>
+                                        <span className="w-full py-2 px-3 rounded-[10px] border border-[#1D242B]/25">{archives.work_schedule}</span>
                                     </div>
                                 </>
                             )}
@@ -181,21 +181,24 @@ export default function ArchiveModalWrapper ({ archives, modalOpen, setErrorMess
                                 <span className="font-bold">Status</span>
                                 <div className="flex items-center w-full border-2 border-dashed border-[#1D242B]/25">
                                     
-                                    <label htmlFor="pending" className={`flex items-center justify-center w-full font-bold p-2 border-r-2 border-dashed border-r-[#1D242B]/25 ${status === 'pending' ? 'bg-[#1D242B]/15 text-[#1D242B]/80' : 'bg-[#FAFAFA] text-[#1D242B] opacity-50'}`}>
-                                        <span>Pending</span>
+                                    <label htmlFor="new_lead" className={`flex items-center justify-center w-full p-2 border-r-2 border-dashed border-r-[#1D242B]/25 ${status === 'New lead' ? 'bg-[#1D242B]/15 text-[#1D242B]/80' : 'bg-[#FAFAFA] text-[#1D242B] opacity-50'}`}>
+                                        <span className='text-[14px] font-bold'>New Lead</span>
                                     </label>
 
-                                    <label htmlFor="contacted" className={`flex items-center justify-center w-full font-bold p-2 border-r-2 border-dashed border-r-[#1D242B]/25 ${status === 'contacted' ? 'bg-[#FFEF90] text-[#FF6308]/75' : 'bg-[#FAFAFA] text-[#1D242B] opacity-50'}`}>
-                                        <span>Contacted</span>
+                                    <label htmlFor="contacted" className={`flex items-center justify-center w-full p-2 border-r-2 border-dashed border-r-[#1D242B]/25 ${status === 'Contacted' ? 'bg-[#FFEF90] text-[#FF6308]/75' : 'bg-[#FAFAFA] text-[#1D242B] opacity-50'}`}>
+                                        <span className='text-[14px] font-bold'>Contacted</span>
                                     </label>
                                     
-                                    <label htmlFor="converted" className={`flex items-center justify-center w-full font-bold p-2 border-r-2 border-dashed border-r-[#1D242B]/25 ${status === 'converted' ? 'bg-[#007C00]/15 text-[#007C00]/75' : 'bg-[#FAFAFA] text-[#1D242B] opacity-50'}`}>
-                                        
-                                        <span>Converted</span>
+                                    <label htmlFor="qualified" className={`flex items-center justify-center w-full p-2 border-r-2 border-dashed border-r-[#1D242B]/25 ${status === 'Qualified' ? 'bg-[#007C00]/15 text-[#007C00]/75' : 'bg-[#FAFAFA] text-[#1D242B] opacity-50'}`}>
+                                        <span className='text-[14px] font-bold'>Qualified</span>
                                     </label>
 
-                                    <label htmlFor="closed" className={`flex items-center justify-center w-full font-bold p-2 ${status === 'closed' ? 'bg-[#FE230A]/15 text-[#FE230A]/75' : 'bg-[#FAFAFA] text-[#1D242B] opacity-50'}`}>
-                                        <span>Closed</span>
+                                    <label htmlFor="closed_won" className={`flex items-center justify-center w-full p-2 border-r-2 border-dashed border-r-[#1D242B]/25 ${status === 'Closed - Won' ? 'bg-[#FE230A]/15 text-[#FE230A]/75' : 'bg-[#FAFAFA] text-[#1D242B] opacity-50'}`}>
+                                        <span className='text-[14px] font-bold'>Closed - Won</span>
+                                    </label>
+
+                                    <label htmlFor="closed_lost" className={`flex items-center justify-center w-full  p-2 ${status === 'Closed - Lost' ? 'bg-[#FE230A]/15 text-[#FE230A]/75' : 'bg-[#FAFAFA] text-[#1D242B] opacity-50'}`}>
+                                        <span className='text-[14px] font-bold'>Closed - Lost</span>
                                     </label>
                                 </div>
                             </div>

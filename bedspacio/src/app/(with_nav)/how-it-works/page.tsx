@@ -5,7 +5,7 @@ export default function HowItWorks() {
 
             <div className="relative flex w-full h-screen xl:h-[350px] lg:h-[350px] md:h-screen items-center justify-center bg-[#1D242B] overflow-hidden">
                 <div className="absolute flex items-center justify-center w-full inset-0 opacity-25">
-                    <img src="/asset/how_it_works.jpg" alt="how-it-works" className="w-full h-full object-cover" />
+                    <img src="/image/how_it_works.jpg" alt="how-it-works" className="w-full h-full object-cover" />
                 </div>
 
                 <div className="absolute flex flex-col items-center justify-center">

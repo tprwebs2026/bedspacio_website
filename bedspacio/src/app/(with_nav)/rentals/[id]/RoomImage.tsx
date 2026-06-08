@@ -141,9 +141,6 @@ export default function RoomImages ({ images }: RoomImageProp) {
 
     const selectedImage = images[selectedIndex];
 
-    console.log('Selected image: ', selectedImage);
-
-
     const imagesLength = images.length; 
 
     const toggleImageLeft = () => {
@@ -156,9 +153,6 @@ export default function RoomImages ({ images }: RoomImageProp) {
             (prev + 1) % images.length
         );
     }
-
-    console.log('Image details from roomImage: ', images );
-    console.log('Number of image', imagesLength);
 
 
     return (

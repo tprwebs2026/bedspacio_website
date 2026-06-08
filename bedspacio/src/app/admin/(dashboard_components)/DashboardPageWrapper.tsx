@@ -45,7 +45,7 @@ export default function DashboardPageWrapper ({
 
 
     return (
-        <div className="flex w-full min-h-screen">
+        <div className="flex w-full h-full overflow-y-auto">
             
             <div className="flex flex-col w-full h-auto p-[1rem] xl:px-[8rem] lg:px-[1rem] gap-[1rem]">
 
@@ -75,7 +75,7 @@ export default function DashboardPageWrapper ({
                     <div className="grid grid-cols-4 w-full rounded-[5px] gap-2">
 
                         {inquiries.map((inq, index) => (
-                            <Link key={index} href={`/admin/inquiry?status=${inq.ghl_status}`} className="flex flex-col w-full gap-2 items-start justify-evenly p-4 rounded-[10px] cursor-pointer border border-[#1D242B]/50 hover:bg-[#0077C0]/10 hover:-translate-y-1 transition-all duration-100">
+                            <Link key={index} href={`/admin/inquiry?ghl_status=${inq.ghl_status}`} className="flex flex-col w-full gap-2 items-start justify-evenly p-4 rounded-[10px] cursor-pointer border border-[#1D242B]/50 hover:bg-[#0077C0]/10 hover:-translate-y-1 transition-all duration-100">
                                 <div className="flex items-center justify-start gap-2 w-full">
                                     <Time className="w-[25px] h-[25px] opacity-75" />
                                     <span className="text-[14px] font-bold text-[#1D242B] opacity-80">{inq.ghl_status}</span>
@@ -128,8 +128,8 @@ export default function DashboardPageWrapper ({
                         </div>
 
                         <div className='flex flex-col items-center w-full h-full gap-1'>
-                            <div className='grid grid-cols-[10%_20%_20%_20%_15%_15%] justify-items-center place-items-center w-full text-[12px] text-[#1D242B]/50 font-bold pb-1'>
-                                <span>Room ID</span>
+                            <div className='grid grid-cols-[25%_25%_15%_15%_20%] justify-items-center place-items-center w-full text-[12px] text-[#1D242B]/50 font-bold pb-1'>
+                                <span>Reference #</span>
                                 <span>Name</span>
                                 <span>Pipeline Stage</span>
                                 <span>Status</span>
@@ -141,18 +141,17 @@ export default function DashboardPageWrapper ({
                                 {recentInquiries.length > 0 ? (
                                     <>
                                         {recentInquiries.map(recent => (
-                                            <div key={recent.id} className='grid grid-cols-[10%_20%_20%_20%_15%_15%] place-items-center justify-items-center w-full text-[14px] text-[#1D242B] border border-[#1D242B]/20 py-2 font-bold rounded-[5px] bg-[#C7EEFF]/50'>
-                                                <span>{recent.room_uuid}</span>
+                                            <Link href={`/admin/inquiry?page=1&search=${recent.reference_number}`} key={recent.id} className='group grid grid-cols-[25%_25%_15%_15%_20%] place-items-center justify-items-center w-full text-[14px] text-[#1D242B] border border-[#1D242B]/20 py-2 font-bold rounded-[5px] bg-[#C7EEFF]/50 hover:bg-[#0077C0]/25 active:bg-[#C7EEFF]/50'>
+                                                <span>{recent.reference_number}</span>
                                                 <span>{recent.fullname}</span>
                                                 {/* <span>{formatDate(recent.target_move_in)}</span> */}
                                                 <span>{recent.ghl_pipeline_stage}</span>
                                                 <span>{recent.ghl_status.charAt(0).toUpperCase() + recent.ghl_status.slice(1).toLowerCase()}</span>
-                                                <span>{timeAgo(recent.created_at)}</span>
-                                                <Link href={`/admin/inquiry?page=1&search=${recent.room_uuid}`} className='cursor-pointer flex items-center gap-1 bg-[#0077C0]/50 hover:bg-[#0077C0]/75 active:bg-[#0077C0]/50 rounded-full px-2 py-1 text-[12px]'>
-                                                    <span>View</span>
-                                                    <ArrowRight className="w-[15px] h-[15px] stroke-[#1D242B] stroke-2" />
-                                                </Link>
-                                            </div>
+                                                <span className='flex items-center gap-[1rem]'>
+                                                    {timeAgo(recent.created_at)}
+                                                    <ArrowRight className="opacity-0 group-hover:opacity-100 group-hover:-translate-x-1 transition-all duration-100 w-[20px] h-[20px] stroke-[#1D242B] stroke-2" />
+                                                </span>
+                                            </Link>
                                         ))}
 
                                         <div className='flex items-center justify-center w-full py-2'>

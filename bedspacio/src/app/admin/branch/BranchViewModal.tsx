@@ -137,8 +137,6 @@ export default function BranchViewModal ({ propertyManagers, branch, isModalOpen
             formData , 
             { withCredentials: true })
 
-        console.log('Branch updated: ', updated);
-
         setSuccessMessage('Update success');
 
         onSuccess();

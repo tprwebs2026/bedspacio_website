@@ -22,7 +22,7 @@ export type InquiryType = {
 // removed target_move_in and replaced by ghl_pipeline_stage
 export type RecentInquiryType = {
     id: number,
-    room_uuid: string,
+    reference_number: string,
     fullname: string,
     ghl_pipeline_stage: string,
     ghl_status: string,

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link";
 import { ArchiveType, ArchiveModalType } from "./page"
-import { deleteMultipleArchived, deleteSingleArchived, getArchivedInquiries, getArchivedSingleById, unarchiveInquiryMultiple } from "../../../../../lib/inquiry";
+import { deleteMultipleArchived, deleteSingleArchived, getAllArchivedInquiries, getArchivedSingleById, unarchiveInquiryMultiple } from "../../../../../lib/inquiry";
 import ArchiveModalWrapper from "./ArchiveModalWrapper";
 
 // icons
@@ -46,7 +46,7 @@ export default function ArchivePageWrapper ({ archives }: ArchiveProp) {
 
     const loadArchives = async () => {
         try {
-            const response = await getArchivedInquiries();
+            const response = await getAllArchivedInquiries();
             setArchiveList(response);
 
         } catch (err) {
@@ -96,9 +96,6 @@ export default function ArchivePageWrapper ({ archives }: ArchiveProp) {
             }
 
             setConfirmType(null);
-            
-            
-
         } catch (err) {
             console.error('Failed to restore archives: ', err);
         }
@@ -152,7 +149,7 @@ export default function ArchivePageWrapper ({ archives }: ArchiveProp) {
                             <span className="text-[14px] text-[#1D242B]/75">Inqiury Type</span>
                             <span className="text-[14px] text-[#1D242B]/75">Name</span>
                             <span className="text-[14px] text-[#1D242B]/75">Contact #</span>
-                            <span className="text-[14px] text-[#1D242B]/75">Status</span>
+                            <span className="text-[14px] text-[#1D242B]/75">Stage</span>
                             <span className="text-[14px] text-[#1D242B]/75">Submitted at (yyy-mm-dd)</span>
                         </div>
 
@@ -183,7 +180,7 @@ export default function ArchivePageWrapper ({ archives }: ArchiveProp) {
                                             </span>
                                             <span>{arch.fullname}</span>
                                             <span>{arch.contact_number}</span>
-                                            <span 
+                                            {/* <span 
                                                 className={`px-2 py-1 text-[14px] font-bold w-fit rounded-full
                                                 ${arch.status === 'pending' 
                                                     ? 'text-[#1D242B] bg-[#1D242B]/15'
@@ -193,7 +190,10 @@ export default function ArchivePageWrapper ({ archives }: ArchiveProp) {
                                                             ? 'text-[#007C00] bg-[#007C00]/15'
                                                             : 'text-[#FE230A] bg-[#FE230A]/15'
                                                 }
-                                            `}>{arch.status}</span>
+                                            `}>{arch.ghl_status}</span> */}
+                                            <span  className={`px-2 py-1 text-[14px] font-bold w-fit rounded-full`}>
+                                                {arch.inq_status}
+                                            </span>
                                             <span>{arch.created_at.split("T")[0].split("-").join('-')}</span>
                                             <button onClick={() => {
                                                 viewInquiryModal(arch.id);

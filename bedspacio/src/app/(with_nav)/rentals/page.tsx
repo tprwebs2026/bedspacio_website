@@ -221,15 +221,6 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
 
     const inclusionList = await getInclusions();
 
-    console.table({
-        parameter: [
-            params.branch,
-            params.room_type,
-            params.minimumBudget,
-            params.maximumBudget,
-            params.inclusion
-        ]
-    });
     
     query.set("page", String(page));
 

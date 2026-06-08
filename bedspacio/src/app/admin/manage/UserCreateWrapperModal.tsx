@@ -38,8 +38,6 @@ export default function UserCreateWrapperModal ({ isModalOpen, onSuccess }: Moda
 
 
     const onSubmit = async (data: UserType) => {
-        console.log('User: ', data);
-
         setLoading(true)
 
         try {
@@ -56,7 +54,6 @@ export default function UserCreateWrapperModal ({ isModalOpen, onSuccess }: Moda
                 withCredentials: true
             });
 
-            console.log(result);
             setCreatedUser(result.data);
             onSuccess();
             setModalOpen(true);

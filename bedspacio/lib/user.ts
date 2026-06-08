@@ -63,7 +63,8 @@ export const getCurrentUserInfo = async () => {
             {
                 headers: {
                     Cookie: cookieHeader
-                }
+                },
+                withCredentials: true
             }
         );
         return response.data;

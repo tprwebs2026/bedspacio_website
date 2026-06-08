@@ -56,6 +56,7 @@ app.use(
         store: sessionStore,
         resave: false,
         saveUninitialized: false,
+        rolling: true,
         cookie: {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             secure: false, // Change to production later --> process.env.NODE_ENV === 'production',

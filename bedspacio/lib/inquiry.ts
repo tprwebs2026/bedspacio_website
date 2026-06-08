@@ -18,6 +18,12 @@ import { cookies } from "next/headers";
 // }
 
 
+
+/*
+    6-8-2026
+    1. use this function if GoHighLevel is Integrated
+*/
+
 export const getAllInquiry = async (params: {
     ghl_status?: string;
     page?: number;
@@ -26,6 +32,29 @@ export const getAllInquiry = async (params: {
     const response = await axios.get(`${BASE_URL}/inquiry/v1`, {
         params: {
             ghl_status: params.ghl_status || undefined,
+            page: params.page || 1,
+            search: params.search || undefined,
+        },
+        withCredentials: true,
+    });
+
+    return response.data;
+};
+
+
+/*
+    6-8-2026
+    1. This is a fallback if GoHighLevel is not integrated
+*/
+
+export const getAllInquiries = async (params: {
+    inq_status?: string;
+    page?: number;
+    search?: string;
+} = {}) => {
+    const response = await axios.get(`${BASE_URL}/inquiry/v2/fallback`, {
+        params: {
+            inq_status: params.inq_status || undefined,
             page: params.page || 1,
             search: params.search || undefined,
         },
@@ -65,9 +94,28 @@ export const getRoomID = async () => {
 }
 
 
+/*
+    Temporarily commenting out to do fallbacks if GHL integration is not made
+*/
+
+// export const updateStatusById = async (id: number, status: string) => {
+//     try {
+//         const response = await axios.patch(`${BASE_URL}/inquiry/v1/status/${id}`, 
+//             { status: status }, 
+//             { 
+//                 withCredentials: true,
+//             },
+//         );
+
+//         return response.data;
+//     } catch (err) {
+//         console.error('Failed to update inquiry status: ', err);
+//     }
+// };
+
+
 export const updateStatusById = async (id: number, status: string) => {
     try {
-
         const response = await axios.patch(`${BASE_URL}/inquiry/v1/status/${id}`, 
             { status: status }, 
             { 
@@ -80,6 +128,24 @@ export const updateStatusById = async (id: number, status: string) => {
         console.error('Failed to update inquiry status: ', err);
     }
 };
+
+
+/* USE THIS AS FALLBACK IF GHL is not INTEGRATED */
+export const updateInquiryStatusById = async (id: number, status: string) => {
+    try {
+        const response = await axios.patch(`${BASE_URL}/inquiry/v2/status/${id}/fallback`, 
+            { inq_status: status }, 
+            { 
+                withCredentials: true,
+            },
+        );
+
+        return response.data;
+    } catch (err) {
+        console.error('Failed to update inquiry status: ', err);
+    }
+};
+
 
 
 export const deleteSingleInquiry = async (id: number) => {
@@ -200,6 +266,20 @@ export const unarchiveInquiryMultiple = async (ids: number[]) => {
 export const getArchivedInquiries = async () => {
     try {
         const response = await axios.get(`${BASE_URL}/inquiry/v1/archived`, {
+            withCredentials: true
+        });
+
+        return response.data ?? [];
+
+    } catch (err) {
+        throw err;
+    }
+}
+
+
+export const getAllArchivedInquiries = async () => {
+    try {
+        const response = await axios.get(`${BASE_URL}/inquiry/v2/archived/fallback`, {
             withCredentials: true
         });
 

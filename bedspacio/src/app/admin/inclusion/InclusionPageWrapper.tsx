@@ -21,8 +21,6 @@ interface InclusionProp  {
 
 export default function InclusionPageWrapper ({ inclusions: initialInclusion }: InclusionProp ) {
 
-    console.log('Inclusions: ', initialInclusion)
-
     const [allInclusions, setAllInclusions] = useState<InclusionType[]>(initialInclusion)
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
@@ -31,7 +29,6 @@ export default function InclusionPageWrapper ({ inclusions: initialInclusion }: 
     const loadInclusions = async () => {
         const data = await getInclusions();
 
-        console.log(data)
         setAllInclusions(data)
     }
     

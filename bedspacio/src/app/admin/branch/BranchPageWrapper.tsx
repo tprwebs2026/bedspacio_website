@@ -86,9 +86,8 @@ export default function BranchPageWrapper ({ branches: initialBranches }: branch
         loadAllBranch();
         
         setTimeout(() => setDeleteMessage(''), 4000)
-        console.log('Deleted Branch: ', branchToDelete);
     }
- 
+
 
 
     return (

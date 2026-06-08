@@ -58,13 +58,13 @@
 // export default async function SubmitInquiry(data: InquiryFormValues, startingPrice: any) {
 //     try {
 //         const room_inquiry = await axios.post(
-//             `${BASE_URL}/inquiry/v1/room-inquiry`, {
+//             `${BASE_URL}/inquiry/v2/room-inquiry`, {
 //                 room_uuid: data.room_uuid,
-//                 expected_revenue: startingPrice * data.months_of_stay,
+//                 starting_price: startingPrice,
 //                 fullname: data.fullname,
 //                 email: data.email,
 //                 contact_number: data.contact_number,
-//                 schedule: data.schedule,
+//                 work_schedule: data.work_schedule,
 //                 target_move_in: data.target_move_in,
 //                 months_of_stay: data.months_of_stay,
 //                 message: data.message
@@ -175,9 +175,6 @@ import axios from "axios"
 
 export default async function SubmitInquiry(data: InquiryFormValues, startingPrice: any) {
     try {
-
-        console.log('target move-in: ', data.target_move_in);
-
         
         const response = await axios.post(
             `${BASE_URL}/gohighlevel/submissions`, {
@@ -193,8 +190,6 @@ export default async function SubmitInquiry(data: InquiryFormValues, startingPri
             }, {
                 withCredentials: true
             });
-
-            console.log("Submit Inquiry: ", response.data);
 
 
             if (!response.data.success) {

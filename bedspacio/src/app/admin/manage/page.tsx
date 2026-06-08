@@ -8,7 +8,6 @@ import { ManageType} from "./Manage";
 export default async function PageWrapper () {
 
     const users = await getAllUsers();
-    console.log('All users: ', users);
 
     const currentUser = await getCurrentUser();
 

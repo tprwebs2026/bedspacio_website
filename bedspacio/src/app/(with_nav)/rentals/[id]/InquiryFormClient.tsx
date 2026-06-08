@@ -361,7 +361,7 @@
 //     fullname: string,
 //     contact_number: string,
 //     email: string,
-//     schedule: string,
+//     work_schedule: string,
 //     target_move_in: string,
 //     months_of_stay: number,
 //     message: string,
@@ -447,9 +447,6 @@
 //             });
 
 //             reset();
-
-            
-
 //         } catch (err: any) {
 //             console.error('Error submitting inquiry: ', err);
 //             const message =
@@ -557,15 +554,15 @@
 
 //                     <div className='flex flex-col gap-1 w-full'>
 //                         <span className='text-[14px] text-[#1D242B]'>Work Shift Schedule</span>
-//                         <select className={`w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0] ${slot === 0 && 'opacity-50'}`} defaultValue={""} {...register('schedule', {required: 'Schedule is required.'})} disabled={slot==0}>
+//                         <select className={`w-full border border-[#1D242B]/75 p-2 rounded-[10px] font-bold bg-[#FAFAFA] focus:outline-none focus:border-2 focus:border-[#0077C0] ${slot === 0 && 'opacity-50'}`} defaultValue={""} {...register('work_schedule', {required: 'Schedule is required.'})} disabled={slot==0}>
 //                             {/* Morning Shift, Mid-Shift, Night Shift */}
 //                             <option value='' hidden>Select a schedule</option>
 //                             <option value='Morning Shift' >Morning Shift</option>
 //                             <option value='Mid Shift' >Mid Shift</option>
 //                             <option value='Night Shift'>Night Shift</option>
 //                         </select>
-//                         {errors.schedule && (
-//                             <span className='text-[16px] text-[#FF0000]'>{errors.schedule.message}</span>
+//                         {errors.work_schedule && (
+//                             <span className='text-[16px] text-[#FF0000]'>{errors.work_schedule.message}</span>
 //                         )}
 //                     </div>
 
@@ -648,15 +645,15 @@
 //                             </span>
 //                         </div>
 
-//                         <div className='flex items-center justify-between w-full border-b border-dashed border-[#1D242B]/25'>
+//                         {/* <div className='flex items-center justify-between w-full border-b border-dashed border-[#1D242B]/25'>
 //                             <span>Expected Response:</span>
 //                             <span>
 //                                 <strong>{submissionData?.expected_response_time}</strong>
 //                             </span>
-//                         </div>
+//                         </div> */}
 
 
-//                         <span className='font-bold text-[18px] text-left pt-2'>Submission details</span>
+//                         {/* <span className='font-bold text-[18px] text-left pt-2'>Submission details</span> */}
 
 
 //                         <div className='flex items-center justify-between w-full border-b border-dashed border-[#1D242B]/25'>
@@ -681,7 +678,7 @@
 
 //                         <div className='flex items-center justify-between w-full border-b border-dashed border-[#1D242B]/25'>
 //                             <span>Work Schedule: </span>
-//                             <span><strong>{payload?.schedule}</strong></span>
+//                             <span><strong>{payload?.work_schedule}</strong></span>
 //                         </div>
 
 //                         <div className={`flex items-center justify-between w-full ${payload?.message !== "" && 'border-b border-dashed border-[#1D242B]/25'}`}>
@@ -696,7 +693,9 @@
 //                             </div>
 //                         )}
 
-//                         <span className='text-center text-[14px] bg-[#A6EEAB]/50 leading-[1] rounded-[10px] text-[#00822F] w-fit px-3 py-2'>{`The property owner/agent will contact you through your mobile number or your provided email.`}</span>
+//                         <span className='text-center text-[14px] bg-[#A6EEAB]/50 leading-[1] rounded-[10px] text-[#00822F] w-fit px-3 py-2'>
+//                             {`We have received your inquiry. Please wait in the mean time, a property manager/agent will contact you through your mobile number or your provided email.`}
+//                         </span>
 
 
 //                     </div>
@@ -1137,6 +1136,9 @@
 //     )
 // }
 
+
+
+
 // ------------------------  GoHighLevel  ------------------------ //
 
 
@@ -1202,7 +1204,6 @@ export default function InquiryFormClient ({
     const [submissionData, setSubmissionData] = useState<InquirySubmissionResponse | null>(null);
 
     const { register, handleSubmit, reset, formState: { errors, isSubmitSuccessful } } = useForm<InquiryFormValues>();
-    console.log('Starting price:', typeof startingPrice)
 
     const onSubmit = async (data: InquiryFormValues) => {
         if (submitting) return;
@@ -1222,20 +1223,12 @@ export default function InquiryFormClient ({
             // Fake loading of 1.5 seconds
             await new Promise(resolve => setTimeout(resolve, 1500));
 
-            console.log({
-                expected_revenue: startingPrice,
-                months: data.months_of_stay,
-                total: startingPrice * data.months_of_stay
-            });
-
             const result = await SubmitInquiry(data, Number(startingPrice));
 
             if (!result) {
                 throw new Error("No response from server");
             }
 
-            console.log(result)
-            
             if (result.success) {
                 setIsSubmitted(true);
                 setPayload(data);
@@ -1268,7 +1261,7 @@ export default function InquiryFormClient ({
     };
 
     return (
-        <div className={`flex flex-col items-start w-full rounded-[10px] h-fit border-dashed border-2 border-[#0077C0]/75 overflow-hidden`}>
+        <div className={`sticky top-22 shadow-lg flex flex-col items-start w-full rounded-[10px] h-fit border-dashed border-2 border-[#0077C0]/75 overflow-hidden`}>
             <div className='grid grid-cols-2 w-full place-items-center bg-[#FAFAFA]'>
                 <button onClick={() => {setInquireOpen(true); setReserveOpen(false);}} className={`${inquireOpen ? 'bg-[#C7EEFF] text-[#0077C0]' : 'bg-[#FAFAFA] text-[#0077C0] opacity-50'} flex items-center justify-center gap-2 p-2 py-4 w-full cursor-pointer hover:opacity-100 transition-all duration-100`}>
                     <Inquire className={`fill-[#0077C0] w-[30px] h-auto`} />
@@ -1281,7 +1274,7 @@ export default function InquiryFormClient ({
             </div>
 
             {inquireOpen && !isSubmitted && !loading && (
-                <form onSubmit={handleSubmit(onSubmit)} className={`relative flex flex-col w-full gap-[1rem] p-4 py-5 bg-[#C7EEFF]`}>
+                <form onSubmit={handleSubmit(onSubmit)} className={`relative flex flex-col w-full h-[600px] overflow-y-auto thin-scrollbar gap-[1rem] p-4 py-5 bg-[#C7EEFF]`}>
 
                     {/* SHOWS WHEN AVAILABLE SLOT FOR THE ROOM IS ZERO */}
                     {slot === 0 && (

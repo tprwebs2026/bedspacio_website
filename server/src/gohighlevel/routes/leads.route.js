@@ -341,7 +341,9 @@ highRoute.post('/submissions/manual', async (req, res) => {
 
 /*
     This is a fallback if a user tries to create an Opportunity inside GHL directly and not on the Inquiry page on website
-    
+
+    - no reference should be added there 
+    - once the opportunity is created this POST route will be triggered by the webhook and this POST route will update the reference number
 */
 highRoute.post('/fallback/opportunity-created', async (req, res) => {
     try {
@@ -505,7 +507,6 @@ highRoute.post('/status-change', async (req, res) => {
         console.log(JSON.stringify(req.body, null, 2));
         console.log('=================================');
 
-
         const {
             contact_id,
             id: opportunity_id,
@@ -530,27 +531,6 @@ highRoute.post('/status-change', async (req, res) => {
                 message: 'Missing reference number'
             });
         }
-
-
-        // await db.none(
-        //     `
-        //     UPDATE inquiries
-        //     SET
-        //         ghl_contact_id = $1,
-        //         ghl_opportunity_id = $2,
-        //         ghl_pipeline_stage = $3,
-        //         ghl_status = $4,
-        //         updated_at = NOW()
-        //     WHERE reference_number = $5
-        //     `,
-        //     [
-        //         contact_id,
-        //         opportunity_id,
-        //         pipleline_stage,
-        //         status,
-        //         referenceNumber
-        //     ]
-        // );
 
         const updates = [];
         const values = [];
@@ -609,6 +589,164 @@ highRoute.post('/status-change', async (req, res) => {
 })
 
 
+
+highRoute.post('/opportunity-sync', async (req, res) => {
+    try {
+
+        const secret = req.headers["x-webhook-secret"];
+        if (secret !== process.env.WEBHOOK_SECRET) {
+            return res.status(401).json({
+                success: false
+            })
+        };
+
+        console.log(req.body);
+
+        const {
+            id: opportunity_id,
+            customData
+        } = req.body;
+
+        const updates= [];
+        const values = [];
+
+        if (customData?.room_uuid) {
+            updates.push(`room_uuid = $${values.length + 1}`);
+            values.push(customData.room_uuid);
+        }
+
+        if (customData?.message) {
+            updates.push(`message = $${values.length + 1}`);
+            values.push(customData.message);
+        }
+
+        if (customData?.work_schedule) {
+            updates.push(`work_schedule = $${values.length + 1}`);
+            values.push(customData.work_schedule);
+        }
+
+        if (customData?.target_move_in) {
+            updates.push(`target_move_in = $${values.length + 1}`);
+            values.push(customData.target_move_in);
+        }
+
+        if (customData?.months_of_stay) {
+            updates.push(`months_of_stay = $${values.length + 1}`);
+            values.push(customData.months_of_stay);
+        }
+
+        updates.push(`updated_at = NOW()`);
+        values.push(opportunity_id);
+
+        if (updates.length === 1) {
+            return res.status(200).json({
+                success: true,
+                message: 'No fields to update'
+            });
+        };
+
+        await db.result(
+            `
+            UPDATE inquiries
+            SET ${updates.join(', ')}
+            WHERE ghl_opportunity_id = $${values.length}
+            `,
+            values
+        );
+        
+        return res.status(200).json({
+            success: true
+        });
+
+    } catch (err) {
+        console.error(err);
+
+        return res.status(500).json({
+            success: false
+        });
+    }
+})
+
+
+highRoute.post('/contact-sync', async (req, res) => {
+    try {
+
+        const secret = req.headers["x-webhook-secret"];
+        if (secret !== process.env.WEBHOOK_SECRET) {
+            return res.status(401).json({
+                success: false
+            })
+        };
+
+        console.log(req.body);
+
+        const {
+            contact_id,
+            customData
+        } = req.body;
+
+        const updates= [];
+        const values = [];
+
+        if (customData?.full_name) {
+            updates.push(`fullname = $${values.length + 1}`);
+            values.push(customData.full_name);
+        }
+
+        if (customData?.email) {
+            updates.push(`email = $${values.length + 1}`);
+            values.push(customData.email);
+        }
+
+        if (customData?.phone) {
+            updates.push(`contact_number = $${values.length + 1}`);
+            values.push(customData.phone);
+        }
+
+        updates.push(`updated_at = NOW()`);
+        values.push(contact_id);
+
+        if (updates.length === 1) {
+            return res.status(200).json({
+                success: true,
+                message: 'No fields to update'
+            });
+        };
+
+        await db.result(
+            `
+            UPDATE inquiries
+            SET ${updates.join(', ')}
+            WHERE ghl_contact_id = $${values.length}
+            `,
+            values
+        );
+        
+        return res.status(200).json({
+            success: true
+        });
+
+    } catch (err) {
+        console.error(err);
+
+        return res.status(500).json({
+            success: false
+        });
+    }
+})
+
+
+highRoute.delete('/opportunity', async (req, res) => {
+    try {
+
+    } catch(err) {
+        
+
+        return res.status(500).json({
+            success: false
+        })
+    }
+})
 
 
 

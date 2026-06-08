@@ -30,7 +30,6 @@ export default function Login () {
         try {
             const response = await axios.post(`${BASE_URL}/user-setup/v1/login`, { username, password }, { withCredentials: true });
 
-            console.log('User response: ', response.data);
             router.push('/admin');
 
         } catch (err) {

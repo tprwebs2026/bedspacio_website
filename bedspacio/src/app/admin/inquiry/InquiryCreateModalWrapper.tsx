@@ -92,16 +92,12 @@ export default function InquiryCreateModalWrapper ({
                 { withCredentials: true }
             );
 
-            console.log('Manual inquiry record result: ', response);
-            console.log('Inquiry id: ', response.data.data?.id);
-            console.log('Reference number: ', response.data.referenceNumber);
-
             setCreatedRecord(response.data.data);
             setRecordResponse({
                 reference_number: response.data.referenceNumber,
                 crm_contact_id: response.data.crm_contact_id,
                 crm_opportunity_id: response.data.crm_opportunity_id
-            });
+            }); 
 
             setSuccessMessage('Successfully created new inquiry record');
             setTimeout(() => setSuccessMessage(''), 3500)

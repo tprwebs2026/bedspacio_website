@@ -132,7 +132,7 @@ export default async function About() {
 
             <section className="relative flex items-center justify-center w-full h-screen xl:h-[300px] lg:h-[300px] bg-[#1D242B] overflow-hidden">
                 <div className="absolute flex items-center w-full inset-0 opacity-25">
-                    <img src="/asset/Aboutus_header_bg_image.jpg" alt="about-us-header" className='w-full h-full object-cover' />
+                    <img src="/image/Aboutus_header_bg_image.jpg" alt="about-us-header" className='w-full h-full object-cover' />
                 </div>
 
                 <div className="absolute flex flex-col items-center justify-center">

@@ -49,7 +49,6 @@ export default function Manage ({ users }: ManageProps) {
     const handleShowUserInfo = async (id: number) => {
         const data = await getUserInfo(id);
 
-        console.log(data);
         setUserViewWrapperModal(true);
         setSelectedUser(data);
     }

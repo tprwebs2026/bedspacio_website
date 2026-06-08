@@ -1,6 +1,6 @@
 "use server"
 
-import { getArchivedInquiries } from "../../../../../lib/inquiry"
+import { getAllArchivedInquiries } from "../../../../../lib/inquiry"
 import { requireUser } from "../../../../../lib/user"
 import ArchivePageWrapper from "./ArchivePageWrapper"
 
@@ -10,7 +10,7 @@ export type ArchiveType = {
     type: string,
     fullname: string,
     contact_number: string,
-    status: string,
+    inq_status: string,
     created_at: string,
     updated_at: string
 }
@@ -31,12 +31,12 @@ export type ArchiveModalType = {
     email: string,
     contact_number: string,
     subject: string,
-    schedule: string,
+    work_schedule: string,
     target_move_in: string,
     months_of_stay: number,
     message: string,
     type: string,
-    status: string,
+    inq_status: string,
     ip_address: string,
     created_at: string,
     inquiry_logs: InquiryLogsType[]
@@ -47,7 +47,7 @@ export default async function ArchivePage () {
     // checks if a user is logged in
     const user = await requireUser()
     
-    const archives = await getArchivedInquiries()
+    const archives = await getAllArchivedInquiries()
 
     return (
         <ArchivePageWrapper 
