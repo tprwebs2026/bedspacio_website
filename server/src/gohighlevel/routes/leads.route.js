@@ -8,11 +8,17 @@ const highRoute = express.Router();
 
 const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 10);
 
+
+/*
+    TODO: 06-09-2026
+    - When GoHighLevel account is created, add a custom field: room_name (Room Name) on the opportunity
+*/
 highRoute.post(`/submissions`, async(req , res) => {
     try {
 
         const { 
             room_uuid,
+            room_name,
             starting_price, // only for postgres
             type = 'room_inquiry', // only for postgres
             fullname,
@@ -91,6 +97,7 @@ highRoute.post(`/submissions`, async(req , res) => {
             customFields: [
                 { key: 'reference_number', value: referenceNumber },
                 { key: 'room_uuid', value: room_uuid },
+                { key: 'room_name', value: room_name },
                 { key: 'work_schedule', value: work_schedule },
                 { key: 'target_movein', value: target_move_in },
                 { key: 'months_of_stay', value: Number(months_of_stay) },
@@ -115,6 +122,7 @@ highRoute.post(`/submissions`, async(req , res) => {
             INSERT INTO inquiries (
                 reference_number, 
                 room_uuid,
+                room_name
                 starting_price,
                 type,
                 fullname,
@@ -131,12 +139,14 @@ highRoute.post(`/submissions`, async(req , res) => {
             ) VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8, $9, $10,
-                $11, $12, $13, $14, $15
+                $11, $12, $13, $14, $15, 
+                $16
             ) RETURNING *
             `,
             [ 
                 referenceNumber, 
                 room_uuid, 
+                room_name,
                 starting_price, 
                 type, fullname, 
                 contact_number, 
@@ -178,6 +188,8 @@ highRoute.post(`/submissions`, async(req , res) => {
         return res.status(500).json({ error: 'Server could not process inquiry' });
     }
 });
+
+
 
 
 highRoute.post('/submissions/manual', async (req, res) => {

@@ -16,7 +16,7 @@ export default function WindowDeleteMultiple ({ count, ids, onArchive, onConfirm
     
 
     return (
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 flex items-end justify-center pb-[2rem] transform transition-transform duration-300 ease-out
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-end justify-center pb-[2rem] transform transition-transform duration-300 ease-out
             animate-slide-up">
             <div className="flex min-w-[300px] items-center justify-between gap-[2rem] bg-[#FAFAFA] border-2 border-dashed border-[#1D242B]/50 p-2 rounded-[10px]">
                     <span className="whitespace-nowrap font-bold">Selected {count} item/s</span>

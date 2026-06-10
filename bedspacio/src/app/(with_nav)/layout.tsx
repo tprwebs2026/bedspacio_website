@@ -17,10 +17,18 @@ export default function WithNavigation({
 
     return (
         <>  
-            <script 
+            {/*
+                Noted at 06-09-2026
+                1. Chat button widget from GoHighLevel
+                2. Uncomment this if GHL is integrated
+             */}
+            {/* <script 
                 src="https://beta.leadconnectorhq.com/loader.js" 
                 data-resources-url="https://beta.leadconnectorhq.com/chat-widget/loader.js" data-widget-id="6a1bc87f1b5a98ef9d7bcf2d">
-            </script>
+            </script> */}
+
+
+            
             {/* <Script id="kommo-widget" strategy="afterInteractive">
                 {`
                     (function(a,m,o,c,r,m){

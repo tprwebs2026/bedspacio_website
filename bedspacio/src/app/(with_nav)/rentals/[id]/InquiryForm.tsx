@@ -48,6 +48,7 @@ type PropertyManagerInfo = {
     propertyManagerContact: string,
     profileImage: string,
     room_uuid: string,
+    room_name: string,
     startingPrice: any
 }
 
@@ -57,6 +58,7 @@ export default async function InquiryForm ({
     propertyManagerContact, 
     profileImage,
     room_uuid,
+    room_name,
     startingPrice
 }: PropertyManagerInfo) {
 
@@ -70,6 +72,7 @@ export default async function InquiryForm ({
                 propertyManagerContact={propertyManagerContact}
                 profileImage={profileImage}
                 room_uuid={room_uuid}
+                room_name={room_name}
                 startingPrice={startingPrice}
             />
         </>

@@ -122,7 +122,7 @@ import FullScreen from '@/asset/icon/full-screen.svg'
 
 // Prod/Dev
 import { BASE_URL } from '@/config/config'
-
+import Image from 'next/image'
 
 import ImageFullView from './ImageFullView'
 
@@ -174,6 +174,7 @@ export default function RoomImages ({ images }: RoomImageProp) {
                             </button>
                         </div>
                     )}
+                    
 
                     <img onClick={() => setFullViewOpen(prev => !prev)}
                         src={`${BASE_URL}/file/room/image/${selectedImage?.image}`}

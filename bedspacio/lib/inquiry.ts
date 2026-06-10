@@ -114,6 +114,7 @@ export const getRoomID = async () => {
 // };
 
 
+/* USE THIS IF GHL is not INTEGRATED 06-08-2026 */
 export const updateStatusById = async (id: number, status: string) => {
     try {
         const response = await axios.patch(`${BASE_URL}/inquiry/v1/status/${id}`, 
@@ -130,7 +131,7 @@ export const updateStatusById = async (id: number, status: string) => {
 };
 
 
-/* USE THIS AS FALLBACK IF GHL is not INTEGRATED */
+/* USE THIS AS FALLBACK IF GHL is not INTEGRATED 06-08-2026 */
 export const updateInquiryStatusById = async (id: number, status: string) => {
     try {
         const response = await axios.patch(`${BASE_URL}/inquiry/v2/status/${id}/fallback`, 

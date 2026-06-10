@@ -157,36 +157,12 @@ import InclusionFilter from "./InclusionFilter";
 import Pagination from "./Pagination";
 import Breadcrumbs from "@/components/BreadCrumb"
 
+import { Metadata } from "next";
 
-
-// MAKE THIS an "async" function later when fetching data
-
-/*
-    ----- THIS IS AN EXAMPLE ----- 
-
-    export default async function ListingsPage() {
-        const res = await fetch("http://localhost:5000/api/listings", {
-            cache: "no-store",
-        });
-
-        const listings = await res.json();
-
-        return (
-            <div>
-            {listings.map((listing: any) => (
-                <Link
-                key={listing.id}
-                href={`/listings/${listing.id}`}
-                >
-                <div>{listing.name}</div>
-                </Link>
-            ))}
-            </div>
-        );
-    }
-
-    ----- THIS IS AN EXAMPLE ----- 
-*/
+export const metadata: Metadata = {
+    title: "Rentals | BedSpacio",
+    description: 'Add later'
+}
 
 
 export default async function Rentals({ searchParams }: { searchParams: Promise <{ 

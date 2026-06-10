@@ -189,6 +189,41 @@
 // }
 
 
+// ------ FOR SEO ------ //
+
+import type { Metadata } from "next";
+
+    type MetaDataProps = {
+        params: Promise<{ id: number }>;
+    };
+
+    export async function generateMetadata(
+    { params }: Props
+    ): Promise<Metadata> {
+
+    const { id } = await params;
+
+    const room = await getRoomPreviewById(id);
+
+    return {
+        title: `${room.title} | BedSpacio`,
+        description: `${room.type} for rent at ${room.branch.address}. Starting at ₱${room.price}/month.`,
+
+        openGraph: {
+            title: room.title,
+            description: room.description,
+            images: room.images?.length
+                ? [room.images[0].image_url]
+                : [],
+            type: "website",
+        },
+
+        alternates: {
+            canonical: `https://bedspacio.com/rentals/${id}`,
+        },
+    };
+}
+
 
 // ------------------ POSTGRES ---------------- //
 
@@ -289,6 +324,8 @@ export default async function RoomDetails ({ params }: Props ) {
                                 <ArrowLong className="w-[25px] h-full stroke-[#1D242B] stroke-2" />
                                 <span className={`${room.slot === 0 ? 'text-[#F60002]' : 'text-[#007C01]' }`}>Available Slot: <strong>{room.slot}</strong></span>
                             </div>
+
+                            {/* Ignore */}
                             {/* {room.room_type === "bedspace" ? (
                                 <>
                                     <div className="flex items-center gap-2">
@@ -363,6 +400,7 @@ export default async function RoomDetails ({ params }: Props ) {
                         </div>
                     </div>
 
+                    {/* Ignore */}
                     {/* <InquiryForm 
                         slot = {room.slot}
                         propertyManager={room.property_manager.fullname}
@@ -378,6 +416,7 @@ export default async function RoomDetails ({ params }: Props ) {
                         propertyManagerContact={room.property_manager.contact_number}
                         profileImage={room.profile_image}
                         room_uuid={room.room_uuid}
+                        room_name={room.title}
                         startingPrice={parseFloat(room.price)}
                     />
                 </div>

@@ -204,7 +204,7 @@
 
 // ------------- POSTGRES ------------- //
 
-"use client"
+// "use client"
 
 import Arrow from '@/asset/icon/arrow-long.svg'
 
@@ -215,65 +215,73 @@ import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { BASE_URL } from '@/config/config';
 
-export type inquiryFormValues = {
-    fullname: string,
-    contact_number: string,
-    email: string,
-    subject: string,
-    message: string
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Contact Us | BedSpacio',
+    description: "Got questions? We're easy to reach and happy to chat. Whether by call or message, our team is here to help you every step of the way."
 }
+
+
+// export type inquiryFormValues = {
+//     fullname: string,
+//     contact_number: string,
+//     email: string,
+//     subject: string,
+//     message: string
+// }
 
 export default function ContactUs() {
 
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
-    const [isSubmitted, setIsSubmitted] = useState(false);
+    // const [loading, setLoading] = useState<boolean>(false);
+    // const [error, setError] = useState<string>('');
+    // const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const { register, handleSubmit, reset, formState: { errors, isSubmitSuccessful } } = useForm<inquiryFormValues>();
+    // const { register, handleSubmit, reset, formState: { errors, isSubmitSuccessful } } = useForm<inquiryFormValues>();
     
-    const onSubmit = async (data: inquiryFormValues) => {
+    // const onSubmit = async (data: inquiryFormValues) => {
 
-        setLoading(true);
-        setError('');
-        setIsSubmitted(false);
+    //     setLoading(true);
+    //     setError('');
+    //     setIsSubmitted(false);
 
 
-        try {
-            // Fake loading of 1.5 seconds
-            await new Promise(resolve => setTimeout(resolve, 1500));
+    //     try {
+    //         // Fake loading of 1.5 seconds
+    //         await new Promise(resolve => setTimeout(resolve, 1500));
 
-            const payload = {
-                fullname: data?.fullname,
-                contact_number: data?.contact_number,
-                email: data?.email,
-                subject: data?.subject,
-                message: data?.message
-            }
+    //         const payload = {
+    //             fullname: data?.fullname,
+    //             contact_number: data?.contact_number,
+    //             email: data?.email,
+    //             subject: data?.subject,
+    //             message: data?.message
+    //         }
 
-            const inquiry = await axios.post(`${BASE_URL}/inquiry/v1/general-inquiry`, payload,
-                { withCredentials: true }
-            )
+    //         const inquiry = await axios.post(`${BASE_URL}/inquiry/v1/general-inquiry`, payload,
+    //             { withCredentials: true }
+    //         )
 
-            console.log("Payload: ", data);
-            console.log('Result of inquiry: ', inquiry);
+    //         console.log("Payload: ", data);
+    //         console.log('Result of inquiry: ', inquiry);
 
-            setIsSubmitted(true)
-            reset();
+    //         setIsSubmitted(true)
+    //         reset();
 
-        } catch (err: any) {
-            console.error('Error submitting inquiry: ', err);
-            const message =
-                err?.response?.data?.message ||
-                err?.message ||
-                'Unexpected error occurred';
+    //     } catch (err: any) {
+    //         console.error('Error submitting inquiry: ', err);
+    //         const message =
+    //             err?.response?.data?.message ||
+    //             err?.message ||
+    //             'Unexpected error occurred';
 
-            setError(message);
-            setIsSubmitted(false);
+    //         setError(message);
+    //         setIsSubmitted(false);
 
-        } finally {
-            setLoading(false);
-        }
-    };
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
 
     return (
@@ -299,14 +307,15 @@ export default function ContactUs() {
 
                     <div className="flex flex-col gap-[2rem]">
                         <span className="text-[28px] xl:text-[36px] lg:text-[36px] text-[#0077C0] font-[900] whitespace-nowrap">Reach us on:</span>
-                        <div className="flex flex-col items-start w-full">
+                        <div className="flex flex-col items-start w-full gap-2">
                             <span className="text-[20px] text-[#1D242B] leading-[1.2]">Mobile: 0917 849 0044</span>
-                            <span className="text-[20px] text-[#1D242B] leading-[1.2]">Telephone: (02) 8802 3188</span>
+                            <span className="text-[20px] text-[#1D242B] leading-[1.2]">Landline: (02) 8802 3188</span>
                             <span className="text-[20px] text-[#1D242B] leading-[1.2]">Email: bedspacio@gmail.com</span>
                         </div>
                     </div>
                 </div>
 
+{/*                 
                 {!isSubmitted && !loading && (
                     <div className="flex flex-col w-full h-auto rounded-[15px] border border-[#1D242B]/50 bg-[#C7EEFF]/50 overflow-hidden">
                         <span className="w-full py-[0.5rem] border-b-2 border-dashed border-b-[#1D242B]/50 text-[26px] text-center bg-[#FAFAFA] italic">Inquiry Form</span>
@@ -404,7 +413,15 @@ export default function ContactUs() {
                         <span className="text-[28px] text-[#0077C0] font-bold">INQUIRY SENT!</span>
                         <span className="text-[20px] text-[#1D242B] text-center leading-[1.2] w-full">Thank you! Your inquiry was submitted successfully. We sent you a confirmation email and will be in touch with you soon.</span>
                     </div>
-                )}
+                )} */}
+
+
+
+                <div className='flex w-full h-full overflow-hidden rounded-[50px]'>
+                    <img src="/image/why_choose_us/image_2.jpg" alt="bedspacio" className='w-full h-full object-cover rounded-[10px]'/>
+                </div>
+
+
             </div>
         </div>
     )

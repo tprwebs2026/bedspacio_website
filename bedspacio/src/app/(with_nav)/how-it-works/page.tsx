@@ -1,5 +1,13 @@
 
-export default function HowItWorks() {
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+    title: "How it Works | BedSpacio"
+}
+
+export default async function HowItWorks() {
+
+
     return (
         <div className="flex flex-col items-center justify-start min-h-screen w-full">
 

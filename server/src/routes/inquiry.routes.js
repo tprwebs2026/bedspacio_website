@@ -353,115 +353,6 @@ const inquiryRoutes = express.Router();
 // });
 
 
-// Reason for commenting: 
-/*
-    This is used on the version where GHL or any other third party CRM is NOT used.
-    This holds on to the status used on the inquiries table on the database (postgres)
-    - If GHL is used, no need to query for status, instead use ghl_status 
-*/
-
-// inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
-
-//     try {
-
-//         const {
-//             room_uuid,
-//             expected_revenue,
-//             fullname,
-//             email,
-//             contact_number,
-//             schedule,
-//             target_move_in,
-//             months_of_stay,
-//             message,
-//             type = 'room_inquiry',
-//         } = req.body;
-
-//         const ip_address = req.ip;
-
-//         const nanoid = customAlphabet(
-//             'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
-//             10
-//         );
-
-//         const reference_number = `INQ-${nanoid()}`;
-
-//         const result = await db.tx(async t => {
-
-//             // STEP 1: Insert inquiry
-//             const inquiry = await t.one(
-//                 `
-//                 INSERT INTO inquiries (
-//                     room_uuid,
-//                     expected_revenue,
-//                     fullname,
-//                     email,
-//                     contact_number,
-//                     schedule,
-//                     target_move_in,
-//                     months_of_stay,
-//                     message,
-//                     ip_address,
-//                     type,
-//                     reference_number
-//                 ) VALUES (
-//                     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
-//                 )
-//                 RETURNING id, created_at
-//                 `,
-//                 [
-//                     room_uuid,
-//                     expected_revenue,
-//                     fullname,
-//                     email,
-//                     contact_number,
-//                     schedule,
-//                     target_move_in,
-//                     months_of_stay,
-//                     message,
-//                     ip_address,
-//                     type,
-//                     reference_number,
-//                 ]
-//             );
-
-//             // STEP 2: Update inquiry with reference number
-//             const updatedInquiry = await t.one(
-//                 `
-//                 UPDATE inquiries
-//                 SET reference_number = $1
-//                 WHERE id = $2
-//                 RETURNING
-//                     id,
-//                     reference_number,
-//                     created_at
-//                 `,
-//                 [reference_number, inquiry.id]
-//             );
-
-//             return updatedInquiry;
-//         });
-
-//         return res.status(200).json({
-//             success: true,
-//             inquiry_id: result.id,
-//             reference_number: result.reference_number,
-//             expected_response_time: 'Within 24 hours'
-//         });
-
-//     } catch (err) {
-
-//         console.error('Error creating inquiry:', err);
-
-//         return res.status(500).json({
-//             success: false,
-//             message: 'Internal server error'
-//         });
-//     }
-// });
-
-
-
 
 /*
     1. Whenever a user submits a form inquiry from /rentals page,
@@ -472,88 +363,6 @@ const inquiryRoutes = express.Router();
 */
 
 inquiryRoutes.post('/v1/room-inquiry', inquiryLimiter, async (req, res) => {
-    try {
-        const {
-            room_uuid,
-            starting_price,
-            fullname,
-            email,
-            contact_number,
-            schedule,
-            target_move_in,
-            months_of_stay,
-            message,
-            type = 'room_inquiry'
-        } = req.body;
-
-        const ip_address = req.ip;
-
-        const nanoid = customAlphabet(
-            'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
-            8
-        );
-
-        const reference_number = `INQ-${nanoid()}`;
-
-
-        // STEP 1: Insert inquiry
-        const inquiry = await db.one(
-            `
-            INSERT INTO inquiries (
-                room_uuid,
-                starting_price,
-                fullname,
-                email,
-                contact_number,
-                schedule,
-                target_move_in,
-                months_of_stay,
-                message,
-                ip_address,
-                type, 
-                reference_number
-            ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
-            )
-            RETURNING id, created_at
-            `,
-            [
-                room_uuid,
-                starting_price,
-                fullname,
-                email,
-                contact_number,
-                schedule,
-                target_move_in,
-                months_of_stay,
-                message,
-                ip_address,
-                type,
-                reference_number
-            ]
-        );
-
-        return res.status(200).json({
-            success: true,
-            inquiry_id: inquiry.id,
-            reference_number: inquiry.reference_number,
-        });
-    } catch (err) {
-        console.error('Error creating inquiry:', err);
-
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        });
-    }
-});
-
-
-/*
-    1. Used to store the inquiry form submission to database only
-    2. Fallback POST request if GoHighLevel is not integrated
-*/
-inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
     try {
         const {
             room_uuid,
@@ -597,10 +406,95 @@ inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
             )
+            RETURNING id, created_at
+            `,
+            [
+                room_uuid,
+                starting_price,
+                fullname,
+                email,
+                contact_number,
+                work_schedule,
+                target_move_in,
+                months_of_stay,
+                message,
+                ip_address,
+                type,
+                reference_number
+            ]
+        );
+
+        return res.status(200).json({
+            success: true,
+            inquiry_id: inquiry.id,
+            reference_number: inquiry.reference_number,
+        });
+    } catch (err) {
+        console.error('Error creating inquiry:', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+
+/*
+    1. Used to store the inquiry form submission to database only
+    2. Fallback POST request if GoHighLevel is not integrated
+*/
+inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
+    try {
+        const {
+            room_uuid,
+            room_name,
+            starting_price,
+            fullname,
+            email,
+            contact_number,
+            work_schedule,
+            target_move_in,
+            months_of_stay,
+            message,
+            type = 'room_inquiry'
+        } = req.body;
+
+        const ip_address = req.ip;
+
+        const nanoid = customAlphabet(
+            'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
+            8
+        );
+
+        const reference_number = `INQ-${nanoid()}`;
+
+
+        // STEP 1: Insert inquiry
+        const inquiry = await db.one(
+            `
+            INSERT INTO inquiries (
+                room_uuid,
+                room_name,
+                starting_price,
+                fullname,
+                email,
+                contact_number,
+                work_schedule,
+                target_move_in,
+                months_of_stay,
+                message,
+                ip_address,
+                type, 
+                reference_number
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+            )
             RETURNING id, created_at, reference_number
             `,
             [
                 room_uuid,
+                room_name,
                 starting_price,
                 fullname,
                 email,
@@ -636,6 +530,99 @@ inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
         });
     }
 });
+
+
+// Fallback POST request for manually creating inquiry inside inquiries page in ADMIN
+// Will be used if GoHighLevel is not Integrated to the system
+
+
+inquiryRoutes.post('/v2/room-inquiry/manual', inquiryLimiter, async (req, res) => {
+    try {
+
+        const {
+            fullname,
+            contact_number,
+            email,
+            work_schedule,
+            target_move_in,
+            months_of_stay,
+            room_uuid,
+            note
+        } = req.body;
+
+        const ip_address = req.ip;
+
+        // Generate your inquiry reference number locally using nanoid
+        
+        const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 10);
+        const referenceNumber = `INQ-${nanoid(10).toUpperCase()}`;
+
+        const room = await db.oneOrNone(
+            `SELECT price FROM rooms WHERE room_uuid = $1`,
+            [room_uuid]
+        )
+
+        if (!room) {
+            return res.status(400).json({
+                success: false,
+                message: 'Room not found'
+            })
+        }
+    
+
+        const record = await db.oneOrNone(
+            `
+            INSERT INTO inquiries (
+                type, 
+                fullname,
+                contact_number,
+                email,
+                work_schedule,
+                target_move_in,
+                months_of_stay,
+                room_uuid,
+                message,
+                reference_number,
+                ip_address
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+            ) RETURNING *
+            `, [
+                'room_inquiry',
+                fullname, 
+                contact_number,
+                email,
+                work_schedule,
+                target_move_in,
+                months_of_stay,
+                room_uuid,
+                note,
+                referenceNumber,
+                ip_address
+            ]
+        );
+
+        // Response back to your Next.js frontend
+        return res.status(200).json({
+            success: true,
+            message: 'Inquiry successfully processed and added to GHL New Lead stage.',
+            referenceNumber: referenceNumber,
+            data: record
+        });
+
+        
+
+    } catch (err) {
+        console.log('Error creating new inquiry record in admin: ', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+})
+
+
 
 
 /*

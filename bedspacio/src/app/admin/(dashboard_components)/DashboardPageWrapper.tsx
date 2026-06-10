@@ -1,3 +1,6 @@
+
+//------------- GoHighLevel Integration ------------- //
+
 "use client"
 
 // icons

@@ -49,56 +49,57 @@
 // ------------- POSTGRES -------------- // 
 
 
-// "use server"
+"use server"
 
-// import { BASE_URL } from '@/config/config'
-// import { InquiryFormValues } from "./InquiryFormClient"
-// import axios from "axios"
+import { BASE_URL } from '@/config/config'
+import { InquiryFormValues } from "./InquiryFormClient"
+import axios from "axios"
 
-// export default async function SubmitInquiry(data: InquiryFormValues, startingPrice: any) {
-//     try {
-//         const room_inquiry = await axios.post(
-//             `${BASE_URL}/inquiry/v2/room-inquiry`, {
-//                 room_uuid: data.room_uuid,
-//                 starting_price: startingPrice,
-//                 fullname: data.fullname,
-//                 email: data.email,
-//                 contact_number: data.contact_number,
-//                 work_schedule: data.work_schedule,
-//                 target_move_in: data.target_move_in,
-//                 months_of_stay: data.months_of_stay,
-//                 message: data.message
-//             }, {
-//                 withCredentials: true
-//             });
+export default async function SubmitInquiry(data: InquiryFormValues, startingPrice: any) {
+    try {
+        const room_inquiry = await axios.post(
+            `${BASE_URL}/inquiry/v2/room-inquiry`, {
+                room_uuid: data.room_uuid,
+                room_name: data.room_name,
+                starting_price: startingPrice,
+                fullname: data.fullname,
+                email: data.email,
+                contact_number: data.contact_number,
+                work_schedule: data.work_schedule,
+                target_move_in: data.target_move_in,
+                months_of_stay: data.months_of_stay,
+                message: data.message
+            }, {
+                withCredentials: true
+            });
 
-//             console.log("Submit Inquiry: ", room_inquiry.data);
+            console.log("Submit Inquiry: ", room_inquiry.data);
 
 
-//             if (!room_inquiry.data.success) {
-//                 return {
-//                     success: false,
-//                     message: room_inquiry.data.message,
-//                 };
-//             };
+            if (!room_inquiry.data.success) {
+                return {
+                    success: false,
+                    message: room_inquiry.data.message,
+                };
+            };
 
-//             return {
-//                 success: true,
-//                 message: room_inquiry.data.message,
-//                 data: room_inquiry.data,
-//             };
+            return {
+                success: true,
+                message: room_inquiry.data.message,
+                data: room_inquiry.data,
+            };
 
-//     } catch (err: any) {
-//         console.error('Something went wrong with the inquiry process: ', err);
+    } catch (err: any) {
+        console.error('Something went wrong with the inquiry process: ', err);
         
-//         return {
-//             success: false,
-//             message:
-//                 err?.response?.data?.message ||
-//                 'Failed to submit inquiry'
-//         };
-//     }
-// }
+        return {
+            success: false,
+            message:
+                err?.response?.data?.message ||
+                'Failed to submit inquiry'
+        };
+    }
+}
 
 
 // ----------------------- KOMMO -------------------------- //
@@ -167,50 +168,51 @@
 // ------------ GoHighLevel --------------------- //
 
 
-"use server"
+// "use server"
 
-import { BASE_URL } from '@/config/config'
-import { InquiryFormValues } from "./InquiryFormClient"
-import axios from "axios"
+// import { BASE_URL } from '@/config/config'
+// import { InquiryFormValues } from "./InquiryFormClient"
+// import axios from "axios"
 
-export default async function SubmitInquiry(data: InquiryFormValues, startingPrice: any) {
-    try {
+// export default async function SubmitInquiry(data: InquiryFormValues, startingPrice: any) {
+//     try {
         
-        const response = await axios.post(
-            `${BASE_URL}/gohighlevel/submissions`, {
-                room_uuid: data.room_uuid,
-                starting_price: startingPrice,
-                fullname: data.fullname,
-                email: data.email,
-                contact_number: data.contact_number,
-                work_schedule: data.work_schedule,
-                target_move_in: data.target_move_in,
-                months_of_stay: Number(data.months_of_stay),
-                message: data.message
-            }, {
-                withCredentials: true
-            });
+//         const response = await axios.post(
+//             `${BASE_URL}/gohighlevel/submissions`, {
+//                 room_uuid: data.room_uuid,
+//                 room_name: data.room_name,
+//                 starting_price: startingPrice,
+//                 fullname: data.fullname,
+//                 email: data.email,
+//                 contact_number: data.contact_number,
+//                 work_schedule: data.work_schedule,
+//                 target_move_in: data.target_move_in,
+//                 months_of_stay: Number(data.months_of_stay),
+//                 message: data.message
+//             }, {
+//                 withCredentials: true
+//             });
 
 
-            if (!response.data.success) {
-                return {
-                    success: false,
-                    message: response.data.message,
-                };
-            };
+//             if (!response.data.success) {
+//                 return {
+//                     success: false,
+//                     message: response.data.message,
+//                 };
+//             };
 
-            return {
-                success: true,
-                message: response.data.message,
-                inquiry_id: response.data.data?.id || Date.now(),
-                reference_number: response.data.referenceNumber
-            };
+//             return {
+//                 success: true,
+//                 message: response.data.message,
+//                 inquiry_id: response.data.data?.id || Date.now(),
+//                 reference_number: response.data.referenceNumber
+//             };
 
-    } catch (err: any) {
-        console.error('Something went wrong with the inquiry process: ', err);
-        return {
-            success: false,
-            message: err?.response?.data?.error || err?.message || 'Failed to submit inquiry'
-        };
-    }
-}
+//     } catch (err: any) {
+//         console.error('Something went wrong with the inquiry process: ', err);
+//         return {
+//             success: false,
+//             message: err?.response?.data?.error || err?.message || 'Failed to submit inquiry'
+//         };
+//     }
+// }

@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 
 import SearchFilter from '@/components/SearchFilter'
 import FrequentlyAskedQuestions from '@/components/FrequentlyAskedQuestion'
@@ -10,8 +11,14 @@ import Community from '@/asset/icon/community.svg'
 import Reviews from '@/components/Reviews'
 import ReviewsMobile from '@/components/reviewsMobile'
 import BranchRoomCard from '@/components/Branch&RoomCard'
+import HomeInquiryRedirect from './(home-inquiry)/HomeInquiryRedirect'
 
-export default function Home() {
+export const metadata: Metadata = {
+    title: 'Home | BedSpacio',
+    description: 'asdasdas'
+}
+
+export default async function Home() {
     
     return (
         <div className="flex flex-col min-h-screen items-start justify-start ">
@@ -27,11 +34,6 @@ export default function Home() {
                         <span className="flex justify-center text-[#1D242B] text-[20px] md:text-[24px] text-center font-bold w-full">Made for students, workers, and everyday city living.</span>
                     </div>
 
-                    {/* <div className='flex flex-col items-center justify-center gap-2 bg-[#1D242B]/50 rounded-[10px]  h-full p-4'>
-                        <span className='text-[#FAFAFA] text-[18px]'>Tell us your preferrence</span>
-
-                        <SearchFilter/>
-                    </div> */}
                     <div className='flex items-center justify-center bg-[#1D242B]/25 rounded-[5px] border border-[#FAFAFA]'>
                         <SearchFilter />
                     </div>
@@ -132,7 +134,8 @@ export default function Home() {
 
 
             <FrequentlyAskedQuestions />
-            <HomeInquiry /> 
+            {/* <HomeInquiry />  */}
+            <HomeInquiryRedirect />
         </div>
     )
 }

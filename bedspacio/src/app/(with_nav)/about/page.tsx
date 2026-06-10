@@ -119,10 +119,20 @@ import VisionLogo from '@/asset/icon/vission.svg'
 
 import Inquire from '@/asset/icon/inquire.svg'
 import Link from "next/link"
+import Image from 'next/image'
 
 import { BASE_URL } from '@/config/config'
 import { getPropertyManagers } from '../../../../lib/user'
 import { DefaultAvatar } from '@/app/admin/manage/DefaultAvatar'
+
+
+
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+    title: "About Us | BedSpacio",
+    description: "BedSpacio, a property management business designed to provide affordable, comfortable, and convenient living spaces. BedSpacio was established to address the rising demand for quality rental accomodations, particularly for students, young professionals, employees, and individuals seeking practical housing options in strategic locations. The company focuses on creating spaces that combine affordability with comfort, making it easier for tenants to find a place that suits both their lifestyle and budget."
+}
 
 export default async function About() {
     const managers = await getPropertyManagers();
@@ -199,7 +209,6 @@ export default async function About() {
                         {managers.map((manager: any) => (
                             <div key={manager.id} className="flex flex-col gap-[1rem] items-center justify-center">
                                 <div className="flex items-center justify-center w-[150px] h-[150px] xl:w-[300px] xl:h-[300px] rounded-full bg-[#C7EEFF] overflow-hidden">
-                                    {/* <img src={`data:wepb/image;base64,${manager.profile_image}`} alt="" className='w-full h-full object-cover' /> */}
                                     {manager.profile_image ? (
                                         <img src={`${BASE_URL}/file/user/${manager.id}`} alt="" className='w-full h-full object-cover' />
                                     ) : (
