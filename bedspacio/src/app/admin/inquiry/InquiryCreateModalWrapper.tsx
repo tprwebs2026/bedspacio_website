@@ -363,14 +363,14 @@ export default function InquiryCreateModalWrapper ({
 
 
 
-// ------------- USE THIS IF GHL IS INTEGRATED ------------- /
+//------------- USE THIS IF GHL IS INTEGRATED ------------- //
 
 // "use client"
 
-// For manually creating inquiry for staff/property manager
-// Create a webhook on GHL for this to work
-// REASON: Only on website is able to create unique Inquiry Reference Number
-// Manual creation > Save to database > trigger webhook on GHL > create opportunity > save data on GHL
+// // For manually creating inquiry for staff/property manager
+// // Create a webhook on GHL for this to work
+// // REASON: Only on website is able to create unique Inquiry Reference Number
+// // Manual creation > Save to database > trigger webhook on GHL > create opportunity > save data on GHL
 
 // import { RoomUUIDType } from "./InquiryPageWrapper"
 // import { BASE_URL } from "@/config/config"

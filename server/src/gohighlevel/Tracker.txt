@@ -1,45 +1,15 @@
 -- TODO: 
 
 
-POST REQUEST
+June 15, 2026 Note
 
-# 1. Send information from Next.js submission form to GoHighLevel Piple (New Lead)
--- reference_number
--- room_uuid
--- fullname 
--- contact_number
--- email
--- work_schedule
--- target_move_in
--- months_of_stay
--- starting_price
--- message
-
-# 2. Store a copy of Inquiry to Postgres (limited)
--- reference_number
--- room_uuid
--- fullname
--- contact_number
--- status
--- date_submitted
-
-# 3. Successfull submission from express backend 
--- Automate a trigger on GoHighLevel to immediately send a confirmation email to user once it received a new data on contacts/created a new lead on pipeline
--- send an email to user/inquirer 
--- provide the reference number to them and instruct what to do
+- Create CMS feature
+> Change embed youtube link (Home)
+> Change Image on About Us (About us)
 
 
-# 4. Reflection of GHL lead status ( open, won, lost, abandon) to admin dashboard status
+> Add new page on Admin 
+- Content page
+    > Manage youtube link in iframe
+    > Manage images on other pages
 
--- Open: new lead = pending
--- Open: contacted, qualified, proposal sent, negotiation = contacted
--- Won = converted
--- Lost = closed
--- abandoned = closed 
-
-
-##################
-
-If lead comes from Live chat/message
-
-an admin/property manager must manually do the form submission

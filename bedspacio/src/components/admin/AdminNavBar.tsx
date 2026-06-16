@@ -99,6 +99,8 @@ export default function AdminNavBar () {
 
                     <Link href="/admin/inquiry" className={`flex flex-col items-center justify-center p-2 xl:p-6 lg:p-6 whitespace-nowrap text-[#FAFAFA] font-bold hover:bg-[#1D242B]/25 transition-all duration-100  ${path.startsWith('/admin/inquiry') && 'bg-[#1D242B]'}`}>Inquiry</Link>
 
+                    <Link href="/admin/content" className={`flex flex-col items-center justify-center p-2 xl:p-6 lg:p-6 whitespace-nowrap text-[#FAFAFA] font-bold hover:bg-[#1D242B]/25 transition-all duration-100  ${path.startsWith('/admin/content') && 'bg-[#1D242B]'}`}>Content</Link>
+
                     {user?.role === 'admin' && (
                         <Link href="/admin/manage" className={`flex flex-col items-center justify-center p-2 xl:p-6 lg:p-6 whitespace-nowrap text-[#FAFAFA] font-bold hover:bg-[#1D242B]/25 transition-all duration-100  ${path === '/admin/manage' && 'bg-[#1D242B]'}`}>Manage</Link>
                     )}

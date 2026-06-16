@@ -39,7 +39,13 @@ export const getRoomListings = cache(async ({
     }
 
 
-    const response = await axios.get(`${BASE_URL}/room/v1/listing?${params.toString()}`, { withCredentials: true })
+    const response = await axios.get(
+        `${BASE_URL}/room/v1/listing?${params.toString()}`, 
+        { withCredentials: true }
+    )
+
+    console.log('Response in room listing: ', response);
+
     return response.data ?? [];
 })
 
@@ -189,9 +195,9 @@ export const getRoomPreviews = async ({
 } 
 
 
-export const getRoomPreviewById = async (id: number) => {
+export const getRoomPreviewByUUID = async (room_uuid: string) => {
     try {
-        const result = await axios.get(`${BASE_URL}/room/v1/preview/${id}/details`, {
+        const result = await axios.get(`${BASE_URL}/room/v1/preview/${room_uuid}/details`, {
             withCredentials: true
         });
 

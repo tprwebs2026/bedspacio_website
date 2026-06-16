@@ -189,21 +189,22 @@
 // }
 
 
+
 // ------ FOR SEO ------ //
 
 import type { Metadata } from "next";
 
     type MetaDataProps = {
-        params: Promise<{ id: number }>;
+        params: Promise<{ room_uuid: string }>;
     };
 
     export async function generateMetadata(
     { params }: Props
     ): Promise<Metadata> {
 
-    const { id } = await params;
+    const { room_uuid } = await params;
 
-    const room = await getRoomPreviewById(id);
+    const room = await getRoomPreviewByUUID(room_uuid);
 
     return {
         title: `${room.title} | BedSpacio`,
@@ -219,13 +220,13 @@ import type { Metadata } from "next";
         },
 
         alternates: {
-            canonical: `https://bedspacio.com/rentals/${id}`,
+            canonical: `https://bedspacio.com/rentals/${room_uuid}`,
         },
     };
 }
 
 
-// ------------------ POSTGRES ---------------- //
+// // ------------------ POSTGRES ---------------- //
 
 
 import Link from "next/link";
@@ -236,14 +237,14 @@ import Location from '@/asset/icon/map-pin.svg'
 import Map from "@/components/Map";
 import Breadcrumbs from "@/components/BreadCrumb";
 
-import { getRoomPreviewById } from "../../../../../lib/room";
+import { getRoomPreviewByUUID } from "../../../../../lib/room";
 import { ODOO_BASE_URL } from "@/config/config";
 import RoomImages from "./RoomImage";
 
 
 
 
-type Props = { params: Promise<{ id: number }> };
+type Props = { params: Promise<{ room_uuid: string }> };
 
 type Inclusions = {
     id: number,
@@ -275,9 +276,11 @@ type RoomDetailType = {
 }
 
 export default async function RoomDetails ({ params }: Props ) {
-    const { id } = await params
+    const { room_uuid } = await params
 
-    const room = await getRoomPreviewById(id);
+    const room = await getRoomPreviewByUUID(room_uuid);
+
+    console.log('Details for rooms listing: ', room);
 
     return (
         <div className="flex flex-col items-start w-full min-h-screen">

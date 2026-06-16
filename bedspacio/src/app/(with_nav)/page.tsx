@@ -12,6 +12,7 @@ import Reviews from '@/components/Reviews'
 import ReviewsMobile from '@/components/reviewsMobile'
 import BranchRoomCard from '@/components/Branch&RoomCard'
 import HomeInquiryRedirect from './(home-inquiry)/HomeInquiryRedirect'
+import VideoDemo from '@/components/VideoDemo'
 
 export const metadata: Metadata = {
     title: 'Home | BedSpacio',
@@ -41,20 +42,23 @@ export default async function Home() {
                 </div>
             </section>
 
-            <section  className={`flex w-full p-[1rem] py-[4rem] xl:h-[800px] lg:h-[800px] md:h-[800px] bg-[#FAFAFA] items-center justify-center `}>
+
+            {/* TO CHANGE: Make the youtube link dynamically change to support future updates  */}
+            {/* <section  className={`flex w-full p-[1rem] py-[4rem] xl:h-[800px] lg:h-[800px] md:h-[800px] bg-[#FAFAFA] items-center justify-center `}>
                 <div className="w-full max-w-5xl mx-auto rounded-[10px] overflow-hidden">
                     <div className="aspect-video">
                         <iframe
                         className="w-full h-full"
                         src="https://www.youtube.com/embed/tTx9-kGmGUI"
-                        title="Male Capsule Room for rent!"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         referrerPolicy="strict-origin-when-cross-origin"
                         allowFullScreen
                         />
                     </div>
                 </div>
-            </section>  
+            </section>   */}
+
+            <VideoDemo />
 
 
             <BranchRoomCard />
@@ -134,7 +138,6 @@ export default async function Home() {
 
 
             <FrequentlyAskedQuestions />
-            {/* <HomeInquiry />  */}
             <HomeInquiryRedirect />
         </div>
     )

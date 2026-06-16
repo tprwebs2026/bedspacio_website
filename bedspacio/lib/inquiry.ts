@@ -132,6 +132,10 @@ export const updateStatusById = async (id: number, status: string) => {
 
 
 /* USE THIS AS FALLBACK IF GHL is not INTEGRATED 06-08-2026 */
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 export const updateInquiryStatusById = async (id: number, status: string) => {
     try {
         const response = await axios.patch(`${BASE_URL}/inquiry/v2/status/${id}/fallback`, 
@@ -149,6 +153,44 @@ export const updateInquiryStatusById = async (id: number, status: string) => {
 
 
 
+// Not needed if GHL is integrated
+// 06-14-2026
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
+interface UpdateInquiryFields {
+    room_uuid?: string;
+    target_move_in?: string;
+    months_of_stay?: number;
+}
+
+export const updateInquiryFields = async (
+    id: number,
+    fields: UpdateInquiryFields
+) => {
+    try {
+        const response = await axios.patch(
+            `${BASE_URL}/inquiry/v1/${id}/fields`,
+            fields,
+            { withCredentials: true }
+        );
+
+        return response.data;
+
+    } catch (err) {
+        console.error('Error updating inquiry fields:', err);
+        throw err;
+    }
+}
+
+
+// Not needed if GHL is integrated
+// 06-14-2026
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 export const deleteSingleInquiry = async (id: number) => {
     try {
         const response = await axios.delete(`${BASE_URL}/inquiry/v1/${id}`, {
@@ -163,6 +205,12 @@ export const deleteSingleInquiry = async (id: number) => {
 }
 
 
+// Not needed if GHL is integrated
+// 06-14-2026
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 export const deleteMultipleInquiry = async (ids: number[]) => {
     try {
         const response =  await axios.delete(`${BASE_URL}/inquiry/v1/multiple`, {
@@ -176,6 +224,7 @@ export const deleteMultipleInquiry = async (ids: number[]) => {
         throw err;
     }
 }
+
 
 
 export const addNewNote = async (id: number, note: string, user_id: number) => {
@@ -200,6 +249,12 @@ export const addNewNote = async (id: number, note: string, user_id: number) => {
 }
 
 
+// Not needed if GHL is integrated
+// 06-14-2026
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 export const archiveInquirySingle = async (id: number) => {
     try {
         const response = await axios.patch(
@@ -216,6 +271,8 @@ export const archiveInquirySingle = async (id: number) => {
 }
 
 
+// Not needed if GHL is integrated
+// 06-14-2026
 export const unarchivedInquirySingle = async (id: number) => {
     try {
         const response = await axios.patch(
@@ -231,6 +288,9 @@ export const unarchivedInquirySingle = async (id: number) => {
     }
 }
 
+
+// Not needed if GHL is integrated
+// 06-14-2026
 export const archiveInquiryMultiple = async (ids: number[]) => {
     try {
         const response = await axios.patch(
@@ -247,7 +307,8 @@ export const archiveInquiryMultiple = async (ids: number[]) => {
 }
 
 
-
+// Not needed if GHL is integrated
+// 06-14-2026
 export const unarchiveInquiryMultiple = async (ids: number[]) => {
     try {
         const response = await axios.patch(
@@ -264,6 +325,8 @@ export const unarchiveInquiryMultiple = async (ids: number[]) => {
 }
 
 
+// Not needed if GHL is integrated
+// 06-14-2026
 export const getArchivedInquiries = async () => {
     try {
         const response = await axios.get(`${BASE_URL}/inquiry/v1/archived`, {
@@ -278,6 +341,8 @@ export const getArchivedInquiries = async () => {
 }
 
 
+// Not needed if GHL is integrated
+// 06-14-2026
 export const getAllArchivedInquiries = async () => {
     try {
         const response = await axios.get(`${BASE_URL}/inquiry/v2/archived/fallback`, {
@@ -292,6 +357,8 @@ export const getAllArchivedInquiries = async () => {
 }
 
 
+// Not needed if GHL is integrated
+// 06-14-2026
 export const getArchivedSingleById = async (id: number) => {
     try {
         const response = await axios.get(
@@ -308,6 +375,8 @@ export const getArchivedSingleById = async (id: number) => {
 }
 
 
+// Not needed if GHL is integrated
+// 06-14-2026
 export const deleteSingleArchived = async (id: number) => {
     try {
         const response = await axios.delete(`${BASE_URL}/inquiry/v1/archived/${id}`, {
@@ -322,6 +391,8 @@ export const deleteSingleArchived = async (id: number) => {
 }
 
 
+// Not needed if GHL is integrated
+// 06-14-2026
 export const deleteMultipleArchived = async (ids: number[]) => {
     try {
         const response = await axios.delete(

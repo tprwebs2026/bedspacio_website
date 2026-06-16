@@ -46,37 +46,12 @@ const dashboardRoute = express.Router();
 
 
 
-// dashboardRoute.get('/v1/inquiry/pending', async (req, res) => {
-//     try {
+/*
+    Commented on 06-11-2026
 
-//         const result = await db.manyOrNone(
-//             `SELECT 
-//                 id,
-//                 room_uuid,
-//                 fullname,
-//                 ghl_status,
-//                 target_move_in,
-//                 created_at
-//             FROM inquiries 
-//             WHERE 
-//                 is_archived = false AND
-//                 ghl_status = 'open' AND
-//                 type = 'room_inquiry'
-//             ORDER BY created_at ASC
-//             LIMIT 8 OFFSET 0
-//             `
-//         )
-
-//         return res.status(200).json(result);
-
-//     } catch (err) {
-//         console.error('Error retrieving room inquiries: ', err);
-//         return res.status(500).json({
-//             message: 'Internal server error'
-//         })
-//     }
-// });
-
+    - Use this for GoHighLevel Integration
+    - Counts the new-leads from GHL opportunity pipeline
+*/
 dashboardRoute.get('/v1/inquiry/new-leads', async (req, res) => {
     try {
 
@@ -93,6 +68,44 @@ dashboardRoute.get('/v1/inquiry/new-leads', async (req, res) => {
             WHERE 
                 is_archived = false AND
                 ghl_pipeline_stage = 'New Lead' AND
+                type = 'room_inquiry'
+            ORDER BY created_at DESC
+            LIMIT 8 OFFSET 0
+            `
+        )
+
+        return res.status(200).json(result);
+
+    } catch (err) {
+        console.error('Error retrieving room inquiries: ', err);
+        return res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
+});
+
+
+/*
+    Commented on 06-11-2026
+
+    - Use this as FALLBACK if GHL is NOT integrated
+    - Counts the 'New leads' from inq_status field in inquiries table in database
+*/
+dashboardRoute.get('/v2/inquiry/new-leads', async (req, res) => {
+    try {
+
+        const result = await db.manyOrNone(
+            `SELECT 
+                id,
+                reference_number,
+                fullname,
+                inq_status,
+                target_move_in,
+                created_at
+            FROM inquiries 
+            WHERE 
+                is_archived = false AND
+                inq_status = 'New lead' AND
                 type = 'room_inquiry'
             ORDER BY created_at DESC
             LIMIT 8 OFFSET 0
@@ -155,7 +168,11 @@ dashboardRoute.get('/v1/inquiry/new-leads', async (req, res) => {
 // });
 
 
-
+/*
+    Commented on 06-11-2026
+    - Use this if GoHighLevel is integrated
+    - Counts the stages from pipeline on GoHighLevel and the ghl_status on the inquiries table on database
+*/ 
 dashboardRoute.get('/v1/inquiries', async (req, res) => {
     try {
 
@@ -179,6 +196,53 @@ dashboardRoute.get('/v1/inquiries', async (req, res) => {
 
         result.forEach((item) => {
             const stat = stats.find(s => s.ghl_status === item.ghl_status);
+
+            if (stat) {
+                stat.count = Number(item.count);
+            }
+        });
+
+        return res.status(200).json(stats);
+
+    } catch (err) {
+        console.error('Error retrieving dashboard stats:', err);
+
+        return res.status(500).json({
+            message: 'Internal server error'
+        });
+    }
+});
+
+
+/*
+    Commented on 06-11-2026
+    - Use this as fallback route if GoHighLevel is not Integrated
+    - Counts the 'New lead' from inq_status on inquiries table
+*/ 
+dashboardRoute.get('/v2/inquiries/count', async (req, res) => {
+    try {
+
+        const result = await db.manyOrNone(
+            `SELECT
+                inq_status,
+                COUNT(*) AS count
+            FROM inquiries
+            WHERE
+                is_archived = false
+                AND type = 'room_inquiry'
+            GROUP BY inq_status`
+        );
+
+        const stats = [
+            { inq_status: 'New lead', count:  0 },
+            { inq_status: 'Contacted', count:  0 },
+            { inq_status: 'Qualified', count:  0 },
+            { inq_status: 'Closed - Won', count:  0 },
+            { inq_status: 'Close - Lost', count:  0 }
+        ];
+
+        result.forEach((item) => {
+            const stat = stats.find(s => s.inq_status === item.inq_status);
 
             if (stat) {
                 stat.count = Number(item.count);

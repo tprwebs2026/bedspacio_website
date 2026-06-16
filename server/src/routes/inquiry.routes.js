@@ -1,357 +1,12 @@
 import express from 'express';
 import axios from 'axios'
 import { db } from '../config/database.js';
-import { searchRead, readByIds, executeKw, createInquiryRecord, createCrmRecord } from '../odoo/odoo.service.js';
-import { getOdooClient } from '../odoo/session.js';
-import { extractOdooError } from '../utils/errorExtract.js';
 import { rateLimitMiddleware, inquiryLimiter } from '../middleware/rateLimit.js';
 import { requireAuth } from '../middleware/auth.js';
 
 import { customAlphabet } from 'nanoid';
 
-const ODOO_URL = process.env.ODOO_URL;
 const inquiryRoutes = express.Router();
-
-
-/*
-    1. Creates an record of type="opportunity" in ODOO
-    2. Inquiry comming from /rentals/[listing_id]
-*/
-
-// inquiryRoutes.post('/v1/:public_room_id/inquiries', async (req, res, next) => {
-//     try {
-//         const {
-//             public_room_id,
-//             starting_price,
-//             full_name,
-//             contact_number,
-//             email,
-//             work_schedule,
-//             target_move_in,
-//             months_of_stay,
-//             other
-//         } = req.body;
-
-
-//         const result = await createInquiryRecord({
-//             model: "bedspacio.inquiry",
-//             values: {
-//                 public_room_id: Number(public_room_id),
-//                 form_type: 'room',
-//                 starting_price: Number(starting_price),
-//                 full_name: full_name,
-//                 contact_number: contact_number,
-//                 email: email,
-//                 work_schedule: work_schedule,
-//                 target_move_in: new Date(target_move_in).toISOString().split('T')[0],
-//                 months_of_stay: Number(months_of_stay),
-//                 others: other,
-//             }
-//         })
-
-
-//         if (!result) {
-//             console.log("Post request result: ", result);
-//             return res.status(500).send({
-//                 success: false,
-//                 message: 'Internal server error!'
-//             })
-//         }
-
-//         if (result?.name === 'odoo.exceptions') {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: result.message,
-//                 error: result
-//             });
-//         }
-
-//         return res.json({
-//             success: true,
-//             data: result,
-//             message: 'Inquiry submitted sucessfully!'
-//         });
-        
-//     } catch (err) {
-//         next(err);
-
-//         console.error('Error creating lead record: ', err);
-//         return res.status(500).json({
-//             success:false,
-//             message: "Error creating Lead Record!"
-//         })
-//     }
-// });
-
-
-
-/*
-    USED IN ODOO CRM
-*/
-
-// inquiryRoutes.post('/v1/crm-record/opportunity', rateLimitMiddleware, async (req, res, next) => {
-//     try {
-//         const {
-//             public_room_id,
-//             starting_price,
-//             fullname,
-//             contactNumber,
-//             email,
-//             schedule,
-//             targetMoveIn,
-//             monthsOfStay,
-//             other
-//         } = req.body;
-
-
-//         const inquiry_result = await createInquiryRecord({
-//             model: "bedspacio.inquiry",
-//             values: {
-//                 public_room_id: Number(public_room_id),
-//                 form_type: 'room',
-//                 starting_price: Number(starting_price),
-//                 full_name: fullname,
-//                 contact_number: contactNumber,
-//                 email: email,
-//                 work_schedule: schedule,
-//                 target_move_in: new Date(targetMoveIn).toISOString().split('T')[0],
-//                 months_of_stay: Number(monthsOfStay),
-//                 others: other,
-
-//                 ip_address: req.ipAddress
-//             }
-//         });
-
-//         if (!inquiry_result?.length) {
-//             return res.status(50).json({
-//                 success: false,
-//                 message: "Failed to create inquiry record"
-//             })
-//         };
-
-//         const inquiryId = inquiry_result[0];
-
-//         if (inquiry_result) {
-//             const result = await createCrmRecord({
-//                 model: "crm.lead",
-//                 values: {
-//                     name: `Opportunity - ${fullname} (${public_room_id})`,
-//                     type: 'opportunity',
-//                     contact_name: fullname,
-//                     email_from: email,
-//                     phone: contactNumber,
-//                     date_deadline: targetMoveIn,
-//                     expected_revenue: `${monthsOfStay * starting_price}`,
-//                     description:`
-//                         <strong>Work Schedule: </strong> ${schedule}, <br/>
-//                         <strong>Target Move-In: </strong> ${targetMoveIn}, <br/>
-//                         <strong>Month/s of Stay: </strong> ${monthsOfStay}, <br/>
-//                         <strong>Other: </strong> ${other}
-//                     `
-//                 }
-//             });
-    
-//             const new_id = Array.isArray(result) && result.length > 0 ? result[0] : null;
-//             console.log('[CreateCrmRecord] New ID: ', new_id);
-
-//             try {
-//                 if (new_id) {
-//                     await executeKw({
-//                         model: "bedspacio.inquiry",
-//                         method: "update_crm_status",
-//                         kwargs: {
-//                             record_id: inquiryId,
-//                             status: "sent",
-//                             crm_id: new_id
-//                         }
-//                     });
-//                 }
-//             } catch (e) {
-//                 console.error("Failed to update CRM status:", e);
-//             }
-            
-//             return res.json({
-//                 success: true,
-//                 data: result,
-//                 message: '[Opportunity] Form submitted successfully'
-//             });
-//         }
-
-
-//     } catch (err) {
-//         console.error('Error creating crm record: ', err);
-
-//         const odooMessage = extractOdooError(err)
-
-//         return res.status(500).json({
-//             success: false,
-//             message: odooMessage
-//         })
-//     }
-// });
-
-
-
-/*
-    USED IN ODOO CRM
-*/
-
-// inquiryRoutes.post('/v1/crm-record/lead', rateLimitMiddleware, async (req, res) => {
-//     try {
-//         const {
-//             fullname, 
-//             contactNumber,
-//             email,
-//             subject,
-//             message
-//         } = req.body;
-
-//         const check_inquiry = await createInquiryRecord({
-//             model: "bedspacio.inquiry", 
-//             values: {
-//                 form_type: 'contact',
-//                 full_name: fullname,
-//                 contact_number: contactNumber,
-//                 email: email,
-//                 others: message,
-//                 ip_address: req.ipAddress
-//             }
-//         })
-
-//         if (!check_inquiry?.length) {
-//             return res.status(50).json({
-//                 success: false,
-//                 message: "Failed to create inquiry record"
-//             })
-//         }
-
-//         const inquiryId = check_inquiry[0];
-
-//         if (check_inquiry) {
-//             const result = await createCrmRecord({
-//                 model: "crm.lead",
-//                 values: {
-//                     name: `Lead - ${fullname} (${subject})`,
-//                     type: "lead",
-//                     contact_name: fullname,
-//                     email_from: email,
-//                     phone: contactNumber,
-//                     description: message
-//                 }
-//             });
-
-//             const new_id = Array.isArray(result) && result.length > 0 ? result[0] : null;
-    
-//             if (!new_id) {
-//                 throw new Error("[lead] CRM record creation failed");
-//             }
-
-//             try {
-//                 if (new_id) {
-//                     await executeKw({
-//                         model: "bedspacio.inquiry",
-//                         method: "update_crm_status",
-//                         kwargs: {
-//                             record_id: inquiryId,
-//                             status: "sent",
-//                             crm_id: new_id
-//                         }
-//                     });
-//                 }
-//             } catch (e) {
-//                 console.error("Failed to update CRM status:", e);
-//             }
-            
-//             console.log('[CreateCrmRecord] New ID: ', new_id);
-    
-//             return res.json({
-//                 success: true,
-//                 data: result,
-//                 message: '[Lead] Form submitted successfully'
-//             });
-//         }
-        
-//     } catch (err) {
-//         console.error('Error creating crm record: ', err);
-
-//         const odooMessage = extractOdooError(err)
-
-//         return res.status(500).json({
-//             success: false,
-//             message: odooMessage
-//         })
-//     }
-// });
-
-
-
-// FROM POSTGRES
-
-// inquiryRoutes.post('/v1/room-inquiry', rateLimitMiddleware,  async (req, res) => {
-//     try {
-//         const { 
-//             room_uuid,
-//             expected_revenue,
-//             fullname,
-//             email,
-//             contact_number,
-//             schedule,
-//             target_move_in,
-//             months_of_stay,
-//             message,
-//             type = 'room_inquiry',
-//             status = 'pending'
-//         } = req.body;
-
-//         const ip_address = req.ip;
-
-//         const inquiry = await db.one(
-//             `
-//                 INSERT INTO inquiries (
-//                     room_uuid, 
-//                     expected_revenue,
-//                     fullname,
-//                     email,
-//                     contact_number,
-//                     schedule,
-//                     target_move_in,
-//                     months_of_stay,
-//                     message,
-//                     ip_address,
-//                     type,
-//                     status
-//                 ) VALUES (
-//                     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
-//                 ) RETURNING id
-//             `, [
-//                 room_uuid,
-//                 expected_revenue,
-//                 fullname,
-//                 email,
-//                 contact_number,
-//                 schedule,
-//                 target_move_in,
-//                 months_of_stay,
-//                 message,
-//                 ip_address,
-//                 type,
-//                 status
-//             ]
-//         );
-
-//         console.log(inquiry)
-
-//         return res.status(200).json(inquiry)
-
-//     } catch (err) {
-//         console.log('Error creating inquiry data: ', err);
-//         return res.status(500).json({
-//             success: false,
-//             message: "Internal server error"
-//         });
-//     }
-// });
-
 
 
 /*
@@ -626,207 +281,11 @@ inquiryRoutes.post('/v2/room-inquiry/manual', inquiryLimiter, async (req, res) =
 
 
 /*
-    PLANNING TO REMOVE - general-inquiry post route - 6/8/2026
-*/
-
-inquiryRoutes.post('/v1/general-inquiry', inquiryLimiter, async (req, res) => {
-    try {
-        const {
-            fullname,
-            contact_number,
-            email,
-            subject,
-            message,
-            type='general_inquiry'
-        } = req.body;
-
-        const ip_address = req.ip;
-
-        const inquiry = await db.one(
-            `INSERT INTO inquiries (
-                fullname,
-                contact_number,
-                email,
-                subject,
-                message,
-                type,
-                ip_address
-            ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7
-            ) RETURNING id;`, 
-            [fullname, contact_number, email, subject, message, type, ip_address]
-        );
-
-        console.log('Created general inquiry ID: ', inquiry.id);
-
-        return res.status(200).json(inquiry);
-
-    } catch (err) {
-        console.log('Error submitting inquiry: ', err);
-
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        })
-    }
-})
-
-
-// inquiryRoutes.get('/v1', async (req, res) => {
-//     try {
-
-//         const status = req.query.status;
-
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = 25;
-//         const offset = (page - 1) * limit;
-
-//         console.log('STATUS:', status);
-//         console.log('PAGE:', page);
-
-//         const result = await db.manyOrNone(
-//             `SELECT 
-//                 id,
-//                 type,
-//                 fullname,
-//                 email,
-//                 status,
-//                 created_at
-//             FROM inquiries 
-//             WHERE 
-//                 is_archived = false
-//                 AND ($1::text IS NULL OR status = $1)
-//             ORDER BY id ASC`,
-//             [ status || null ]
-//         )
-
-        
-
-//         return res.status(200).json({
-//             data: result,
-//             pagination: {
-//                 page,
-//                 limit,
-//                 total: countResult.total,
-//                 totalPages: Math.ceil(countResult.total / limit)
-//             }
-//         });
-
-//     } catch (err) {
-//         console.error('Error retrieving room inquiries: ', err);
-//         return res.status(500).json({
-//             message: 'Internal server error'
-//         })
-//     }
-// });
-
-
-
-
-/*
     Reason for commenting ('/inquiry/v1'): 
     This is used on the version where GHL or any other third party CRM is used.
     This holds on to the status used on the inquiries table on the database (postgres)
     - If GHL is used, no need to qury for status, instead use ghl_status 
 */
-
-// inquiryRoutes.get('/v1', async (req, res) => {
-//     try {
-//         const status = req.query.status;
-//         const search = req.query.search; 
-
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = 25;
-//         const offset = (page - 1) * limit;
-
-//         console.log('STATUS:', status);
-//         console.log('SEARCH:', search);
-//         console.log('PAGE:', page);
-
-//         // MAIN QUERY (paginated)
-//         const result = await db.manyOrNone(
-//             `
-//             SELECT 
-//                 id,
-//                 type,
-//                 reference_number,
-//                 fullname,
-//                 contact_number,
-//                 room_uuid,
-//                 status,
-//                 created_at
-//             FROM inquiries
-//             WHERE 
-//                 is_archived = false
-
-//                 AND ($1::text IS NULL OR status = $1)
-
-//                 AND (
-//                     $2::text IS NULL OR
-//                     reference_number ILIKE '%' || $2 || '%' OR
-//                     fullname ILIKE '%' || $2 || '%' OR
-//                     contact_number ILIKE '%' || $2 || '%' OR
-//                     room_uuid ILIKE '%' || $2 || '%'
-//                 )
-
-//             ORDER BY id DESC
-//             LIMIT $3 OFFSET $4
-//             `,
-//             [
-//                 status || null,
-//                 search || null,
-//                 limit,
-//                 offset
-//             ]
-//         );
-
-//         // COUNT QUERY
-//         const countResult = await db.one(
-//             `
-//             SELECT COUNT(*)::int AS total
-//             FROM inquiries
-//             WHERE 
-//                 is_archived = false
-
-//                 AND ($1::text IS NULL OR status = $1)
-
-//                 AND (
-//                     $2::text IS NULL OR
-//                     reference_number ILIKE '%' || $2 || '%' OR
-//                     fullname ILIKE '%' || $2 || '%' OR
-//                     contact_number ILIKE '%' || $2 || '%' OR
-//                     room_uuid ILIKE '%' || $2 || '%'
-//                 )
-//             `,
-//             [
-//                 status || null,
-//                 search || null
-//             ]
-//         );
-
-//         const totalPages = Math.ceil(countResult.total / limit);
-
-//         return res.status(200).json({
-//             data: result,
-//             pagination: {
-//                 page,
-//                 limit,
-//                 total: countResult.total,
-//                 totalPages
-//             }
-//         });
-
-//     } catch (err) {
-//         console.error('Error retrieving inquiries:', err);
-//         return res.status(500).json({
-//             message: 'Internal server error'
-//         });
-//     }
-// });
-
-
-
-
 inquiryRoutes.get('/v1', async (req, res) => {
     try {
         const ghl_status = req.query.ghl_status;
@@ -1127,9 +586,68 @@ inquiryRoutes.get('/v1/details/:id', async (req, res) => {
 
 
     !!!! UNCOMMENTING TEMPORARILY TO CREATE FALLBACKS - 6/8/2026
+
+
+
+    No need to use if GHL is integrated - 06-15-2026
 */
 
 
+inquiryRoutes.patch('/v1/:id/fields', requireAuth, async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const {
+            room_uuid,
+            target_move_in,
+            months_of_stay
+        } = req.body;
+
+        const updates = [];
+        const values = [];
+        
+        if (room_uuid ) {
+            updates.push(`room_uuid = $${values.length + 1}`);
+            values.push(room_uuid);
+        }
+
+        if (target_move_in ) {
+            updates.push(`target_move_in = $${values.length + 1}`);
+            values.push(target_move_in);
+        }
+
+        if (months_of_stay ) {
+            updates.push(`months_of_stay = $${values.length + 1}`);
+            values.push(months_of_stay);
+        }
+
+        values.push(Number(id));
+
+        await db.none(
+            `UPDATE inquiries
+            SET ${updates.join(', ')}
+            WHERE id = $${values.length}`,
+            values
+        );
+
+        return res.status(200).json({
+            success: true
+        })
+
+    } catch (err) {
+        console.log('Error updating inquiry: ', err);
+
+        return res.status(500).json({
+            success: false
+        })
+    }
+})
+
+
+
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 inquiryRoutes.patch('/v1/status/:id', requireAuth, async (req, res) => {
     try {
         const id = Number(req.params.id);
@@ -1197,7 +715,11 @@ inquiryRoutes.patch('/v1/status/:id', requireAuth, async (req, res) => {
 /* 
     USE THIS AS FALLBACK IF GHL is not INTEGRATED
     ---- 06-08-2026
+
+    No need to use if GHL is integrated
+    - 06-15-2026
 */
+
 inquiryRoutes.patch('/v2/status/:id/fallback', requireAuth, async (req, res) => {
     try {
         const id = Number(req.params.id);
@@ -1266,7 +788,10 @@ inquiryRoutes.patch('/v2/status/:id/fallback', requireAuth, async (req, res) => 
 
 
 
-
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/ 
 inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
     try {
         const ids = req.body;
@@ -1337,7 +862,10 @@ inquiryRoutes.delete('/v1/multiple', requireAuth, async (req, res) => {
 
 
 
-
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/ 
 inquiryRoutes.delete('/v1/archive/multiple', requireAuth, async (req, res) => {
     try {
         const { ids } = req.body;
@@ -1382,6 +910,10 @@ inquiryRoutes.delete('/v1/archive/multiple', requireAuth, async (req, res) => {
 
 
 
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/ 
 inquiryRoutes.patch('/v1/archive/multiple', requireAuth, async (req, res) => {
     try {
         const { ids } = req.body;
@@ -1425,7 +957,10 @@ inquiryRoutes.patch('/v1/archive/multiple', requireAuth, async (req, res) => {
 });
 
 
-
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/ 
 inquiryRoutes.patch('/v1/unarchive/multiple', requireAuth, async (req, res) => {
     try {
         const { ids } = req.body;
@@ -1470,7 +1005,10 @@ inquiryRoutes.patch('/v1/unarchive/multiple', requireAuth, async (req, res) => {
 
 
 
-
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/ 
 inquiryRoutes.delete('/v1/archived/:id', requireAuth, async (req, res) => {
     try {
 
@@ -1515,6 +1053,10 @@ inquiryRoutes.delete('/v1/archived/:id', requireAuth, async (req, res) => {
 
 
 // Delete single inqiury
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 inquiryRoutes.delete('/v1/:id', requireAuth, async (req, res) => {
     try {
 
@@ -1569,6 +1111,10 @@ inquiryRoutes.delete('/v1/:id', requireAuth, async (req, res) => {
 
 // adding a note on the inquiry
 // each note submits the time and the user who added the note
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 
 inquiryRoutes.post('/v1/:id/note', requireAuth, async (req, res) => {
     try {
@@ -1664,6 +1210,10 @@ inquiryRoutes.post('/v1/:id/note', requireAuth, async (req, res) => {
 // all archived inquiries are moved to another page
 
 // This is to archive a single inquiry
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/ 
 inquiryRoutes.patch('/v1/archive/:id', requireAuth, async (req, res) => {
     try {
         const id = Number(req.params.id);
@@ -1721,6 +1271,10 @@ inquiryRoutes.patch('/v1/archive/:id', requireAuth, async (req, res) => {
 });
 
 
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 // restore inquiry to unarchived (is_archived = false)
 inquiryRoutes.patch('/v1/unarchive/:id', requireAuth, async (req, res) => {
     try {
@@ -1781,6 +1335,10 @@ inquiryRoutes.patch('/v1/unarchive/:id', requireAuth, async (req, res) => {
 
 
 // all archived inquiries
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 inquiryRoutes.get('/v1/archived', async (req, res) => {
     try {
 
@@ -1843,6 +1401,10 @@ inquiryRoutes.get('/v2/archived/fallback', async (req, res) => {
 
 
 // check for the details of an archived inquiry based on ID
+/*
+    No need to use if GHL is integrated
+    - 06-15-2026
+*/
 inquiryRoutes.get('/v1/details/:id/archived', async (req, res) => {
     try {
         const id = req.params.id;

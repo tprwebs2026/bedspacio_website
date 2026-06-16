@@ -94,7 +94,6 @@ export default function BranchPageWrapper ({ branches: initialBranches }: branch
         <>
             <div className="flex w-full h-auto">
                 <div className="flex flex-col w-full h-auto px-[1rem] xl:px-[8rem] lg:px-[1rem] py-[1rem] gap-[2rem]">
-                    
                     <div className="flex items-center justify-between w-full">
                         <span className="text-[28px] text-[#1D242B] font-bold">Branch</span>
 
@@ -104,23 +103,23 @@ export default function BranchPageWrapper ({ branches: initialBranches }: branch
                         </button>
                     </div>
 
-                        {/* Block */}
-                        {branches.length > 0 ? (
-                            branches.map((branch: branchType) => (
-                                <div className="grid grid-cols-4 xl:grid-cols-5 w-full gap-2">
-                                    <BranchCardWrapper 
-                                        key={branch.id}
-                                        viewModal={() => viewBranch(branch)} 
-                                        branchData={branch}
-                                    />
-                                </div>
-                            ))
-                        ) : (
-                            <div className="flex items-center justify-center w-full h-[500px]" >
-                                <span className='text-[16px] text-[#1D242B] font-bold'>No branches created yet..</span>
-                            </div>
-                        )}
-                    </div>
+                    {/* Block */}
+                    {branches.length > 0 ? (
+                        <div className="grid grid-cols-4 xl:grid-cols-5 w-full gap-2">
+                            {branches.map((branch: branchType) => (
+                                <BranchCardWrapper 
+                                    key={branch.id}
+                                    viewModal={() => viewBranch(branch)} 
+                                    branchData={branch}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-center h-[500px]" >
+                            <span className='text-[16px] text-[#1D242B] font-bold'>No branches created yet..</span>
+                        </div>
+                    )}
+                </div> 
             </div>
 
             {isModalOpen && (

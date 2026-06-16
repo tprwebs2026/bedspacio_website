@@ -4,6 +4,7 @@ import Manage from '@/asset/icon/settings.svg'
 import axios from 'axios'
 import { useState } from 'react'
 import { useAuth } from "@/context/AuthContext"
+import { BASE_URL } from '@/config/config'
 
 import ErrorToast from '@/components/admin/Toast/ErrorToast'
 import SuccessToast from '@/components/admin/Toast/SuccessToast'
@@ -13,6 +14,8 @@ import PasswordChangeModal from './PasswordChangeModal'
 export default function UserProfile () {
 
     const user = useAuth();
+
+    console.log('Username: ', user);
 
     const [fullname, setFullname] = useState<string | undefined>(user?.fullname);
     const [username, setUsername] = useState<string | undefined>(user?.username);
@@ -72,14 +75,13 @@ export default function UserProfile () {
     const imageSrc = 
         imagePreview ||
         (user?.profile_image
-            ? `http://localhost:5000/file/user/${user?.profile_image}`
+            ? `${BASE_URL}/file/user/${user?.profile_image}`
             : undefined
         ) 
 
 
     const handleProfileChange = async (id: number) => {
-        const base_url = 'http://localhost:5000'
-
+        console.log('Click');
         try {
             const profileData = new FormData();
 
@@ -98,7 +100,7 @@ export default function UserProfile () {
                 profileData.append('profile_image', imageBlob)
             }
 
-            const user_updated = await axios.patch(`${base_url}/user/v1/profile/${id}`,
+            const user_updated = await axios.patch(`${BASE_URL}/user/v1/profile/${id}`,
                 profileData, { withCredentials: true }
             );
 
@@ -180,7 +182,7 @@ export default function UserProfile () {
 
                         <div className="flex items-center justify-center w-full gap-2" >
                             {checkChanges && (
-                                <button onClick={() => handleProfileChange(user?.id)} className='bg-[#0077C0] text-[#FAFAFA] p-2 px-4 rounded-[10px] cursor-pointer'>Update</button>
+                                <button onClick={() => handleProfileChange(user?.id)} className='bg-[#0077C0] text-[#FAFAFA] p-2 px-4 rounded-[10px] hover:bg-[#0077C0]/75 active:bg-[#0077C0] cursor-pointer'>Update</button>
                             )}
                         </div>
                     </div>

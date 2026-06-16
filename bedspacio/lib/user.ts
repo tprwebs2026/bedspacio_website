@@ -7,6 +7,10 @@ import { BASE_URL } from "@/config/config";
 import { redirect } from "next/navigation";
 
 
+/*
+    Used for authentication purposes
+    - checks only if a user is logged in 
+*/
 export const getCurrentUser = async () => {
     try {
         const cookieStore = await cookies();
@@ -40,9 +44,15 @@ export const getCurrentUser = async () => {
 };
 
 
+/*
+    Calls on teh function getCurrentUserInfo
+    - gets the data of user such as fullname, username, role, contact and profile image
+    - if all data from user is not existing, admin user is redirected to the login page.
 
+    
+*/ 
 export async function requireUser() {
-    const user = await getCurrentUser();
+    const user = await getCurrentUserInfo();
 
     // Actual unauthenticated user
     if (!user) {
@@ -79,6 +89,9 @@ export const getCurrentUserInfo = async () => {
 };  
 
 
+// Gathers all the data of users 
+// displays the name, username, email and role
+
 export const getAllUsers = async () => {
     try {
 
@@ -114,6 +127,7 @@ export const getUserInfo = async (id: number) => {
         console.error('Failed to retrieve user information: ', err);
     }
 }
+
 
 export const getPropertyManagers = async () => {
     try {

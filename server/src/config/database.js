@@ -2,10 +2,9 @@ import pgPromise from 'pg-promise';
 import pgSession from 'connect-pg-simple';
 import { Pool } from 'pg';
 import session from 'express-session';
-
-import dotenv from 'dotenv'
 import connectPgSimple from 'connect-pg-simple';
-dotenv.config({path: '.env'});
+
+
 
 const PostgreSession = connectPgSimple(session);
 const pgp = new pgPromise();

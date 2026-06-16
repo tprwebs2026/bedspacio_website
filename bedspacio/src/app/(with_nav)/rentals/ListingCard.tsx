@@ -109,6 +109,7 @@ type Inclusions = {
 
 export type ListingDetail = {
     id: number,
+    room_uuid: string,
     title: string,
     type: string,
     gender: string,
@@ -126,9 +127,9 @@ type ListingDetailProps = {
 
 export default function ListingCard ({ detail }:ListingDetailProps) {
 
-
+    console.log('Room uuid in details: ', detail);
     return (
-        <Link key={detail.id} href={`/rentals/${detail.id}`} className="group flex flex-col items-center h-[500px] bg-[#FAFAFA] rounded-[10px] p-3 gap-2 border-1 border-[#1D242B]/25 cursor-pointer hover:border-[#1D242B] active:bg-[#C7EEFF] transition-all duration-100">
+        <Link key={detail.room_uuid} href={`/rentals/${detail.room_uuid}`} className="group flex flex-col items-center h-[500px] bg-[#FAFAFA] rounded-[10px] p-3 gap-2 border-1 border-[#1D242B]/25 cursor-pointer hover:border-[#1D242B] active:bg-[#C7EEFF] transition-all duration-100">
             <div className="relative flex items-center justify-center w-full min-h-[300px] bg-[#C7EEFF] rounded-[5px]">
                 <div className="absolute top-2 left-2 flex items-center px-2 py-1 rounded-[5px] bg-[#1D242B] gap-1 z-10">
                     <span className="text-[12px] text-[#FAFAFA]">{detail.type !== 'bedspace' ? 'Apartment' : 'Bedspace'}</span>

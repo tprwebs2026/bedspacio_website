@@ -1,33 +1,8 @@
 import express from 'express';
 import { db } from '../config/database.js';
-import { searchRead } from '../odoo/odoo.service.js';
-import { readByIds } from '../odoo/odoo.service.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const inclusionRoute = express.Router();
-
-inclusionRoute.get('/v1', async (req, res, next) => {
-    try {
-        const inclusions = await searchRead({
-            model: "bedspacio.room.inclusion",
-            domain: [],
-            fields: [ "name", "slug" ],
-            limit: 20,
-            offset: 0,
-            order: "id asc"
-        });
-
-        res.json(inclusions.map(
-            inc => ({
-                id: inc.id,
-                name:inc.name,
-                slug: inc.slug
-            })
-        )) ?? [];
-    } catch (err) {
-        next(err);
-    }
-});
 
 
 // FROM DATABASE

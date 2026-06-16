@@ -1,8 +1,5 @@
 import express from 'express';
-import { searchRead } from '../odoo/odoo.service.js';
-import { readByIds } from '../odoo/odoo.service.js';
 import { requireAuth } from '../middleware/auth.js';
-
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -18,39 +15,7 @@ const branchRoute = express.Router();
 */
 
 
-branchRoute.get('/v1', async (req, res, next) => {
-    try {
-        const domain = [];
 
-        const branches = await searchRead({
-            model: "bedspacio.branch",
-            domain,
-            fields: [
-                "branch_name", 
-                // "branch_image",
-                "address"
-            ],
-            limit: 20,
-            offset: Number(req.query.offset || 0),
-            order: "id asc"
-        });
-
-        res.json(
-            branches.map(branch => ({
-                id: branch.id,
-                name: branch.branch_name,
-                branch_image: `/web/image/bedspacio.branch/${branch.id}/branch_image`,
-                address:branch.address
-            }))
-        )
-
-    } catch (err) {
-        next(err);
-    }
-})
-
-
-// TODO: Add image upload later on
 branchRoute.post('/v1/new', requireAuth, branchImage.single('branch_image'), async (req, res) => {
     try {
         const { name, address, userId } = req.body;
@@ -191,6 +156,8 @@ branchRoute.get('/v1/preview', async (req, res) => {
         return res.status(500).json({ message: 'Internal server error' })
     }
 })
+
+
 
 branchRoute.get('/v1/preview/name-address', async (req, res) => {
     try {
