@@ -51,6 +51,7 @@ inquiryRoutes.post('/v1/room-inquiry', inquiryLimiter, async (req, res) => {
                 fullname,
                 email,
                 contact_number,
+                subject,
                 work_schedule,
                 target_move_in,
                 months_of_stay,
@@ -59,7 +60,7 @@ inquiryRoutes.post('/v1/room-inquiry', inquiryLimiter, async (req, res) => {
                 type, 
                 reference_number
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
             )
             RETURNING id, created_at
             `,
@@ -69,6 +70,7 @@ inquiryRoutes.post('/v1/room-inquiry', inquiryLimiter, async (req, res) => {
                 fullname,
                 email,
                 contact_number,
+                `Room Inquiry - ${fullname}-${room_uuid}`,
                 work_schedule,
                 target_move_in,
                 months_of_stay,
@@ -135,6 +137,7 @@ inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
                 fullname,
                 email,
                 contact_number,
+                subject,
                 work_schedule,
                 target_move_in,
                 months_of_stay,
@@ -143,7 +146,7 @@ inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
                 type, 
                 reference_number
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
             )
             RETURNING id, created_at, reference_number
             `,
@@ -154,6 +157,7 @@ inquiryRoutes.post('/v2/room-inquiry', inquiryLimiter, async (req, res) => {
                 fullname,
                 email,
                 contact_number,
+                `Room Inquiry - ${fullname}-${room_uuid}`,
                 work_schedule,
                 target_move_in,
                 months_of_stay,
@@ -586,8 +590,6 @@ inquiryRoutes.get('/v1/details/:id', async (req, res) => {
 
 
     !!!! UNCOMMENTING TEMPORARILY TO CREATE FALLBACKS - 6/8/2026
-
-
 
     No need to use if GHL is integrated - 06-15-2026
 */

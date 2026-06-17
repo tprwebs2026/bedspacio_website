@@ -11,6 +11,8 @@ import Pagination from "./Pagination";
 import Breadcrumbs from "@/components/BreadCrumb"
 
 import { Metadata } from "next";
+import { getRentalsPageBanner } from "../../../../lib/content";
+import { BASE_URL } from "@/config/config";
 
 export const metadata: Metadata = {
     title: "Rentals | BedSpacio",
@@ -27,6 +29,8 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
     inclusion?: string[]
 }>
 }) {
+
+    const bannerImage = await getRentalsPageBanner();
     
     const params = await searchParams;
     const page = Math.max(Number(params.page ?? "1"), 1);
@@ -62,7 +66,7 @@ export default async function Rentals({ searchParams }: { searchParams: Promise 
 
             <section className="relative flex flex-col items-center justify-center w-full h-auto bg-[#1D242B] py-[2rem] px-[1rem] xl:px-0 lg:px-0 md:px-0 rounded-0 xl:rounded-[5px] lg:rounded-[5px]">
                 <span className="text-[#0077C0] text-[32px] font-bold">Customise Filter</span>
-                <img src="/image/rentas_bg_image.jpg" alt="rentals-header-image"  className="absolute inset-0 w-full h-full object-cover opacity-25"/>
+                <img src={`${BASE_URL}/file/content/rentals/${bannerImage.asset_url}`} alt="rentals-header-image"  className="absolute inset-0 w-full h-full object-cover opacity-25"/>
 
                 <SearchFilter />    
             </section>

@@ -1,5 +1,7 @@
 
 import { Metadata } from "next"
+import { getHowItWorksPageBanner } from "../../../../lib/content"
+import { BASE_URL } from "@/config/config";
 
 export const metadata: Metadata = {
     title: "How it Works | BedSpacio"
@@ -7,13 +9,14 @@ export const metadata: Metadata = {
 
 export default async function HowItWorks() {
 
+    const Banner = await getHowItWorksPageBanner();
 
     return (
         <div className="flex flex-col items-center justify-start min-h-screen w-full">
 
             <div className="relative flex w-full h-screen xl:h-[350px] lg:h-[350px] md:h-screen items-center justify-center bg-[#1D242B] overflow-hidden">
                 <div className="absolute flex items-center justify-center w-full inset-0 opacity-25">
-                    <img src="/image/how_it_works.jpg" alt="how-it-works" className="w-full h-full object-cover" />
+                    <img src={`${BASE_URL}/file/content/how-it-works/${Banner?.asset_url}`} alt="how-it-works" className="w-full h-full object-cover" />
                 </div>
 
                 <div className="absolute flex flex-col items-center justify-center">

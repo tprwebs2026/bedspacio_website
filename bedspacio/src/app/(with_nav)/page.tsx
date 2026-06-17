@@ -13,6 +13,8 @@ import ReviewsMobile from '@/components/reviewsMobile'
 import BranchRoomCard from '@/components/Branch&RoomCard'
 import HomeInquiryRedirect from './(home-inquiry)/HomeInquiryRedirect'
 import VideoDemo from '@/components/VideoDemo'
+import { getHomePageBanner } from '../../../lib/content'
+import { BASE_URL } from '@/config/config'
 
 export const metadata: Metadata = {
     title: 'Home | BedSpacio',
@@ -20,12 +22,14 @@ export const metadata: Metadata = {
 }
 
 export default async function Home() {
+
+    const heroImage = await getHomePageBanner();
     
     return (
         <div className="flex flex-col min-h-screen items-start justify-start ">
             
             <section className="relative flex flex-col w-full min-h-[800px] xl:h-screen items-center justify-center bg-[#0077C0] xl:items-start xl:justify-center lg:items-start lg:justify-center lg:h-[800px]">
-                <img src="/image/BedSpacio.png" alt="bedspacio-header-image" className='h-full w-full object-cover absolute inset-0 opacity-10'/>
+                <img src={`${BASE_URL}/file/content/home/${heroImage.asset_url}`} alt="bedspacio-header-image" className='h-full w-full object-cover absolute inset-0 opacity-10'/>
 
                 <div className="absolute flex flex-col items-center justify-center xl:justify-center lg:justify-center md:justify-center w-full h-auto xl:gap-[5rem] lg:gap-[5rem] gap-[5rem] p-[1rem] border-box xl:p-0 lg:p-[1rem] md:p-[2rem]">
                     <div className="flex flex-col items-center justify-center gap-[1rem] xl:gap-[2rem] lg:gap-[2rem] md:gap-[1rem] xl:w-[800px] lg:w-[800px] md:w-[800px]">
