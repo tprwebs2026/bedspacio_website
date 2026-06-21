@@ -13,9 +13,11 @@ export default function NotFound () {
                 <span className='font-bold text-[28px] text-[#1D242B]'>Unauthorized</span>
             </div>
 
+            <span>It seems like you are trying to access a page that is not in the scope of your authorization!</span>
+
             <Link href={"/admin"} className='flex items-center gap-2 border-2 border-[#1D242B] rounded-full px-[1rem] py-[0.2rem] hover:bg-[#1D242B]/10 active:bg-[#FAFAFA] transition-all duration-100'>
-                <Arrow className="w-[25px] h-[25px] -rotate-180" />
-                Go back to home page
+                <Arrow className="w-[25px] h-[25px] -rotate-180 stroke-[#1D242B] stroke-2" />
+                Go back to dashboard page
             </Link>
         </div>
     )

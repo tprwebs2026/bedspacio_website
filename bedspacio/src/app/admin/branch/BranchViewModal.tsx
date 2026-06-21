@@ -50,8 +50,10 @@ export default function BranchViewModal ({ propertyManagers, branch, isModalOpen
     const [branchAddress, setBranchAddress] = useState<string>(branch.address ?? '');
     const [branchImagePreview, setBranchImagePreview] = useState<string | undefined>(undefined)
     const [branchImageBlob, setBranchImageBlob] = useState<File | null>(null)
+    const [updatedBranchImage, setUpdatedBranchImage] = useState<string>(branch?.image)
     const [selectedPropertyManager, setSelectedPropertyManager] = useState<number>(branch.property_manager_id);
 
+    const [loading, setLoading] = useState<boolean>(false)
 
     console.log('branch data: ', branch);
 
@@ -89,19 +91,11 @@ export default function BranchViewModal ({ propertyManagers, branch, isModalOpen
             if (branchImagePreview) {
                 URL.revokeObjectURL(branchImagePreview)
             }
-
             setBranchImageBlob(file);
             setBranchImagePreview(URL.createObjectURL(file))
         }
     };
 
-    const imageSrc =
-        branchImagePreview ||
-        (branch?.image
-            ? `http://localhost:5000/file/branch/image/${branch.image}`
-            : undefined);
-
-    
 
     const branchNameChanged = branchName !== branch.branch_name;
     const branchAddressChanged = branchAddress !== branch.address;
@@ -110,39 +104,55 @@ export default function BranchViewModal ({ propertyManagers, branch, isModalOpen
 
 
     const handleBranchChange = async (id: number) => {
-        const formData = new FormData();
+        setLoading(true);
+        try {
+            const formData = new FormData();
 
-        if (branchNameChanged) {
-            formData.append('name', branchName);
-        };
+            if (branchNameChanged) {
+                formData.append('name', branchName);
+            };
 
-        if (branchAddressChanged) {
-            formData.append('address', branchAddress);
-        };
+            if (branchAddressChanged) {
+                formData.append('address', branchAddress);
+            };
 
-        if (propertyManagerChanged) {
-            formData.append('property_manager_id', selectedPropertyManager.toString());
+            if (propertyManagerChanged) {
+                formData.append('property_manager_id', selectedPropertyManager.toString());
+            }
+
+            if (landmarksChanged) {
+                formData.append('landmarks', JSON.stringify(landmarks));
+            }
+
+            if (branchImageBlob) {
+                formData.append('branch_image', branchImageBlob)
+            }
+
+            await axios.patch(
+                `${BASE_URL}/branch/v1/${id}`,
+                formData , 
+                { withCredentials: true }
+            )
+                
+            onSuccess();
+            isModalOpen();
+
+            setSuccessMessage('Update success');
+            setTimeout(() => setSuccessMessage(''), 3500);
+            
+
+        } catch (err) {
+            console.error('Failed to update branch: ', err);
+        } finally {
+            setLoading(false);
         }
-
-        if (landmarksChanged) {
-            formData.append('landmarks', JSON.stringify(landmarks));
-        }
-
-        if (branchImageBlob) {
-            formData.append('branch_image', branchImageBlob)
-        }
-
-        const updated = await axios.patch(
-            `${BASE_URL}/branch/v1/${id}`,
-            formData , 
-            { withCredentials: true })
-
-        setSuccessMessage('Update success');
-
-        onSuccess();
-        setTimeout(() => setSuccessMessage(''), 3500);
-        isModalOpen();
     }
+
+    const imageSrc =
+        branchImagePreview ||
+        (updatedBranchImage
+            ? branch.image
+            : undefined);
 
 
     const DataChanges = branchNameChanged || branchAddressChanged || propertyManagerChanged || landmarksChanged || branchImageBlob
@@ -194,7 +204,7 @@ export default function BranchViewModal ({ propertyManagers, branch, isModalOpen
                     </div>
 
 
-                    <div className='flex flex-col w-full gap-[1rem]'>
+                    <div className='flex flex-col w-full gap-[1rem] h-[500px] overflow-y-auto thin-scrollbar'>
                         <div className='flex flex-col gap-2'>
                             <span className='text-[16px] font-bold'>Basic Information</span>
 
@@ -250,7 +260,7 @@ export default function BranchViewModal ({ propertyManagers, branch, isModalOpen
                 */}
                 <div className='flex items-center justify-end w-full gap-1'>
                     {DataChanges && (
-                        <button onClick={() => handleBranchChange(branch.id)} className='bg-[#0077C0] text-[#FAFAFA] font-bold rounded-[10px] p-2 px-4 cursor-pointer hover:bg-[#0077C0]/90 active:bg-[#0077C0]'>Save</button>
+                        <button onClick={() => handleBranchChange(branch.id)} className='bg-[#0077C0] text-[#FAFAFA] font-bold rounded-[10px] p-2 px-4 cursor-pointer hover:bg-[#0077C0]/90 active:bg-[#0077C0]'>{loading ? 'Saving...' : 'Save'}</button>
                     )}  
                     <button onClick={isModalOpen} className='bg-[#1D242B]/15 text-[#1D242B] font-bold rounded-[10px] p-2 cursor-pointer hover:bg-[#1D242B]/30 active:bg-[#FAFAFA]'>Close</button>
                 </div>

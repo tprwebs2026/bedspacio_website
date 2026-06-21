@@ -1,111 +1,34 @@
 import multer from 'multer';
 
-const branchImageStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'file/branch/image');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-})
+const storage = multer.memoryStorage();
 
-export const branchImage = multer({ 
-    storage: branchImageStorage
+const imageUpload = multer({
+    storage,
+    limits: {
+        fileSize: 2 * 1024 * 1024,
+    },
+    fileFilter: (req, file, cb) => {
+        const allowedMimeTypes = [
+            "image/jpeg",
+            "image/png",
+        ];
+
+        if (allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(
+                new Error("Only JPG and PNG images are allowed.")
+            );
+        }
+    },
 });
 
+export const branchImage = imageUpload;
+export const userImage = imageUpload;
+export const roomImage = imageUpload;
 
-
-const userImageStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'file/user');
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    }
-})
-
-export const userImage = multer({
-    storage: userImageStorage
-})
-
-
-
-const roomImageStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'file/room/image');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-})
-
-export const roomImage = multer({
-    storage: roomImageStorage
-})
-
-
-
-// Content images
-const homeImageStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'file/content/home');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-})
-
-export const homeContentImage = multer({
-    storage: homeImageStorage
-})
-
-
-
-const rentalImageStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'file/content/rentals');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-})
-
-export const rentalContentImage = multer({
-    storage: rentalImageStorage
-})
-
-
-const aboutusImageStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'file/content/about-us');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-})
-
-export const aboutUsContentImage = multer({
-    storage: aboutusImageStorage
-})
-
-
-
-const howItWorksImageStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'file/content/how-it-works');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-})
-
-export const howItWorksContentImage = multer({
-    storage: howItWorksImageStorage
-})
-
-
-
-// ------------ FOR RENDER ------------- //
-/*
-    Use this when deployed
-*/
+export const homeContentImage = imageUpload;
+export const rentalContentImage = imageUpload;
+export const aboutUsContentImage = imageUpload;
+export const howItWorksContentImage = imageUpload;
+export const contactContentImage = imageUpload;

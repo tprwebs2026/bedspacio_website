@@ -13,7 +13,7 @@ import ReviewsMobile from '@/components/reviewsMobile'
 import BranchRoomCard from '@/components/Branch&RoomCard'
 import HomeInquiryRedirect from './(home-inquiry)/HomeInquiryRedirect'
 import VideoDemo from '@/components/VideoDemo'
-import { getHomePageBanner } from '../../../lib/content'
+import { getHomePageBanner, getWhyChooseUsImages } from '../../../lib/content'
 import { BASE_URL } from '@/config/config'
 
 export const metadata: Metadata = {
@@ -21,15 +21,35 @@ export const metadata: Metadata = {
     description: 'asdasdas'
 }
 
+type whyChooseUsImage = {
+    asset_key: string,
+    asset_url: string
+}
+
 export default async function Home() {
 
     const heroImage = await getHomePageBanner();
+
+    const whyChooseUsImage = await getWhyChooseUsImages();
+
+    const topImage = whyChooseUsImage?.find((item: whyChooseUsImage) =>
+        item.asset_key === 'why_choose_us_top'
+    )?.asset_url;
+
+    const bottomLeftImage = whyChooseUsImage?.find((item: whyChooseUsImage) =>
+        item.asset_key === 'why_choose_us_bottom_left'
+    )?.asset_url;
+
+    const bottomRightImage = whyChooseUsImage?.find((item: whyChooseUsImage) =>
+        item.asset_key === 'why_choose_us_bottom_right'
+    )?.asset_url;
+
     
     return (
         <div className="flex flex-col min-h-screen items-start justify-start ">
             
             <section className="relative flex flex-col w-full min-h-[800px] xl:h-screen items-center justify-center bg-[#0077C0] xl:items-start xl:justify-center lg:items-start lg:justify-center lg:h-[800px]">
-                <img src={`${BASE_URL}/file/content/home/${heroImage.asset_url}`} alt="bedspacio-header-image" className='h-full w-full object-cover absolute inset-0 opacity-10'/>
+                <img src={heroImage.asset_url} alt="bedspacio-header-image" className='h-full w-full object-cover absolute inset-0 opacity-10'/>
 
                 <div className="absolute flex flex-col items-center justify-center xl:justify-center lg:justify-center md:justify-center w-full h-auto xl:gap-[5rem] lg:gap-[5rem] gap-[5rem] p-[1rem] border-box xl:p-0 lg:p-[1rem] md:p-[2rem]">
                     <div className="flex flex-col items-center justify-center gap-[1rem] xl:gap-[2rem] lg:gap-[2rem] md:gap-[1rem] xl:w-[800px] lg:w-[800px] md:w-[800px]">
@@ -71,15 +91,15 @@ export default async function Home() {
             <section className='flex xl:grid lg:grid xl:grid-cols-2 lg:grid-cols-2 md:grid md:grid-cols-2 w-full xl:min-h-[800px] lg:min-h-[800px] bg-[#FAFAFA] xl:px-[8rem] lg:px-[6rem] py-[3rem] xl:py-[6rem] lg:py-[6rem] md:py-[3rem]  gap-[1rem]'>
                 <div className='hidden xl:flex lg:flex md:flex flex-col w-full h-auto gap-2'>
                     <div className='flex items-center justify-center h-[325px] md:min-h-[325px] lg:min-h-[325px] sm:min-h-[325px] bg-[#C7EEFF] rounded-[15px] overflow-hidden'>
-                        <img src="/image/why_choose_us/image_1.jpg" alt="" className='w-full h-full object-cover'/>
+                        <img src={topImage} alt="why_choose_us_image_1" className='w-full h-full object-cover'/>
                     </div>
 
                     <div className='grid grid-cols-2 w-full gap-2'>
                         <div className='flex items-center justify-center h-[325px] w-full bg-[#C7EEFF] rounded-[15px] overflow-hidden'>
-                            <img src="/image/why_choose_us/image_2.jpg" alt="" className='w-full h-full object-cover'/>
+                            <img src={bottomLeftImage} alt="why_choose_us_image_2" className='w-full h-full object-cover'/>
                         </div>
                         <div className='flex items-center justify-center h-[325px] w-full bg-[#C7EEFF] rounded-[15px] overflow-hidden'>
-                            <img src="/image/why_choose_us/image_4.jpg" alt="" className='w-full h-full object-cover'/>
+                            <img src={bottomRightImage} alt="why_choose_us_image_2" className='w-full h-full object-cover'/>
                         </div>
                     </div>
                 </div>

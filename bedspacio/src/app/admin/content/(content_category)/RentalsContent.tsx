@@ -52,13 +52,6 @@ export default function RentalsContent ({
         setLoading(true);
 
         try {
-            await new Promise<void>((resolve) => {
-                setTimeout(() => {
-                    setLoading(true);
-                    resolve();
-                }, 1500);
-            });
-
             const bannerForm = new FormData();
             bannerForm.append('rental_hero_banner', bannerBlob);
 
@@ -81,11 +74,7 @@ export default function RentalsContent ({
         }
     }
 
-    const rentalBannerSrc =
-        bannerPreview ??
-        (updatedBanner
-            ? `${BASE_URL}/file/content/rentals/${updatedBanner}`
-            : undefined);
+    const rentalBannerSrc = bannerPreview ?? updatedBanner;
 
     return (
         <div className="flex flex-col w-full h-full items-center justify-start p-[2rem]">
@@ -112,7 +101,7 @@ export default function RentalsContent ({
                             <label htmlFor="banner_image" className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAFAFA] cursor-pointer hover:bg-[#C7EEFF] active:bg-[#FAFAFA]">
                                 <Upload className="w-[15px] h-[15px] fill-[#0077C0] stroke-2" />
                                 <span className="text-[#0077C0] text-[14px] font-bold">Replace</span>
-                                <input type="file" id="banner_image" hidden onChange={handleBannerChange}/>
+                                <input type="file" id="banner_image" accept=".jpg,.jpeg,.png,image/jpeg,image/png" hidden onChange={handleBannerChange}/>
                             </label>
                         )}
                     </div>

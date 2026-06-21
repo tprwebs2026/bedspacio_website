@@ -45,7 +45,43 @@ export const getYoutubeUrl = async () => {
         );
 
         return response.data;
-        
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getBedspaceTypeImage = async () => {
+    try {
+        const response = await axios.get(
+            `${BASE_URL}/content/v1/room-type/bedspace_image`,
+            { withCredentials:true }
+        );
+        return response.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getApartmentTypeImage = async () => {
+    try {
+        const response = await axios.get(
+            `${BASE_URL}/content/v1/room-type/apartment_image`,
+            { withCredentials:true }
+        );
+        return response.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getWhyChooseUsImages = async () => {
+    try {
+        const response = await axios.get(
+            `${BASE_URL}/content/v1/why-choose-us`,
+            { withCredentials: true }
+        );
+
+        return response.data;
     } catch (err) {
         throw err;
     }
@@ -61,7 +97,6 @@ export const getRentalsPageBanner = async () => {
             `${BASE_URL}/content/v1/rentals-banner`,
             { withCredentials: true }
         );
-
         return response.data; 
     } catch (err) {
         throw err;
@@ -79,7 +114,30 @@ export const getAboutUsPageBanner = async () => {
             `${BASE_URL}/content/v1/aboout-us-banner`,
             { withCredentials: true }
         );
+        return response.data; 
+    } catch (err) {
+        throw err;
+    }
+}
 
+export const getAboutUsWhoWeAreImage = async () => {
+    try {
+        const response = await axios.get(
+            `${BASE_URL}/content/v1/aboout-us/who-we-are`,
+            { withCredentials: true }
+        );
+        return response.data; 
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getAboutUsHistoryImage = async () => {
+    try {
+        const response = await axios.get(
+            `${BASE_URL}/content/v1/aboout-us/history`,
+            { withCredentials: true }
+        );
         return response.data; 
     } catch (err) {
         throw err;
@@ -94,6 +152,22 @@ export const getHowItWorksPageBanner = async () => {
     try {
         const response = await axios.get(
             `${BASE_URL}/content/v1/how-it-works-banner`,
+            { withCredentials: true }
+        );
+
+        return response.data; 
+    } catch (err) {
+        throw err;
+    }
+}
+
+
+// CONTACT
+
+export const getContactImage = async () => {
+    try {
+        const response = await axios.get(
+            `${BASE_URL}/content/v1/contacts`,
             { withCredentials: true }
         );
 

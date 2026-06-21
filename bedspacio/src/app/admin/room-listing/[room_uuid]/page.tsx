@@ -19,7 +19,8 @@ type PaymentTermViewType = {
 
 export type ImageViewType = {
     id: number,
-    image: string
+    image: string,
+    public_id?: string
 }
 
 export type BranchViewType = {
@@ -59,10 +60,7 @@ export default async function RoomViewPage ({ params }: { params: Promise<{ room
     }
 
     const { room_uuid } = await params;
-    console.log('Parameter ID: ', typeof room_uuid);
-
     const roomId = Number(room_uuid);
-    console.log('room uuid type: ', typeof roomId);
 
     const roomData = await getRoomById(roomId);
     const branches = await getBranchInfo();

@@ -21,10 +21,6 @@ import userRoute from './src/routes/user.routes.js';
 import userSetupRoute from './src/routes/user.setup.routes.js';
 
 
-// Routes for GoHighLevel
-import highRoute from './src/gohighlevel/routes/leads.route.js';
-
-
 const app = express();
 
 app.use(express.json());
@@ -38,18 +34,7 @@ app.use(cors({
 
 // used for postgres
 // file uploads for branch image, room image, and profile image
-// app.use('/file', express.static('file'));
-
-/*
-    Use this when express is deployed to render
-    This is will be the persistent disk folder for image storage
-*/
-const isProduction = process.env.NODE_ENV === 'production';
-const staticPath = isProduction 
-    ? '/opt/render/project/src/file'
-    : 'file';
-
-app.use('/file', express.static(staticPath));
+app.use('/file', express.static('file'));
 
 
 
@@ -85,8 +70,6 @@ app.use('/inquiry', inquiryRoutes);
 app.use('/dashboard', dashboardRoute);
 app.use('/content', contentRoute);
 
-// for GoHighLevel
-app.use('/gohighlevel', highRoute);
 
 
 app.get('/', (req, res) => {

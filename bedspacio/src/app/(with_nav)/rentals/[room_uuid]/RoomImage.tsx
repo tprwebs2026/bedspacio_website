@@ -177,7 +177,7 @@ export default function RoomImages ({ images }: RoomImageProp) {
                     
 
                     <img onClick={() => setFullViewOpen(prev => !prev)}
-                        src={`${BASE_URL}/file/room/image/${selectedImage?.image}`}
+                        src={selectedImage?.image}
                         alt="sample"
                         className="w-full h-full object-cover rounded-[10px]"
                     />
@@ -192,7 +192,7 @@ export default function RoomImages ({ images }: RoomImageProp) {
                         >
                             <img
                                 // src={`data:image/webp;base64,${img.image}`}
-                                src={`${BASE_URL}/file/room/image/${img.image}`}
+                                src={img.image}
                                 alt="sample"
                                 className={`w-full h-full object-cover opacity-50 active:opacity-100 ${selectedIndex === index && 'opacity-100'}`}
                             />
@@ -204,7 +204,7 @@ export default function RoomImages ({ images }: RoomImageProp) {
             <div className='hidden xl:flex lg:flex'>
                 {fullViewOpen && (
                     <ImageFullView 
-                        selectedImage={`${BASE_URL}/file/room/image/${selectedImage?.image}`}
+                        selectedImage={selectedImage?.image}
                         totalImage = {imagesLength}
                         onClose={() => setFullViewOpen(prev => !prev)}
                         viewLeft={toggleImageLeft}

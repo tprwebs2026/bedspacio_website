@@ -142,7 +142,7 @@ export default function ListingCard ({ detail }:ListingDetailProps) {
                 <div className="flex w-full h-full text-[#FAFAFA] rounded-[5px] overflow-hidden">
                     <img loading="lazy" 
                     // src={`data:image/webp;base64,${detail.thumbnail}`} 
-                    src={`${BASE_URL}/file/room/image/${detail.thumbnail}`}
+                    src={detail.thumbnail}
                     alt="thumbnail" className="group-hover:scale-102 transition-all duration-100 w-full h-full object-cover"/>
                 </div>
             </div>

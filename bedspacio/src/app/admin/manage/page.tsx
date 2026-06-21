@@ -3,7 +3,6 @@
 import { redirect } from "next/navigation";
 import { getAllUsers, getCurrentUser } from "../../../../lib/user"
 import Manage from "./Manage";
-import { ManageType} from "./Manage";
 
 export default async function PageWrapper () {
 

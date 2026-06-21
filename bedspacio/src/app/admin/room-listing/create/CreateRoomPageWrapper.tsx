@@ -2,6 +2,7 @@
 
 import axios from "axios"
 import { useState } from "react"
+import { BASE_URL } from "@/config/config"
 
 import Remove from '@/asset/icon/delete.svg'
 import GalleryWrapper from "./GalleryWrapper"
@@ -10,7 +11,6 @@ import BranchSelectionWrapper from "./BranchSelectionWrapper"
 
 import ErrorToast from "@/components/admin/Toast/ErrorToast"
 import SuccessToast from "@/components/admin/Toast/SuccessToast"
-import { stringify } from "querystring"
 import Link from "next/link"
 
 type PaymentTerms = {
@@ -66,6 +66,8 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
     const [totalAparmentCapacity, setTotalApartmentCapacity] = useState<number>(0)
     const [totalAparmentSlot, setTotalApartmentSlot] = useState<number>(0)
 
+    const [loading, setLoading] = useState<boolean>(false);
+
     const finalCapacity = 
         typeSelected === 'bedspace'
             ? totalBedspaceCapacity
@@ -120,8 +122,7 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
     }
 
     const handleSubmitNewRoom = async () => {
-        const base_url = 'http://localhost:5000'
-
+        setLoading(true);
         try {
             const formData = new FormData();
     
@@ -203,7 +204,7 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
             }
 
     
-            await axios.post(`${base_url}/room/v1/new-room`, formData, {
+            await axios.post(`${BASE_URL}/room/v1/new-room`, formData, {
                 withCredentials: true
             });
 
@@ -231,11 +232,12 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
             console.error('Failed to create new room: ', err);
             setErrorToastMessage('Failed to create room');
             setTimeout(() => setErrorToastMessage(''), 3500)
+        } finally {
+            setLoading(false);
         }
     }
 
     
-    console.log(paymentTermPair);
     return (
         <>
             <div className="flex w-full min-h-screen">
@@ -475,7 +477,7 @@ export default function CreateRoomPageWrapper ({ inclusions, branches }: RoomPro
                     </div>
 
                     <div className="flex items-center w-full items-end justify-end gap-1">
-                        <button onClick={handleSubmitNewRoom} className="flex items-center px-4 py-2 border-2 border-[#0077C0] bg-[#0077C0] hover:bg-[#006BAC] active:bg-[#0077C0] text-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">Create</button>
+                        <button onClick={handleSubmitNewRoom} className="flex items-center px-4 py-2 border-2 border-[#0077C0] bg-[#0077C0] hover:bg-[#006BAC] active:bg-[#0077C0] text-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">{loading ? 'Creating...' : 'Create'}</button>
                         <Link href={'/admin/room-listing'} className="flex items-center px-4 py-2 border-2 border-[#0077C0] text-[#0077C0] hover:bg-[#0077C0]/15 active:bg-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">Cancel</Link>
                     </div>
                 </div>

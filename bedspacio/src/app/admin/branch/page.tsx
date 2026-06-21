@@ -11,4 +11,4 @@ export default async function Branch () {
     const branches = await getAllBranches();
 
     return <BranchPageWrapper branches={branches}/>
-}
+} 

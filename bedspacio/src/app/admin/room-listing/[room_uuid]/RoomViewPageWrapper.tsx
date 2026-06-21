@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import axios from "axios";
 import { BASE_URL } from "@/config/config";
 import { useRouter } from "next/navigation";
@@ -32,6 +32,7 @@ type PaymentTerms = {
 
 type RoomImage = {
     preview: string;
+    public_id?: string,
     file?: File;
     existing: boolean;
 };
@@ -79,11 +80,12 @@ export default function RoomViewPageWrapper ({room, inclusions, branches }: Room
     const [images, setImages] = useState<RoomImage[]>(
         room.images.map(img => ({
             preview: img.image,
+            public_id: img.public_id,
             existing: true
         }))
     );
 
-    console.log('Selcted Inclusions: ', selectedInclusions);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const [paymentTermPair, setPaymentTermPair] =
     useState<PaymentTerms[]>(
@@ -130,6 +132,7 @@ export default function RoomViewPageWrapper ({room, inclusions, branches }: Room
 
 
     const handleRoomChange = async (id: number) => {
+        setLoading(true);
         try {
             const formData = new FormData();
 
@@ -214,7 +217,8 @@ export default function RoomViewPageWrapper ({room, inclusions, branches }: Room
                 JSON.stringify(
                     images
                         .filter(img => img.existing)
-                        .map(img => img.preview)
+                        .map(img => img.public_id)
+                        .filter(Boolean)
                 )
             );
 
@@ -236,10 +240,16 @@ export default function RoomViewPageWrapper ({room, inclusions, branches }: Room
             setSuccessMessage('Room updated successfully');
             setTimeout(() => setSuccessMessage(''), 3500);
 
+            if (updated.data.success) {
+                router.refresh();
+            }
+
         } catch (err) {
             console.error("Failed to update room:", err);
             setError('Update failed');
             setTimeout(() => setError(''), 3500);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -269,6 +279,23 @@ export default function RoomViewPageWrapper ({room, inclusions, branches }: Room
         }
     }
 
+    const imagesChanged = useMemo(() => {
+        const existingImages = images
+            .filter(img => img.existing)
+            .map(img => img.preview)
+            .sort();
+
+        const originalImages = room.images
+            .map(img => img.image)
+            .sort();
+
+        return (
+            JSON.stringify(existingImages) !==
+                JSON.stringify(originalImages) ||
+                images.some(img => !img.existing)
+        );
+    }, [images, room.images]);
+
 
     const changesMade = 
         title !== room.title ||
@@ -284,7 +311,7 @@ export default function RoomViewPageWrapper ({room, inclusions, branches }: Room
         JSON.stringify(selectedInclusions.sort()) !==
         JSON.stringify(
             room.inclusions.map((inc) => Number(inc.id)).sort()
-        );
+        ) || imagesChanged;
 
 
 
@@ -542,7 +569,7 @@ export default function RoomViewPageWrapper ({room, inclusions, branches }: Room
 
                     {changesMade && (
                         <div className="flex items-center w-full items-end justify-end gap-1">
-                            <button onClick={() => handleRoomChange(room.id)} className="flex items-center px-4 py-2 border-2 border-[#0077C0] bg-[#0077C0]/75 hover:bg-[#0077C0] active:bg-[#0077C0]/75 text-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">Save Changes</button>
+                            <button onClick={() => handleRoomChange(room.id)} className="flex items-center px-4 py-2 border-2 border-[#0077C0] bg-[#0077C0]/75 hover:bg-[#0077C0] active:bg-[#0077C0]/75 text-[#FAFAFA] font-bold rounded-[10px] cursor-pointer">{loading ? 'Saving changes...' : 'Save Changes'}</button>
                             <Link href={'/admin/room-listing'} className="flex items-center px-4 py-2 border-2 border-[#0077C0] hover:bg-[#0077C0]/15 active:bg-[#FAFAFA] text-[#0077C0] font-bold rounded-[10px] cursor-pointer">Cancel</Link>
                         </div>
                     )}

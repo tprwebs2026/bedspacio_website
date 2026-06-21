@@ -85,10 +85,7 @@ type RoomDetailType = {
 
 export default async function RoomDetails ({ params }: Props ) {
     const { room_uuid } = await params
-
     const room = await getRoomPreviewByUUID(room_uuid);
-
-    console.log('Details for rooms listing: ', room);
 
     return (
         <div className="flex flex-col items-start w-full min-h-screen">

@@ -18,9 +18,9 @@ import { BASE_URL } from "@/config/config";
 
 // icon
 import Upload from '@/asset/icon/upload.svg'
-import { BannerType } from "../ContentPageWrapper";
 
 // type imports
+import { BannerType } from "../ContentPageWrapper";
 
 
 interface HowItWorkContentProp {
@@ -100,7 +100,7 @@ export default function HowItWorksContent ({
     const aboutUsBannerSrc =
         bannerPreview ??
         (updatedBanner
-            ? `${BASE_URL}/file/content/how-it-works/${updatedBanner}`
+            ? updatedBanner
             : undefined);
 
 
@@ -110,12 +110,12 @@ export default function HowItWorksContent ({
         <div className="flex flex-col w-full h-full items-start justify-start p-[2rem]">
             <div className="flex flex-col items-center gap-[2rem] w-full">
                 <div className="flex flex-col items-center gap-2 w-full">
-                    <span className="font-bold">Banner Image</span>
+                    <span className="font-bold">How It Works Banner</span>
 
                     <div className="relative flex w-full items-center justify-center h-[300px] bg-[#1D242B]/25 rounded-[10px] overflow-hidden">
                         <div className="absolute inset-0 bg-black/50"/>
 
-                        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-2xl text-[#FAFAFA] text-center">How It Works Banner</span>
+                        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-2xl text-[#FAFAFA] text-center">Banner Image</span>
 
                         <div className="absolute bottom-3 right-3 flex items-center justify-center gap-1">
                             {bannerPreview ? (
@@ -132,7 +132,7 @@ export default function HowItWorksContent ({
                                 <label htmlFor="banner_image" className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAFAFA] cursor-pointer hover:bg-[#C7EEFF] active:bg-[#FAFAFA]">
                                     <Upload className="w-[15px] h-[15px] fill-[#0077C0] stroke-2" />
                                     <span className="text-[#0077C0] text-[14px] font-bold">Replace</span>
-                                    <input type="file" id="banner_image" hidden onChange={handleImageChange}/>
+                                    <input type="file" id="banner_image" accept=".jpg,.jpeg,.png,image/jpeg,image/png" hidden onChange={handleImageChange}/>
                                 </label>
                             )}
 
@@ -143,7 +143,7 @@ export default function HowItWorksContent ({
                 </div>
 
 
-                <div className="grid grid-cols-2 place-items-center justify-items-center gap-[2rem] w-full">
+                {/* <div className="grid grid-cols-2 place-items-center justify-items-center gap-[2rem] w-full">
                     <div className="flex flex-col items-center gap-2 w-full">
                         <span className="font-bold">Step 1 Image</span>
 
@@ -239,7 +239,9 @@ export default function HowItWorksContent ({
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
+
+
             </div>
         </div>
     )

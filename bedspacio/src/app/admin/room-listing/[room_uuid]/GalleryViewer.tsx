@@ -10,6 +10,7 @@ const MAX_IMAGES = 6;
 
 type RoomImage = {
     preview: string;
+    public_id?: string,
     file?: File;
     existing: boolean;
 };
@@ -82,7 +83,7 @@ export default function GalleryViewer ({ images, setImages }: GalleryViewerProps
                                 <img
                                     src={
                                         img.existing
-                                            ? `http://localhost:5000/file/room/image/${img.preview}`
+                                            ? img.preview
                                             : img.preview
                                     }
                                     alt=""

@@ -1,9 +1,10 @@
 import express from 'express';
 import axios from 'axios'
 import { db } from '../config/database.js';
-import { rateLimitMiddleware, inquiryLimiter } from '../middleware/rateLimit.js';
+import { inquiryLimiter } from '../middleware/rateLimit.js';
 import { requireAuth } from '../middleware/auth.js';
 
+import resend from '../service/resend.js';
 import { customAlphabet } from 'nanoid';
 
 const inquiryRoutes = express.Router();
@@ -40,7 +41,11 @@ inquiryRoutes.post('/v1/room-inquiry', inquiryLimiter, async (req, res) => {
         );
 
         const reference_number = `INQ-${nanoid()}`;
-
+        
+        const roomName = await db.one( 
+            `SELECT title FROM rooms WHERE room_uuid = $1`,
+            [ room_uuid ]
+        )
 
         // STEP 1: Insert inquiry
         const inquiry = await db.one(
@@ -80,6 +85,41 @@ inquiryRoutes.post('/v1/room-inquiry', inquiryLimiter, async (req, res) => {
                 reference_number
             ]
         );
+
+        try {
+            await resend.emails.send({
+                from: process.env.EMAIL_FROM,
+                to: email,
+                subject: `ROOM INQUIRY RECEIVED`,
+                html:`
+                    <div style="font-family: Arial, sans-serif; line-height: 1.5;">
+                        <h2>Thank you, ${fullname}!</h2>
+
+                        <p>We have successfully received your room inquiry.</p>
+
+                        <p><strong>Reference Number:</strong> ${reference_number}</p>
+                        <p><strong>Room ID:</strong> ${room_uuid}</p>
+                        <p><strong>Room:</strong> ${roomName.title}</p>
+                        <p><strong>Target Move-In date:</strong> ${target_move_in}</p>
+                        <p><strong>Months of Stay:</strong> ${months_of_stay}</p>
+
+                        <p>Please keep your Reference Number for future communication regarding this inquiry.</p>
+                        <p>Our property manager will contact you through your mobile number or email address to discuss room availability and the next steps.</p>
+
+                        <p>If you have any questions or need to update your inquiry details, please reply to this email and include your Reference Number.</p>
+
+                        <hr />
+
+                        <p>Thank you for choosing BedSpacio.</p>
+
+                        <p>Best regards,</p>
+                        <p>BedSpacio Team</p>
+                    </div>
+                `
+            }).catch(console.error);
+        } catch (err) {
+            console.error("Email sending failed:", emailError);
+        }
 
         return res.status(200).json({
             success: true,

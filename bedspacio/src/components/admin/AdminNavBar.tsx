@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import { BASE_URL } from "@/config/config"
 
 import Home from '@/asset/icon/home.svg'
 import Profile from '@/asset/icon/profile.svg'
@@ -33,7 +34,6 @@ export default function AdminNavBar () {
     const dropdownRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter(); // navigate to other page
     const user  = useAuth();
-    const base_url='http://localhost:5000'
 
 
     const path = usePathname();
@@ -99,10 +99,12 @@ export default function AdminNavBar () {
 
                     <Link href="/admin/inquiry" className={`flex flex-col items-center justify-center p-2 xl:p-6 lg:p-6 whitespace-nowrap text-[#FAFAFA] font-bold hover:bg-[#1D242B]/25 transition-all duration-100  ${path.startsWith('/admin/inquiry') && 'bg-[#1D242B]'}`}>Inquiry</Link>
 
-                    <Link href="/admin/content" className={`flex flex-col items-center justify-center p-2 xl:p-6 lg:p-6 whitespace-nowrap text-[#FAFAFA] font-bold hover:bg-[#1D242B]/25 transition-all duration-100  ${path.startsWith('/admin/content') && 'bg-[#1D242B]'}`}>Content</Link>
-
                     {user?.role === 'admin' && (
-                        <Link href="/admin/manage" className={`flex flex-col items-center justify-center p-2 xl:p-6 lg:p-6 whitespace-nowrap text-[#FAFAFA] font-bold hover:bg-[#1D242B]/25 transition-all duration-100  ${path === '/admin/manage' && 'bg-[#1D242B]'}`}>Manage</Link>
+                        <>
+                            <Link href="/admin/content" className={`flex flex-col items-center justify-center p-2 xl:p-6 lg:p-6 whitespace-nowrap text-[#FAFAFA] font-bold hover:bg-[#1D242B]/25 transition-all duration-100  ${path.startsWith('/admin/content') && 'bg-[#1D242B]'}`}>Content</Link>
+
+                            <Link href="/admin/manage" className={`flex flex-col items-center justify-center p-2 xl:p-6 lg:p-6 whitespace-nowrap text-[#FAFAFA] font-bold hover:bg-[#1D242B]/25 transition-all duration-100  ${path === '/admin/manage' && 'bg-[#1D242B]'}`}>Manage</Link>
+                        </>
                     )}
 
                 </div>
@@ -116,7 +118,7 @@ export default function AdminNavBar () {
                     </div>
                     <div className="flex items-center justify-center rounded-full w-[35px] h-[35px] rounded-full overflow-hidden bg-[#CCC]/50">  
                         {user?.profile_image ? (
-                            <img src={`${base_url}/file/user/${user?.profile_image}`} alt="profile image" className="w-full h-full object-cover"/>
+                            <img src={user?.profile_image} alt="profile image" className="w-full h-full object-cover"/>
                         ) : (
                             <div className="scale-25 bg-[#FAFAFA]">
                                 <DefaultAvatar name={user?.fullname} />

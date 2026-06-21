@@ -27,11 +27,11 @@ export default function ImageFullView ({ selectedImage, totalImage, onClose, vie
             )}
             <div className="relative flex items-center justify-center w-[1000px] h-[700px]">
 
-                <button onClick={onClose} className="absolute top-4 right-4 flex items-center gap-1 bg-[#FAFAFA] text-[#1D242B] text-[18px] font-bold px-3 py-1 rounded-full cursor-pointer opacity-50 hover:opacity-100 active:bg-[#1D242B] active:text-[#FAFAFA]">
+                <button onClick={onClose} className="absolute top-4 right-4 flex items-center gap-1 bg-[#FAFAFA] text-[#1D242B] text-[18px] font-bold px-3 py-1 rounded-full cursor-pointer opacity-100 active:bg-[#1D242B] active:text-[#FAFAFA]">
                     <CloseImage className="w-[20px] h-[20px]"/>
                     close
                 </button>
-                <img src={`${selectedImage}`} alt="room image" className="w-full h-full object-cover rounded-[10px]"/>
+                <img src={selectedImage} alt="room image" className="w-full h-full object-cover rounded-[10px]"/>
             </div>
         </div>
     )

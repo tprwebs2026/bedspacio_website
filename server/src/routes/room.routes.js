@@ -2,11 +2,11 @@ import express from 'express';
 import axios from 'axios'
 import { db } from '../config/database.js';
 import { requireAuth } from '../middleware/auth.js';
-import { roomImage } from '../middleware/multer.js';
 import { customAlphabet } from 'nanoid'
 
-import fs from 'fs/promises'
-import path from 'path'
+import { roomImage } from '../middleware/multer.js';
+import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
+import { deleteFromCloudinary } from '../utils/deleteFromCloudinary.js';
 
 const roomRoute = express.Router();
 
@@ -83,16 +83,33 @@ roomRoute.post('/v1/new-room', requireAuth, roomImage.array('room_image', 6), as
                     )
                 ),
 
-                ...req.files.map((img, index) =>
+                ...req.files.map(async (img, index) => {
+
+                    const imageUpload = await uploadToCloudinary(
+                        img,
+                        `bedspacio/room/room-${createdRoom.room_uuid}`
+                    )
+
                     t.none(
                         `
-                        INSERT INTO room_images
-                        (room_id, image_url, sort_order)
-                        VALUES ($1, $2, $3)
+                        INSERT INTO room_images (
+                            room_id, 
+                            image_url, 
+                            sort_order, 
+                            public_id
+                        )
+                        VALUES (
+                            $1, $2, $3, $4
+                        )
                         `,
-                        [createdRoom.id, img.filename, index + 1]
+                        [
+                            createdRoom.id, 
+                            imageUpload.secure_url, 
+                            index + 1, 
+                            imageUpload.public_id
+                        ]
                     )
-                )
+                })
             ]);
 
             if (type === 'bedspace') {
@@ -105,7 +122,7 @@ roomRoute.post('/v1/new-room', requireAuth, roomImage.array('room_image', 6), as
                         upper_deck_available,
                         lower_deck_available
                     )
-                    VALUES ($1,$2,$3,$4,$5)
+                    VALUES ( $1,$2,$3,$4,$5 )
                     `,
                     [
                         createdRoom.id,
@@ -146,13 +163,12 @@ roomRoute.patch(
             }
 
             const room = await db.one(
-                `SELECT EXISTS(
-                    SELECT 1 FROM rooms WHERE id = $1
-                ) AS exists`,
+                `SELECT * FROM rooms WHERE id = $1
+                `,
                 [id]
             );
 
-            if (!room.exists) {
+            if (!room) {
                 return res.status(404).json({
                     success: false,
                     message: 'Room not found'
@@ -203,13 +219,84 @@ roomRoute.patch(
                 );
             }
 
-            const hasBedspaceConfig =
-                upper_deck_total?.trim() !== '' &&
-                lower_deck_total?.trim() !== '' &&
-                upper_deck_available?.trim() !== '' &&
-                lower_deck_available?.trim() !== '';
+            // const hasBedspaceConfig =
+            //     upper_deck_total?.trim() !== '' &&
+            //     lower_deck_total?.trim() !== '' &&
+            //     upper_deck_available?.trim() !== '' &&
+            //     lower_deck_available?.trim() !== '';
 
-            if (hasBedspaceConfig && roomUpdates.type !== 'apartment') {
+            // if (hasBedspaceConfig && roomUpdates.type !== 'apartment') {
+            //     await db.none(
+            //         `
+            //         INSERT INTO bedspace_configs (
+            //             room_id,
+            //             upper_deck_total,
+            //             lower_deck_total,
+            //             upper_deck_available,
+            //             lower_deck_available
+            //         )
+            //         VALUES ($1, $2, $3, $4, $5)
+
+            //         ON CONFLICT (room_id)
+            //         DO UPDATE SET
+            //             upper_deck_total = EXCLUDED.upper_deck_total,
+            //             lower_deck_total = EXCLUDED.lower_deck_total,
+            //             upper_deck_available = EXCLUDED.upper_deck_available,
+            //             lower_deck_available = EXCLUDED.lower_deck_available
+            //         `,
+            //         [
+            //             id,
+            //             Number(upper_deck_total),
+            //             Number(lower_deck_total),
+            //             Number(upper_deck_available),
+            //             Number(lower_deck_available)
+            //         ]
+            //     );
+
+            //     const computedCapacity =
+            //         Number(upper_deck_total) + Number(lower_deck_total);
+
+            //     const computedSlot =
+            //         Number(upper_deck_available) + Number(lower_deck_available);
+
+            //     await db.none(
+            //         `
+            //         UPDATE rooms
+            //         SET
+            //             capacity = $1,
+            //             slot = $2
+            //         WHERE id = $3
+            //         `,
+            //         [computedCapacity, computedSlot, id]
+            //     );
+            // }
+
+            const finalRoomType = roomUpdates.type || room.type;
+
+            const hasBedspaceFields =
+                upper_deck_total !== undefined &&
+                lower_deck_total !== undefined &&
+                upper_deck_available !== undefined &&
+                lower_deck_available !== undefined;
+            
+            if (finalRoomType === 'bedspace' && hasBedspaceFields) {
+                const upperTotal = Number(upper_deck_total);
+                const lowerTotal = Number(lower_deck_total);
+                const upperAvailable = Number(upper_deck_available);
+                const lowerAvailable = Number(lower_deck_available);
+
+                if (
+                    Number.isNaN(upperTotal) ||
+                    Number.isNaN(lowerTotal) ||
+                    Number.isNaN(upperAvailable) ||
+                    Number.isNaN(lowerAvailable)
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Invalid bedspace configuration values'
+                    });
+                }
+
                 await db.none(
                     `
                     INSERT INTO bedspace_configs (
@@ -230,18 +317,18 @@ roomRoute.patch(
                     `,
                     [
                         id,
-                        Number(upper_deck_total),
-                        Number(lower_deck_total),
-                        Number(upper_deck_available),
-                        Number(lower_deck_available)
+                        upperTotal,
+                        lowerTotal,
+                        upperAvailable,
+                        lowerAvailable
                     ]
                 );
 
                 const computedCapacity =
-                    Number(upper_deck_total) + Number(lower_deck_total);
+                    upperTotal + lowerTotal;
 
                 const computedSlot =
-                    Number(upper_deck_available) + Number(lower_deck_available);
+                    upperAvailable + lowerAvailable;
 
                 await db.none(
                     `
@@ -251,11 +338,13 @@ roomRoute.patch(
                         slot = $2
                     WHERE id = $3
                     `,
-                    [computedCapacity, computedSlot, id]
+                    [
+                        computedCapacity,
+                        computedSlot,
+                        id
+                    ]
                 );
             }
-
-            
 
             // Update inclusions
             if (inclusions) {
@@ -300,23 +389,15 @@ roomRoute.patch(
 
             // Delete removed images
             for (const img of currentImages) {
-                if (!existingImages.includes(img.image_url)) {
-                    const imagePath = path.join(
-                        process.cwd(),
-                        'file/room/image',
-                        img.image_url
-                    );
-
-                    try {
-                        await fs.unlink(imagePath);
-                    } catch (err) {
-                        console.error(err.message);
-                    }
+                if (!existingImages.includes(img.public_id)) {
+                    await deleteFromCloudinary(
+                        img.public_id
+                    )
 
                     await db.none(
                         `
-                        DELETE FROM room_images
-                        WHERE id = $1
+                            DELETE FROM room_images
+                            WHERE id = $1
                         `,
                         [img.id]
                     );
@@ -328,20 +409,26 @@ roomRoute.patch(
                 const currentCount = existingImages.length;
 
                 await Promise.all(
-                    req.files.map((img, index) =>
-                        db.none(
+                    req.files.map(async (img, index) =>{
+                        const imageUpload = await uploadToCloudinary(
+                            img,
+                            `bedspacio/room/room-${room.room_uuid}`
+                        )
+                        
+                        await db.none(
                             `
                             INSERT INTO room_images
-                            (room_id, image_url, sort_order)
-                            VALUES ($1, $2, $3)
+                            (room_id, image_url, sort_order, public_id)
+                            VALUES ($1, $2, $3, $4)
                             `,
                             [
                                 id,
-                                img.filename,
-                                currentCount + index + 1
+                                imageUpload.secure_url,
+                                currentCount + index + 1,
+                                imageUpload.public_id
                             ]
                         )
-                    )
+                    })
                 );
             }
 
@@ -388,18 +475,9 @@ roomRoute.delete('/v1/:id/info', requireAuth, async (req, res) => {
         );
 
         for (const images of room_images) {
-            const old_images = path.join(
-                process.cwd(),
-                'file/room/image',
-                images.image_url
-            );
-
-            try {
-                await fs.unlink(old_images);
-                console.log('Image deleted: ', old_images);
-            } catch (err) {
-                console.log('Failed to delete image: ', err.message);
-            }
+            await deleteFromCloudinary(
+                images.public_id
+            )
         }
         
         await db.none(
@@ -429,61 +507,6 @@ roomRoute.delete('/v1/:id/info', requireAuth, async (req, res) => {
     }
 })
 
-
-
-// 'GET' REQUEST WITH NO SEARCH PARAMS FOR room_uuid, title, branch and type of room
-/*
-roomRoute.get('/v1/admin/all', async (req, res) => {
-    try {
-
-        const branch = req.query.branch
-        const page = Number(req.query.page) || 1;
-        const limit = 10;
-        const offset = (page - 1) * limit;
-
-        const allRooms = await db.manyOrNone(
-            `SELECT
-                r.id, 
-                r.room_uuid,
-                r.title,
-                r.branch_id,
-                r.type,
-                r.slot,
-                r.price,
-                br.name as branch
-            FROM rooms r
-            JOIN branches br ON br.id = r.branch_id
-            ORDER BY r.created_at DESC
-            LIMIT $1 OFFSET $2;
-            `, [ limit, offset ]
-        );
-
-        const totalRooms = await db.one(
-            `SELECT COUNT(*) FROM rooms`
-        );
-
-        const totalPage = Math.ceil(Number(totalRooms.count) / limit)
-
-
-        if (allRooms.length === 0) {
-            return res.status(200).json({
-                message: 'No data found for rooms',
-                data: []
-            });
-        }
-
-        return res.status(200).json({
-            data: allRooms,
-            currentPage: page,
-            totalPage: totalPage
-        })
-
-    } catch (err) {
-        console.error('Error retrieving rooms: ', err);
-        return res.status(500).json({ message: 'Internal server error' })
-    }
-})
-*/
 
 roomRoute.get('/v1/admin/all', async (req, res) => {
     try {
@@ -596,7 +619,8 @@ roomRoute.get('/v1/:room_uuid/info', async (req, res) => {
                         json_agg(
                             jsonb_build_object(
                                 'id', id,
-                                'image', image_url
+                                'image', image_url,
+                                'public_id', public_id
                             )
                             ORDER BY sort_order
                         ) AS images

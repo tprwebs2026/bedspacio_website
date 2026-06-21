@@ -1,10 +1,10 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
-import fs from 'fs/promises'
-import path from 'path'
 
 import { db } from '../config/database.js';
 import { branchImage } from '../middleware/multer.js';
+import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
+import { deleteFromCloudinary } from '../utils/deleteFromCloudinary.js';
 
 const branchRoute = express.Router();
 
@@ -20,17 +20,45 @@ branchRoute.post('/v1/new', requireAuth, branchImage.single('branch_image'), asy
     try {
         const { name, address, userId } = req.body;
         const landmarks = JSON.parse(req.body.landmarks);
-        const image_file = req.file.filename;
 
+        const branch_image = req.file;
+        
+        const imageUpload = await uploadToCloudinary(
+            branch_image,
+            'bedspacio/branch'
+        );
+
+        const image_url = imageUpload.secure_url;
+        const public_id = imageUpload.public_id;
 
         const result = await db.tx(async (t) => {
 
             // 1. Insert branch
             const branch = await t.one(
-                `INSERT INTO branches (name, address, property_manager_id, branch_image)
-                    VALUES ($1, $2, $3, $4)
-                    RETURNING id`,
-                [name, address, userId, image_file]
+                `
+                INSERT INTO branches (
+                    name, 
+                    address, 
+                    property_manager_id, 
+                    branch_image,
+                    branch_public_id
+                )
+                VALUES (
+                    $1, 
+                    $2, 
+                    $3, 
+                    $4,
+                    $5
+                )
+                RETURNING id
+                `,
+                [
+                    name, 
+                    address, 
+                    userId, 
+                    image_url,
+                    public_id
+                ]
             );
 
             // 2. Insert landmarks (ignore duplicates)
@@ -79,16 +107,14 @@ branchRoute.post('/v1/new', requireAuth, branchImage.single('branch_image'), asy
 
 branchRoute.get('/v1/all', async (req, res) => {
     try {
-
-        // get name, address, landmarks, property manager
-
         const response = await db.manyOrNone(
             `SELECT 
                 b.id,
                 b.name AS branch_name,
                 b.branch_image AS image,
                 b.address,
-                u.fullname AS property_manager
+                u.fullname AS property_manager,
+                u.profile_image
             FROM branches b
             JOIN users u 
                 ON u.id = b.property_manager_id
@@ -97,7 +123,8 @@ branchRoute.get('/v1/all', async (req, res) => {
                 b.name, 
                 b.branch_image,
                 b.address, 
-                u.fullname
+                u.fullname,
+                u.profile_image
             ORDER BY id ASC
             `
         );
@@ -240,27 +267,28 @@ branchRoute.delete('/v1/:id', requireAuth, async (req, res) => {
         const id = Number(req.params.id);
 
         const deletedBranch = await db.oneOrNone(
-            `DELETE FROM branches WHERE id = $1
-            RETURNING name, branch_image;`, [id]
+            `
+            DELETE FROM branches 
+            WHERE 
+                id = $1
+            RETURNING 
+                name, 
+                branch_image,
+                branch_public_id`, 
+            [ id ]
         );
         
         if (!deletedBranch) {
-            return res.status(404).json({ message: 'branch not found' })
+            return res.status(404).json({ 
+                success: false,
+                message: 'branch not found' 
+            })
         }
 
-        if (deletedBranch.branch_image) {
-            const image_path = path.join(
-                process.cwd(),
-                'file/branch/image',
-                deletedBranch.branch_image
+        if (deletedBranch.branch_public_id) {
+            await deleteFromCloudinary(
+                deletedBranch.branch_public_id
             );
-
-            try {
-                await fs.unlink(image_path);
-                console.log('Image deleted: ', image_path);
-            } catch (err) {
-                console.log('Failed to delete image: ', err.message);
-            }
         }
 
         await db.none(`
@@ -287,97 +315,11 @@ branchRoute.delete('/v1/:id', requireAuth, async (req, res) => {
 });
 
 
-// branchRoute.patch('/v1/:id', requireAuth, branchImage.single('branch_image'), async (req, res) => {
-//     try {
-//         const branch_id = Number(req.params.id);
-
-//         const branch = await db.oneOrNone(
-//             `SELECT * FROM branches WHERE id = $1`,
-//             [branch_id]
-//         );
-
-//         if (!branch) return res.status(404).json({ message: 'branch not found' });
-
-//         const {landmarks: rawLandmarks, ...branchUpdates} = req.body;
-//         const landmarks = rawLandmarks ? JSON.parse(rawLandmarks) : [];
-//         console.log(req.file);
-
-//         if (req.file) {
-//             if (branch.branch_image) {
-//                 const old_image_path = path.join(
-//                     process.cwd(),
-//                     'file/branch/image',
-//                     branch.branch_image
-//                 );
-
-//                 try {
-//                     await fs.unlink(old_image_path);
-//                     console.log('Removed: ', old_image_path);
-//                 } catch (err) {
-//                     console.error(err.message);
-//                 }
-//             };
-
-//             branchUpdates.branch_image = req.file.filename;
-//         }
-
-//         if ((Object.keys(branchUpdates)).length > 0) {
-//             const keys = Object.keys(branchUpdates);
-
-//             const setBranchClause = keys
-//                 .map((key, index) => `${key} = $${index + 1}`)
-//                 .join(', ');
-            
-//             const values = keys.map(key => branchUpdates[key]);
-//             console.log('values: ', values);
-
-//             await db.oneOrNone(`
-//                 UPDATE branches
-//                 SET ${setBranchClause}
-//                 WHERE id = $${keys.length + 1}    
-//                 RETURNING *
-//             `, [...values, branch_id]);
-//         } 
-
-//         if (landmarks?.length) {
-//             for (const lm of landmarks) {
-//                 if (lm.id) {
-//                     await db.none(`
-//                         UPDATE landmarks
-//                         SET landmark = $1
-//                         WHERE id = $2
-//                     `, [lm.landmark, lm.id]);
-//                 } else {
-//                     const newLandmark = await db.one(`
-//                         INSERT INTO landmarks (landmark)
-//                         VALUES ($1)
-//                         RETURNING id
-//                     `, [lm.landmark]);
-
-//                     await db.none(`
-//                         INSERT INTO branch_landmarks (branch_id, landmark_id)
-//                         VALUES ($1, $2)
-//                     `, [branch_id, newLandmark.id]);
-//                 }
-//             }
-//         }
-
-//         return res.status(200).json({ success: true });
-
-//     } catch (err) {
-//         console.error('Error updating branch: ', err);
-
-//         return res.status(500).json({
-//             succes: false,
-//             message: 'internal server error'
-//         })
-//     }
-// })
-
 
 branchRoute.patch('/v1/:id', requireAuth, branchImage.single('branch_image'), async (req, res) => {
     try {
         const branch_id = Number(req.params.id);
+        const branch_image = req.file;
 
         const branch = await db.oneOrNone(
             `SELECT * FROM branches WHERE id = $1`,
@@ -389,28 +331,28 @@ branchRoute.patch('/v1/:id', requireAuth, branchImage.single('branch_image'), as
         }
 
         const { landmarks: rawLandmarks, ...branchUpdates } = req.body;
+
         const landmarksProvided = rawLandmarks !== undefined;
         const landmarks = landmarksProvided
             ? JSON.parse(rawLandmarks)
             : null;
 
-        if (req.file) {
-            if (branch.branch_image) {
-                const oldImagePath = path.join(
-                    process.cwd(),
-                    'file/branch/image',
-                    branch.branch_image
+        if (branch_image) {
+            if (branch.branch_public_id) {
+                await deleteFromCloudinary(
+                    branch.branch_public_id
                 );
+            };
 
-                try {
-                    await fs.unlink(oldImagePath);
-                } catch (err) {
-                    console.error(err.message);
-                }
-            }
+            const uploadImage = await uploadToCloudinary(
+                branch_image,
+                'bedspacio/branch'
+            );
 
-            branchUpdates.branch_image = req.file.filename;
+            branchUpdates.branch_image = uploadImage.secure_url;
+            branchUpdates.branch_public_id = uploadImage.public_id;
         }
+
 
         if (Object.keys(branchUpdates).length > 0) {
             const keys = Object.keys(branchUpdates);

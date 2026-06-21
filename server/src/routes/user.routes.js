@@ -2,12 +2,12 @@ import express from 'express';
 import { db } from '../config/database.js';
 import { requireAuth } from '../middleware/auth.js';
 import bcrypt from 'bcrypt';
+
 import { generatePassword } from '../utils/generatePassword.js';
 import { userImage } from '../middleware/multer.js';
 
-import fs from 'fs/promises'
-import path from 'path'
-
+import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
+import { deleteFromCloudinary } from '../utils/deleteFromCloudinary.js';
 
 const userRoute = express.Router();
 
@@ -232,6 +232,7 @@ userRoute.patch('/v1/profile/:id', requireAuth, userImage.single('profile_image'
         // set update for all fields inside 'users' table (mainly for image)
 
         const id = Number(req.params.id);
+        const user_image = req.file;
 
         const user = await db.oneOrNone(
             `SELECT * FROM users WHERE id = $1`,
@@ -243,23 +244,20 @@ userRoute.patch('/v1/profile/:id', requireAuth, userImage.single('profile_image'
         const { ...userUpdates } = req.body;
 
 
-        if (req.file) {
-            if (user.profile_image) {
-                const old_image = path.join(
-                    process.cwd(),
-                    'file/user',
-                    user.profile_image
-                );
-
-                try {
-                    await fs.unlink(old_image);
-                    console.log('Replaced: ', old_image);
-                } catch (err) {
-                    console.error(err.message);
-                } 
+        if (user_image) {
+            if (user?.user_public_id) {
+                await deleteFromCloudinary(
+                    user.user_public_id
+                )
             };
 
-            userUpdates.profile_image = req.file.filename
+            const imageUpload = await uploadToCloudinary(
+                user_image,
+                'bedspacio/user'
+            );
+
+            userUpdates.profile_image = imageUpload.secure_url;
+            userUpdates.user_public_id = imageUpload.public_id;
         }
 
         if ((Object.keys(userUpdates).length > 0)) {
@@ -272,18 +270,19 @@ userRoute.patch('/v1/profile/:id', requireAuth, userImage.single('profile_image'
             const values = keys.map(key => userUpdates[key])
             console.log('Values updated to user: ', values);
 
-            await db.oneOrNone(
+            const result = await db.oneOrNone(
                 `UPDATE users 
                 SET ${setUserClause}
                 WHERE id = $${keys.length + 1}
                 RETURNING *`,
                 [...values, user.id]
             )
+
+            return res.status(200).json({ 
+                success: true,
+                data: result 
+            })
         };
-
-        return res.status(200).json({ success: true })
-
-
     } catch (err) {
         console.error('Error updating user profile: ', err);
 

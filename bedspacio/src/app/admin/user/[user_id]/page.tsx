@@ -21,9 +21,11 @@ export default function UserProfile () {
     const [username, setUsername] = useState<string | undefined>(user?.username);
     const [imageBlob, setImageBlob] = useState<File | null>(null); 
     const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
+    const [updatedProfileImage, setUpdatedProfileImage] = useState<string>(user?.profile_image)
 
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
 
     const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
 
@@ -72,16 +74,11 @@ export default function UserProfile () {
         }
     }
 
-    const imageSrc = 
-        imagePreview ||
-        (user?.profile_image
-            ? `${BASE_URL}/file/user/${user?.profile_image}`
-            : undefined
-        ) 
+    
 
 
     const handleProfileChange = async (id: number) => {
-        console.log('Click');
+        setLoading(true);
         try {
             const profileData = new FormData();
 
@@ -104,6 +101,10 @@ export default function UserProfile () {
                 profileData, { withCredentials: true }
             );
 
+            setUpdatedProfileImage(user_updated.data.data.profile_image);
+            setImagePreview(undefined);
+            setImageBlob(null);
+
             console.log('User profile updated: ', user_updated);
             setSuccess('Update successful');
 
@@ -111,8 +112,17 @@ export default function UserProfile () {
 
         } catch (err) {
             console.error('Error uploading image: ', err);
+        } finally {
+            setLoading(false);
         }
     }
+
+    const imageSrc = 
+        imagePreview ||
+        (updatedProfileImage
+            ? updatedProfileImage
+            : undefined
+        ) 
     
 
     const checkChanges = fullname !== user?.fullname || username !== user?.username || imageBlob;
@@ -182,7 +192,7 @@ export default function UserProfile () {
 
                         <div className="flex items-center justify-center w-full gap-2" >
                             {checkChanges && (
-                                <button onClick={() => handleProfileChange(user?.id)} className='bg-[#0077C0] text-[#FAFAFA] p-2 px-4 rounded-[10px] hover:bg-[#0077C0]/75 active:bg-[#0077C0] cursor-pointer'>Update</button>
+                                <button onClick={() => handleProfileChange(user?.id)} className='bg-[#0077C0] text-[#FAFAFA] py-3 w-full rounded-[10px] hover:bg-[#0077C0]/75 active:bg-[#0077C0] cursor-pointer'>{loading ? 'Updating...' : 'Update'}</button>
                             )}
                         </div>
                     </div>

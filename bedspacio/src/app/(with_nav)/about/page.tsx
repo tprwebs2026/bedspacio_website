@@ -15,7 +15,7 @@ import { DefaultAvatar } from '@/app/admin/manage/DefaultAvatar'
 
 
 import { Metadata } from "next"
-import { getAboutUsPageBanner } from '../../../../lib/content'
+import { getAboutUsHistoryImage, getAboutUsPageBanner, getAboutUsWhoWeAreImage } from '../../../../lib/content'
 
 export const metadata: Metadata = {
     title: "About Us | BedSpacio",
@@ -25,13 +25,15 @@ export const metadata: Metadata = {
 export default async function About() {
     const managers = await getPropertyManagers();
     const BannerImage = await getAboutUsPageBanner();
+    const whoWeAreImage = await getAboutUsWhoWeAreImage();
+    const historyImage = await getAboutUsHistoryImage();
     
     return (
         <div className="flex flex-col items-center justify-start min-h-screen w-auto">
 
             <section className="relative flex items-center justify-center w-full h-screen xl:h-[300px] lg:h-[300px] bg-[#1D242B] overflow-hidden">
                 <div className="absolute flex items-center w-full inset-0 opacity-25">
-                    <img src={`${BASE_URL}/file/content/about-us/${BannerImage?.asset_url}`} alt="about-us-header" className='w-full h-full object-cover' />
+                    <img src={BannerImage?.asset_url} alt="about-us-header" className='w-full h-full object-cover' />
                 </div>
 
                 <div className="absolute flex flex-col items-center justify-center">
@@ -50,7 +52,7 @@ export default async function About() {
                     </div>
 
                     <div className="flex items-center justify-center bg-[#C7EEFF] rounded-[10px] min-h-[400px] overflow-hidden">
-                        <img src="/image/BedSpacio.png" alt="" className='w-full h-full object-cover' />
+                        <img src={whoWeAreImage?.asset_url} alt={whoWeAreImage?.asset_name} className='w-full h-full object-cover' />
                     </div>
                 </section>
 
@@ -60,7 +62,7 @@ export default async function About() {
 
                     <div className="flex items-center gap-[1rem] h-[350px] w-full rounded-[15px] overflow-x-auto">
                         <div className="bg-[#C7EEFF] w-full xl:w-full lg:w-full h-full rounded-[15px]">
-                            <img src="/image/history.jpg" alt="" className='w-full h-full object-cover' />
+                            <img src={historyImage?.asset_url} alt={historyImage?.asset_name} className='w-full h-full object-cover' />
                         </div>
                     </div>
                 </section>
@@ -99,7 +101,7 @@ export default async function About() {
                             <div key={manager.id} className="flex flex-col gap-[1rem] items-center justify-center">
                                 <div className="flex items-center justify-center w-[150px] h-[150px] xl:w-[300px] xl:h-[300px] rounded-full bg-[#C7EEFF] overflow-hidden">
                                     {manager.profile_image ? (
-                                        <img src={`${BASE_URL}/file/user/${manager.id}`} alt="" className='w-full h-full object-cover' />
+                                        <img src={manager.profile_image} alt="" className='w-full h-full object-cover' />
                                     ) : (
                                         <DefaultAvatar name={manager.fullname}/>
                                     )}
